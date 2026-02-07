@@ -1,49 +1,50 @@
+```bash
 #!/usr/bin/env bash
-# 生成写作任务
+# Генерация задач для написания
 
 set -e
 
-# 加载通用函数
+# Загрузка общих функций
 SCRIPT_DIR=$(dirname "$0")
 source "$SCRIPT_DIR/common.sh"
 
-# 获取当前故事目录
+# Получение текущей директории истории
 STORY_DIR=$(get_current_story)
 
 if [ -z "$STORY_DIR" ]; then
-    echo "错误: 未找到故事项目" >&2
+    echo "Ошибка: Проект истории не найден" >&2
     exit 1
 fi
 
-# 检查前置条件
+# Проверка предварительных условий
 if [ ! -f "$STORY_DIR/specification.md" ]; then
-    echo "错误: 未找到故事规格，请先使用 /specify 命令" >&2
+    echo "Ошибка: Спецификация истории не найдена, пожалуйста, сначала используйте команду /specify" >&2
     exit 1
 fi
 
 if [ ! -f "$STORY_DIR/outline.md" ]; then
-    echo "错误: 未找到章节规划，请先使用 /outline 命令" >&2
+    echo "Ошибка: План глав не найден, пожалуйста, сначала используйте команду /outline" >&2
     exit 1
 fi
 
-# 获取当前日期
+# Получение текущей даты
 CURRENT_DATE=$(date '+%Y-%m-%d')
 CURRENT_DATETIME=$(date '+%Y-%m-%d %H:%M:%S')
 
-# 创建任务文件，预先填充基础信息
+# Создание файла задач с предварительным заполнением основной информации
 TASKS_FILE="$STORY_DIR/tasks.md"
 cat > "$TASKS_FILE" << EOF
-# 写作任务清单
+# Список задач для написания
 
-## 任务概览
-- **创建日期**：${CURRENT_DATE}
-- **最后更新**：${CURRENT_DATE}
-- **任务状态**：待生成
+## Обзор задач
+- **Дата создания**：${CURRENT_DATE}
+- **Последнее обновление**：${CURRENT_DATE}
+- **Статус задач**：К генерации
 
 ---
 EOF
 
-# 创建进度追踪文件
+# Создание файла отслеживания прогресса
 PROGRESS_FILE="$STORY_DIR/progress.json"
 if [ ! -f "$PROGRESS_FILE" ]; then
     cat > "$PROGRESS_FILE" << EOF
@@ -58,8 +59,9 @@ if [ ! -f "$PROGRESS_FILE" ]; then
 EOF
 fi
 
-# 输出结果
+# Вывод результата
 echo "TASKS_FILE: $TASKS_FILE"
 echo "PROGRESS_FILE: $PROGRESS_FILE"
 echo "CURRENT_DATE: $CURRENT_DATE"
 echo "STATUS: ready"
+```

@@ -1,22 +1,23 @@
+```bash
 #!/usr/bin/env bash
 set -euo pipefail
 
 # generate-commands.sh
-# 基于 spec-kit 架构，为 novel-writer 生成多平台命令
-# 支持命名空间以避免与 spec-kit 冲突
+# На основе архитектуры spec-kit, генерирует команды для novel-writer для различных платформ
+# Поддерживает пространства имен для предотвращения конфликтов с spec-kit
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
-echo "🔨 Novel Writer 命令构建系统"
+echo "🔨 Система сборки команд Novel Writer"
 echo "================================"
 
-# 清理旧的构建产物
+# Очистка старых артефактов сборки
 rm -rf "$PROJECT_ROOT/dist"
 mkdir -p "$PROJECT_ROOT/dist"
 
-# 路径重写函数（将相对路径转换为 .specify/ 路径）
-# 使用临时标记保护已经正确的 .specify/ 路径，避免重复添加前缀
+# Функция переписывания путей (преобразует относительные пути в пути .specify/)
+# Использует временные маркеры для защиты уже корректных путей .specify/, чтобы избежать повторного добавления префикса
 rewrite_paths() {
   sed -E \
     -e 's@\.specify/memory/@__SPECIFY_MEMORY__@g' \
@@ -30,19 +31,19 @@ rewrite_paths() {
     -e 's@__SPECIFY_TEMPLATES__@.specify/templates/@g'
 }
 
-# 核心函数：生成命令文件
+# Основная функция: генерация файлов команд
 generate_commands() {
   local agent=$1           # claude, gemini, cursor, windsurf, roocode
-  local ext=$2             # md 或 toml
-  local arg_format=$3      # $ARGUMENTS 或 {{args}}
-  local output_dir=$4      # 输出目录
-  local script_variant=$5  # sh 或 ps
-  local namespace=$6       # 命名空间前缀（如 "novel."）
-  local frontmatter_type=$7 # full, partial, minimal, none (Markdown frontmatter 类型)
+  local ext=$2             # md или toml
+  local arg_format=$3      # $ARGUMENTS или {{args}}
+  local output_dir=$4      # выходной каталог
+  local script_variant=$5  # sh или ps
+  local namespace=$6       # префикс пространства имен (например, "novel.")
+  local frontmatter_type=$7 # full, partial, minimal, none (тип frontmatter для Markdown)
 
   mkdir -p "$output_dir"
 
-  echo "  📝 生成 $agent 命令 ($script_variant 脚本, frontmatter: $frontmatter_type)..."
+  echo "  📝 Генерация команд для $agent ($script_variant скрипт, frontmatter: $frontmatter_type)..."
 
   for template in "$PROJECT_ROOT/templates/commands"/*.md; do
     [[ -f "$template" ]] || continue
@@ -50,25 +51,25 @@ generate_commands() {
     local name description argument_hint script_command body prompt_body
     name=$(basename "$template" .md)
 
-    # 规范化行尾
+    # Нормализация окончания строк
     file_content=$(tr -d '\r' < "$template")
 
-    # 提取 frontmatter 字段
+    # Извлечение полей frontmatter
     description=$(printf '%s\n' "$file_content" | awk '/^description:/ {sub(/^description:[[:space:]]*/, ""); print; exit}')
     argument_hint=$(printf '%s\n' "$file_content" | awk '/^argument-hint:/ {sub(/^argument-hint:[[:space:]]*/, ""); print; exit}')
 
-    # 提取对应脚本变体的命令
+    # Извлечение команды для соответствующего варианта скрипта
     script_command=$(printf '%s\n' "$file_content" | awk -v sv="$script_variant" '/^[[:space:]]*'"$script_variant"':[[:space:]]*/ {sub(/^[[:space:]]*'"$script_variant"':[[:space:]]*/, ""); print; exit}')
 
     if [[ -z $script_command ]]; then
-      echo "    ⚠️  警告: $template 中未找到 $script_variant 脚本" >&2
+      echo "    ⚠️  Предупреждение: скрипт $script_variant не найден в $template" >&2
       script_command="echo 'Missing script command for $script_variant'"
     fi
 
-    # 替换 {SCRIPT} 占位符
+    # Замена плейсхолдера {SCRIPT}
     body=$(printf '%s\n' "$file_content" | sed "s|{SCRIPT}|${script_command}|g")
 
-    # 移除 scripts: section（因为已经替换了）
+    # Удаление секции scripts: (так как она уже заменена)
     body=$(printf '%s\n' "$body" | awk '
       /^---$/ { print; if (++dash_count == 1) in_frontmatter=1; else in_frontmatter=0; next }
       in_frontmatter && /^scripts:$/ { skip_scripts=1; next }
@@ -77,19 +78,19 @@ generate_commands() {
       { print }
     ')
 
-    # 应用其他替换
+    # Применение других замен
     body=$(printf '%s\n' "$body" | sed "s/{ARGS}/$arg_format/g" | sed "s/\$ARGUMENTS/$arg_format/g" | sed "s/__AGENT__/$agent/g" | rewrite_paths)
 
-    # 为 Gemini 提取纯 prompt 内容（移除 YAML frontmatter）
+    # Извлечение чистого содержимого prompt для Gemini (удаление YAML frontmatter)
     prompt_body=$(printf '%s\n' "$body" | awk '
       /^---$/ { if (++dash_count == 2) { in_content=1; next } next }
       in_content { print }
     ')
 
-    # 根据文件格式生成输出
+    # Генерация вывода в зависимости от формата файла
     case $ext in
       toml)
-        # TOML 格式 (Gemini, Qwen) - 只支持 description 和 prompt
+        # Формат TOML (Gemini, Qwen) - поддерживаются только description и prompt
         local output_file="${namespace}${name}.$ext"
         {
           [[ -n "$description" ]] && echo "description = \"$description\""
@@ -100,16 +101,16 @@ generate_commands() {
         } > "$output_dir/$output_file"
         ;;
       md|prompt.md)
-        # Markdown 格式 - 根据 frontmatter_type 生成不同的输出
+        # Формат Markdown - генерация разного вывода в зависимости от frontmatter_type
         local output_file="${namespace}${name}.$ext"
 
         case $frontmatter_type in
           none)
-            # 纯 Markdown，无 frontmatter (Cursor, GitHub Copilot, Codex, Auggie, CodeBuddy, Amazon Q)
+            # Чистый Markdown, без frontmatter (Cursor, GitHub Copilot, Codex, Auggie, CodeBuddy, Amazon Q)
             echo "$prompt_body" > "$output_dir/$output_file"
             ;;
           minimal)
-            # 最小 frontmatter，只有 description (OpenCode)
+            # Минимальный frontmatter, только description (OpenCode)
             {
               echo "---"
               [[ -n "$description" ]] && echo "description: $description"
@@ -119,7 +120,7 @@ generate_commands() {
             } > "$output_dir/$output_file"
             ;;
           partial)
-            # 部分 frontmatter，description + argument-hint (Roo Code, Windsurf, Kilo Code)
+            # Частичный frontmatter, description + argument-hint (Roo Code, Windsurf, Kilo Code)
             {
               echo "---"
               [[ -n "$description" ]] && echo "description: $description"
@@ -130,7 +131,7 @@ generate_commands() {
             } > "$output_dir/$output_file"
             ;;
           full|*)
-            # 完整 frontmatter，包含所有字段 (Claude)
+            # Полный frontmatter, включая все поля (Claude)
             echo "$body" > "$output_dir/$output_file"
             ;;
         esac
@@ -138,10 +139,10 @@ generate_commands() {
     esac
   done
 
-  echo "    ✅ 完成 ($(ls "$output_dir" | wc -l | tr -d ' ') 个文件)"
+  echo "    ✅ Завершено ($(ls "$output_dir" | wc -l | tr -d ' ') файлов)"
 }
 
-# 复制支持文件到构建目录
+# Копирование вспомогательных файлов в каталог сборки
 copy_support_files() {
   local base_dir=$1
   local script_variant=$2
@@ -149,35 +150,35 @@ copy_support_files() {
   local spec_dir="$base_dir/.specify"
   mkdir -p "$spec_dir"
 
-  # 复制 memory 目录（如果存在）
+  # Копирование каталога memory (если существует)
   if [[ -d "$PROJECT_ROOT/memory" ]]; then
     cp -r "$PROJECT_ROOT/memory" "$spec_dir/"
-    echo "    📁 复制 memory/ → .specify/"
+    echo "    📁 Копирование memory/ → .specify/"
   fi
 
-  # 复制对应的脚本变体目录
+  # Копирование соответствующего каталога вариантов скриптов
   if [[ -d "$PROJECT_ROOT/scripts" ]]; then
     mkdir -p "$spec_dir/scripts"
     case $script_variant in
       sh)
         if [[ -d "$PROJECT_ROOT/scripts/bash" ]]; then
           cp -r "$PROJECT_ROOT/scripts/bash" "$spec_dir/scripts/"
-          echo "    📁 复制 scripts/bash/ → .specify/scripts/"
+          echo "    📁 Копирование scripts/bash/ → .specify/scripts/"
         fi
         ;;
       ps)
         if [[ -d "$PROJECT_ROOT/scripts/powershell" ]]; then
           cp -r "$PROJECT_ROOT/scripts/powershell" "$spec_dir/scripts/"
-          echo "    📁 复制 scripts/powershell/ → .specify/scripts/"
+          echo "    📁 Копирование scripts/powershell/ → .specify/scripts/"
         fi
         ;;
     esac
 
-    # 复制顶层脚本文件
+    # Копирование файлов скриптов верхнего уровня
     find "$PROJECT_ROOT/scripts" -maxdepth 1 -type f -exec cp {} "$spec_dir/scripts/" \; 2>/dev/null || true
   fi
 
-  # 复制 templates（排除 commands 目录）
+  # Копирование шаблонов (исключая каталог commands)
   if [[ -d "$PROJECT_ROOT/templates" ]]; then
     mkdir -p "$spec_dir/templates"
     find "$PROJECT_ROOT/templates" -type f -not -path "*/commands/*" -not -path "*/commands-*/*" | while read -r file; do
@@ -186,53 +187,53 @@ copy_support_files() {
       mkdir -p "$target_dir"
       cp "$file" "$target_dir/"
     done
-    echo "    📁 复制 templates/ → .specify/templates/"
+    echo "    📁 Копирование templates/ → .specify/templates/"
   fi
 
-  # 复制 experts 目录（如果存在）
+  # Копирование каталога experts (если существует)
   if [[ -d "$PROJECT_ROOT/experts" ]]; then
     cp -r "$PROJECT_ROOT/experts" "$spec_dir/"
-    echo "    📁 复制 experts/ → .specify/experts/"
+    echo "    📁 Копирование experts/ → .specify/experts/"
   fi
 
-  # 复制 spec 目录（包括 presets、反AI检测规范等）
+  # Копирование каталога spec (включая presets, правила противодействия AI и т. д.)
   if [[ -d "$PROJECT_ROOT/spec" ]]; then
     local target_spec_dir="$base_dir/spec"
     mkdir -p "$target_spec_dir"
 
-    # 复制 spec 目录下的所有内容（但排除 tracking 和 knowledge 的具体内容，保留目录结构）
+    # Копирование всего содержимого каталога spec (но исключая конкретное содержимое tracking и knowledge, сохраняя структуру каталогов)
     for item in "$PROJECT_ROOT/spec"/*; do
       if [[ -e "$item" ]]; then
         item_name=$(basename "$item")
-        # 复制 presets、config.json 等到项目根 spec/
+        # Копирование presets, config.json и т. д. в корень проекта spec/
         if [[ "$item_name" != "tracking" && "$item_name" != "knowledge" ]]; then
           cp -r "$item" "$target_spec_dir/"
         else
-          # tracking 和 knowledge 只创建空目录（模板在 templates/ 中）
+          # Для tracking и knowledge создаются только пустые каталоги (шаблоны находятся в templates/)
           mkdir -p "$target_spec_dir/$item_name"
         fi
       fi
     done
-    echo "    📁 复制 spec/ (presets, config.json 等)"
+    echo "    📁 Копирование spec/ (presets, config.json и т. д.)"
   fi
 }
 
-# 构建特定平台的变体
+# Сборка вариантов для конкретных платформ
 build_variant() {
   local agent=$1
   local script=$2
 
   echo
-  echo "🏗️  构建 $agent ($script 脚本)..."
+  echo "🏗️  Сборка для $agent ($script скрипт)..."
   echo "--------------------------------"
 
   local base_dir="$PROJECT_ROOT/dist/$agent"
   mkdir -p "$base_dir"
 
-  # 复制支持文件
+  # Копирование вспомогательных файлов
   copy_support_files "$base_dir" "$script"
 
-  # 生成命令文件
+  # Генерация файлов команд
   case $agent in
     claude)
       mkdir -p "$base_dir/.claude/commands"
@@ -288,14 +289,14 @@ build_variant() {
       ;;
   esac
 
-  echo "  ✅ $agent 构建完成"
+  echo "  ✅ Сборка для $agent завершена"
 }
 
-# 支持的平台和脚本类型
+# Поддерживаемые платформы и типы скриптов
 ALL_AGENTS=(claude gemini cursor windsurf roocode copilot qwen opencode codex kilocode auggie codebuddy q)
 ALL_SCRIPTS=(sh ps)
 
-# 解析命令行参数
+# Парсинг аргументов командной строки
 AGENTS=()
 SCRIPTS=()
 
@@ -310,38 +311,63 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     --help)
-      echo "用法: $0 [选项]"
+      echo "Использование: $0 [опции]"
       echo
-      echo "选项:"
-      echo "  --agents=AGENT1,AGENT2   指定要构建的平台 (默认: 全部)"
-      echo "                           可选: claude,gemini,cursor,windsurf,roocode,copilot,qwen,opencode,codex,kilocode,auggie,codebuddy,q"
-      echo "  --scripts=SCRIPT1,...    指定脚本类型 (默认: 全部)"
-      echo "                           可选: sh,ps"
-      echo "  --help                   显示此帮助信息"
+      echo "Опции:"
+      echo "  --agents=AGENT1,AGENT2   Указать платформы для сборки (по умолчанию: все)"
+      echo "                           Доступные: claude,gemini,cursor,windsurf,roocode,copilot,qwen,opencode,codex,kilocode,auggie,codebuddy,q"
+      echo "  --scripts=SCRIPT1,...    Указать тип скриптов (по умолчанию: все)"
+      echo "                           Доступные: sh,ps"
+      echo "  --help                   Показать эту справку"
       echo
-      echo "示例:"
-      echo "  $0                                    # 构建所有平台和脚本"
-      echo "  $0 --agents=claude --scripts=sh       # 只构建 Claude (sh)"
-      echo "  $0 --agents=claude,gemini             # 构建 Claude 和 Gemini (所有脚本)"
+      echo "Примеры:"
+      echo "  $0                                    # Сборка всех платформ и скриптов"
+      echo "  $0 --agents=claude --scripts=sh       # Сборка только Claude (sh)"
+      echo "  $0 --agents=claude,gemini             # Сборка Claude и Gemini (все скрипты)"
       exit 0
       ;;
     *)
-      echo "未知参数: $1"
-      echo "使用 --help 查看帮助"
+      echo "Неизвестный аргумент: $1"
       exit 1
       ;;
   esac
 done
 
-# 如果未指定，使用全部
+# Если агенты или скрипты не указаны, использовать все
+if [ ${#AGENTS[@]} -eq 0 ]; then
+  AGENTS=("${ALL_AGENTS[@]}")
+fi
+if [ ${#SCRIPTS[@]} -eq 0 ]; then
+  SCRIPTS=("${ALL_SCRIPTS[@]}")
+fi
+
+# Выполнение сборки для выбранных агентов и скриптов
+for script in "${SCRIPTS[@]}"; do
+  for agent in "${AGENTS[@]}"; do
+    build_variant "$agent" "$script"
+  done
+done
+
+echo
+echo "================================"
+echo "🔨 Сборка завершена!"
+```
+```sh
+      echo "Используйте --help для получения справки"
+      exit 1
+      ;;
+  esac
+done
+
+# Если не указано, используем все
 [[ ${#AGENTS[@]} -eq 0 ]] && AGENTS=("${ALL_AGENTS[@]}")
 [[ ${#SCRIPTS[@]} -eq 0 ]] && SCRIPTS=("${ALL_SCRIPTS[@]}")
 
-echo "📋 构建配置:"
-echo "  平台: ${AGENTS[*]}"
-echo "  脚本: ${SCRIPTS[*]}"
+echo "📋 Конфигурация сборки:"
+echo "  Платформы: ${AGENTS[*]}"
+echo "  Скрипты: ${SCRIPTS[*]}"
 
-# 执行构建
+# Выполнение сборки
 for agent in "${AGENTS[@]}"; do
   for script in "${SCRIPTS[@]}"; do
     build_variant "$agent" "$script"
@@ -350,15 +376,16 @@ done
 
 echo
 echo "================================"
-echo "✅ 构建完成！"
+echo "✅ Сборка завершена!"
 echo
-echo "📦 构建产物位于: $PROJECT_ROOT/dist/"
+echo "📦 Результаты сборки находятся в: $PROJECT_ROOT/dist/"
 echo
-echo "目录结构:"
+echo "Структура каталогов:"
 tree -L 3 "$PROJECT_ROOT/dist/" 2>/dev/null || find "$PROJECT_ROOT/dist/" -type d | head -20
 
 echo
-echo "💡 提示:"
-echo "  - Claude 用户: 使用 /novel.constitution, /novel.specify 等命令"
-echo "  - Gemini 用户: 使用 /novel:constitution, /novel:specify 等命令"
-echo "  - 其他用户: 使用 /constitution, /specify 等命令"
+echo "💡 Подсказки:"
+echo "  - Пользователи Claude: используйте команды /novel.constitution, /novel.specify и т. д."
+echo "  - Пользователи Gemini: используйте команды /novel:constitution, /novel:specify и т. д."
+echo "  - Другие пользователи: используйте команды /constitution, /specify и т. д."
+```

@@ -1,6 +1,7 @@
+```typescript
 /**
- * 混合方法支持
- * 允许组合使用多种写作方法
+ * Поддержка гибридных методов
+ * Позволяет комбинировать различные методы написания
  */
 
 interface HybridConfig {
@@ -57,51 +58,51 @@ interface ChapterTemplate {
 
 export class HybridMethodManager {
   /**
-   * 预定义的有效混合组合
+   * Предопределенные допустимые гибридные комбинации
    */
   private validCombinations = [
     {
-      name: '史诗奇幻组合',
+      name: 'Эпическая фэнтези-комбинация',
       primary: 'hero-journey',
       secondary: 'story-circle',
-      description: '主线用英雄之旅，角色支线用故事圈',
-      suitable: ['奇幻', '史诗', '系列小说']
+      description: 'Основная сюжетная линия по Пути Героя, побочные сюжетные линии персонажей по Кругу Истории',
+      suitable: ['Фэнтези', 'Эпос', 'Серийные романы']
     },
     {
-      name: '悬疑惊悚组合',
+      name: 'Саспенс-триллер комбинация',
       primary: 'seven-point',
       secondary: 'three-act',
-      description: '整体用七点结构，章节用三幕组织',
-      suitable: ['悬疑', '惊悚', '推理']
+      description: 'Общая структура по семи точкам, организация глав по трем актам',
+      suitable: ['Саспенс', 'Триллер', 'Детектив']
     },
     {
-      name: '多线叙事组合',
+      name: 'Многолинейная повествовательная комбинация',
       primary: 'three-act',
       secondary: 'story-circle',
       micro: 'pixar-formula',
-      description: '主线三幕，支线故事圈，场景用皮克斯',
-      suitable: ['群像', '多线', '现代文学']
+      description: 'Основная линия по трем актам, побочные линии по Кругу Истории, сцены по Формуле Пиксар',
+      suitable: ['Ансамбль', 'Многолинейность', 'Современная литература']
     },
     {
-      name: '成长故事组合',
+      name: 'Комбинация истории взросления',
       primary: 'story-circle',
       secondary: 'hero-journey',
-      description: '整体循环结构，关键章节用英雄之旅',
-      suitable: ['成长', '青春', '系列']
+      description: 'Общая циклическая структура, ключевые главы по Пути Героя',
+      suitable: ['Взросление', 'Молодежь', 'Серия']
     }
   ];
 
   /**
-   * 创建混合结构
+   * Создание гибридной структуры
    */
   createHybridStructure(config: HybridConfig, storyDetails: any): HybridStructure {
-    // 验证组合有效性
+    // Проверка валидности комбинации
     this.validateCombination(config);
 
-    // 创建主线结构
+    // Создание основной сюжетной структуры
     const mainPlot = this.createMainPlot(config.primary.method, storyDetails);
 
-    // 创建次要结构
+    // Создание вторичной структуры
     const mapping: StructureMapping = {
       mainPlot
     };
@@ -118,10 +119,10 @@ export class HybridMethodManager {
       mapping.chapterTemplates = this.createChapterTemplates(config.micro.method, storyDetails);
     }
 
-    // 生成指导原则
+    // Генерация руководящих принципов
     const guidelines = this.generateGuidelines(config);
 
-    // 生成示例
+    // Генерация примеров
     const examples = this.generateExamples(config);
 
     return {
@@ -133,43 +134,43 @@ export class HybridMethodManager {
   }
 
   /**
-   * 验证组合有效性
+   * Проверка валидности комбинации
    */
   private validateCombination(config: HybridConfig): void {
     const incompatible = [
-      ['pixar-formula', 'hero-journey'], // 复杂度不匹配
-      ['pixar-formula', 'seven-point']   // 复杂度不匹配
+      ['pixar-formula', 'hero-journey'], // Несоответствие сложности
+      ['pixar-formula', 'seven-point']   // Несоответствие сложности
     ];
 
     if (config.primary && config.secondary) {
       const pair = [config.primary.method, config.secondary.method].sort();
       incompatible.forEach(([a, b]) => {
         if (pair[0] === a && pair[1] === b) {
-          throw new Error(`不建议的组合：${a} 和 ${b} 复杂度差异太大`);
+          throw new Error(`Нежелательная комбинация: ${a} и ${b} имеют слишком большую разницу в сложности`);
         }
       });
     }
   }
 
   /**
-   * 创建主线结构
+   * Создание основной сюжетной структуры
    */
   private createMainPlot(method: string, storyDetails: any): PlotStructure {
     const structures: Record<string, StructureElement[]> = {
       'three-act': [
-        { name: '第一幕：建立', chapters: [1, 25], description: '介绍世界和冲突' },
-        { name: '第二幕：发展', chapters: [26, 75], description: '冲突升级和发展' },
-        { name: '第三幕：解决', chapters: [76, 100], description: '高潮和结局' }
+        { name: 'Акт I: Завязка', chapters: [1, 25], description: 'Представление мира и конфликта' },
+        { name: 'Акт II: Развитие', chapters: [26, 75], description: 'Эскалация и развитие конфликта' },
+        { name: 'Акт III: Развязка', chapters: [76, 100], description: 'Кульминация и финал' }
       ],
       'hero-journey': [
-        { name: '平凡世界', chapters: [1, 8], description: '英雄的日常' },
-        { name: '冒险召唤', chapters: [9, 16], description: '打破平静' },
-        // ... 其他阶段
+        { name: 'Обычный мир', chapters: [1, 8], description: 'Повседневная жизнь героя' },
+        { name: 'Зов к приключениям', chapters: [9, 16], description: 'Нарушение спокойствия' },
+        // ... другие этапы
       ],
       'seven-point': [
-        { name: '钩子', chapters: [1, 3], description: '吸引读者' },
-        { name: 'PP1', chapters: [25], description: '第一情节点' },
-        // ... 其他节点
+        { name: 'Крючок', chapters: [1, 3], description: 'Захват читателя' },
+        { name: 'PP1', chapters: [25], description: 'Первый поворотный пункт' },
+        // ... другие точки
       ]
     };
 
@@ -180,10 +181,10 @@ export class HybridMethodManager {
   }
 
   /**
-   * 创建支线结构
+   * Создание структуры побочных сюжетов
    */
   private createSubPlots(method: string, storyDetails: any): PlotStructure[] {
-    // 为每条支线创建结构
+    // Создание структуры для каждой побочной линии
     const subPlots: PlotStructure[] = [];
 
     if (storyDetails.subPlots) {
@@ -199,7 +200,7 @@ export class HybridMethodManager {
   }
 
   /**
-   * 创建角色弧线结构
+   * Создание структуры арок персонажей
    */
   private createCharacterArcs(method: string, storyDetails: any): CharacterArcStructure[] {
     const arcs: CharacterArcStructure[] = [];
@@ -220,7 +221,7 @@ export class HybridMethodManager {
   }
 
   /**
-   * 创建章节模板
+   * Создание шаблонов глав
    */
   private createChapterTemplates(method: string, storyDetails: any): ChapterTemplate[] {
     if (method === 'pixar-formula') {
@@ -228,13 +229,13 @@ export class HybridMethodManager {
         {
           method: 'pixar-formula',
           template: `
-## 章节结构（皮克斯公式）
-1. 开始状态：[本章开始时的情况]
-2. 日常/期望：[角色在做什么/想要什么]
-3. 变化事件：[什么打破了平静]
-4. 因此1：[直接后果]
-5. 因此2：[连锁反应]
-6. 结果：[本章结尾状态]
+## Структура главы (Формула Пиксар)
+1. Начальное состояние: [Ситуация в начале главы]
+2. Повседневность/Ожидания: [Что делает персонаж / чего хочет]
+3. Событие, меняющее ситуацию: [Что нарушает спокойствие]
+4. Следствие 1: [Прямое последствие]
+5. Следствие 2: [Цепная реакция]
+6. Итог: [Состояние в конце главы]
           `
         }
       ];
@@ -244,17 +245,17 @@ export class HybridMethodManager {
   }
 
   /**
-   * 适配结构到支线
+   * Адаптация структуры для побочного сюжета
    */
   private adaptStructureToSubplot(method: string, subplot: any): StructureElement[] {
-    // 简化主线结构用于支线
+    // Упрощение основной структуры для побочных сюжетов
     if (method === 'story-circle') {
       return [
-        { name: '舒适区', chapters: subplot.startChapter, description: '支线起点' },
-        { name: '需要', chapters: subplot.startChapter + 2, description: '产生需求' },
-        { name: '搜索', chapters: subplot.middleChapters, description: '寻找解决' },
-        { name: '找到', chapters: subplot.endChapter - 2, description: '获得答案' },
-        { name: '改变', chapters: subplot.endChapter, description: '支线解决' }
+        { name: 'Зона комфорта', chapters: subplot.startChapter, description: 'Начало побочного сюжета' },
+        { name: 'Потребность', chapters: subplot.startChapter + 2, description: 'Возникновение потребности' },
+        { name: 'Поиск', chapters: subplot.middleChapters, description: 'Поиск решения' },
+        { name: 'Находка', chapters: subplot.endChapter - 2, description: 'Получение ответа' },
+        { name: 'Перемены', chapters: subplot.endChapter, description: 'Разрешение побочного сюжета' }
       ];
     }
 
@@ -262,16 +263,16 @@ export class HybridMethodManager {
   }
 
   /**
-   * 创建角色弧线元素
+   * Создание элементов арки персонажа
    */
   private createCharacterArcElements(method: string, character: any): StructureElement[] {
     if (method === 'story-circle') {
       return [
-        { name: '初始状态', chapters: [1, 10], description: `${character.name}的起点` },
-        { name: '产生需求', chapters: [11, 20], description: '意识到缺失' },
-        { name: '努力改变', chapters: [21, 60], description: '尝试和失败' },
-        { name: '获得成长', chapters: [61, 80], description: '真正的改变' },
-        { name: '新的自我', chapters: [81, 100], description: '完成转变' }
+        { name: 'Исходное состояние', chapters: [1, 10], description: `Начало пути ${character.name}` },
+        { name: 'Возникновение потребности', chapters: [11, 20], description: 'Осознание недостатка' },
+        { name: 'Попытки измениться', chapters: [21, 60], description: 'Попытки и неудачи' },
+        { name: 'Достижение роста', chapters: [61, 80], description: 'Истинные перемены' },
+        { name: 'Новое Я', chapters: [81, 100], description: 'Завершение трансформации' }
       ];
     }
 
@@ -279,54 +280,54 @@ export class HybridMethodManager {
   }
 
   /**
-   * 生成指导原则
+   * Генерация руководящих принципов
    */
   private generateGuidelines(config: HybridConfig): string[] {
     const guidelines: string[] = [];
 
-    guidelines.push(`主线情节使用${this.getMethodName(config.primary.method)}结构`);
+    guidelines.push(`Основной сюжет использует структуру ${this.getMethodName(config.primary.method)}`);
 
     if (config.secondary) {
       if (config.secondary.scope === 'sub-plot') {
-        guidelines.push(`支线情节使用${this.getMethodName(config.secondary.method)}结构`);
-        guidelines.push('支线不要喧宾夺主，保持与主线的关联');
+        guidelines.push(`Побочные сюжеты используют структуру ${this.getMethodName(config.secondary.method)}`);
+        guidelines.push('Побочные сюжеты не должны затмевать основной, сохраняйте связь с основной линией');
       } else if (config.secondary.scope === 'character-arc') {
-        guidelines.push(`角色成长使用${this.getMethodName(config.secondary.method)}追踪`);
-        guidelines.push('确保角色弧线与主线情节同步发展');
+        guidelines.push(`Развитие персонажей отслеживается по структуре ${this.getMethodName(config.secondary.method)}`);
+        guidelines.push('Убедитесь, что арки персонажей развиваются синхронно с основным сюжетом');
       }
     }
 
     if (config.micro) {
-      guidelines.push(`单个${config.micro.scope}可以使用${this.getMethodName(config.micro.method)}组织`);
-      guidelines.push('微观结构要服务于宏观结构');
+      guidelines.push(`Отдельные ${config.micro.scope} могут быть организованы по ${this.getMethodName(config.micro.method)}`);
+      guidelines.push('Микроструктура должна служить макроструктуре');
     }
 
-    guidelines.push('保持整体的一致性和连贯性');
-    guidelines.push('避免结构冲突和重复');
+    guidelines.push('Сохраняйте общую согласованность и связность');
+    guidelines.push('Избегайте структурных конфликтов и повторений');
 
     return guidelines;
   }
 
   /**
-   * 生成示例
+   * Генерация примеров
    */
   private generateExamples(config: HybridConfig): string[] {
     const examples: string[] = [];
 
     if (config.primary.method === 'hero-journey' && config.secondary?.method === 'story-circle') {
       examples.push(`
-示例：《奇幻冒险》
-- 主线（英雄之旅）：主角从平凡少年成长为拯救世界的英雄
-- 支线A（故事圈）：导师角色寻找传承者的循环
-- 支线B（故事圈）：反派从善到恶的堕落循环
+Пример: "Фэнтезийное приключение"
+- Основной сюжет (Путь Героя): Главный герой превращается из обычного юноши в героя, спасающего мир
+- Побочный сюжет А (Круг Истории): Цикл поиска наставником преемника
+- Побочный сюжет Б (Круг Истории): Цикл падения злодея от добра ко злу
       `);
     }
 
     if (config.primary.method === 'seven-point' && config.micro?.method === 'pixar-formula') {
       examples.push(`
-示例：《都市悬疑》
-- 整体结构（七点）：通过7个关键节点推进悬疑
-- 章节结构（皮克斯）：每章用"因此...因此...最终"推进
+Пример: "Городской саспенс"
+- Общая структура (Семь точек): Саспенс развивается через 7 ключевых точек
+- Структура глав (Формула Пиксар): Каждая глава строится по принципу "Следствие... Следствие... В итоге..."
       `);
     }
 
@@ -334,25 +335,25 @@ export class HybridMethodManager {
   }
 
   /**
-   * 推荐混合方案
+   * Рекомендация гибридных схем
    */
   recommendHybrid(genre: string, length: number, complexity: string): HybridConfig | null {
-    // 根据特征推荐混合方案
-    if (genre === '奇幻' && length > 200000 && complexity === '复杂') {
+    // Рекомендация гибридных схем на основе характеристик
+    if (genre === 'Фэнтези' && length > 200000 && complexity === 'Сложный') {
       return {
         primary: { method: 'hero-journey', scope: 'main-plot' },
         secondary: { method: 'story-circle', scope: 'character-arc' }
       };
     }
 
-    if (genre === '悬疑' && complexity === '中等') {
+    if (genre === 'Саспенс' && complexity === 'Средний') {
       return {
         primary: { method: 'seven-point', scope: 'main-plot' },
         micro: { method: 'three-act', scope: 'chapter' }
       };
     }
 
-    if (genre === '群像' || genre === '多线') {
+    if (genre === 'Ансамбль' || genre === 'Многолинейность') {
       return {
         primary: { method: 'three-act', scope: 'main-plot' },
         secondary: { method: 'story-circle', scope: 'sub-plot' }
@@ -363,32 +364,32 @@ export class HybridMethodManager {
   }
 
   /**
-   * 生成混合方法文档
+   * Генерация документации по гибридному методу
    */
   generateHybridDocument(structure: HybridStructure): string {
-    let doc = `# 混合方法结构文档\n\n`;
+    let doc = `# Документация по гибридному методу\n\n`;
 
-    doc += `## 方法配置\n`;
-    doc += `- **主要方法**：${this.getMethodName(structure.config.primary.method)} (${structure.config.primary.scope})\n`;
+    doc += `## Конфигурация метода\n`;
+    doc += `- **Основной метод**：${this.getMethodName(structure.config.primary.method)} (${structure.config.primary.scope})\n`;
 
     if (structure.config.secondary) {
-      doc += `- **次要方法**：${this.getMethodName(structure.config.secondary.method)} (${structure.config.secondary.scope})\n`;
+      doc += `- **Вторичный метод**：${this.getMethodName(structure.config.secondary.method)} (${structure.config.secondary.scope})\n`;
     }
 
     if (structure.config.micro) {
-      doc += `- **微观方法**：${this.getMethodName(structure.config.micro.method)} (${structure.config.micro.scope})\n`;
+      doc += `- **Микро-метод**：${this.getMethodName(structure.config.micro.method)} (${structure.config.micro.scope})\n`;
     }
 
-    doc += `\n## 结构映射\n\n`;
-    doc += `### 主线结构\n`;
+    doc += `\n## Карта структуры\n\n`;
+    doc += `### Основной сюжет\n`;
     structure.mapping.mainPlot.elements.forEach(element => {
-      doc += `- **${element.name}**：第${element.chapters[0]}-${element.chapters[1]}章 - ${element.description}\n`;
+      doc += `- **${element.name}**：Главы ${element.chapters[0]}-${element.chapters[1]} - ${element.description}\n`;
     });
 
     if (structure.mapping.subPlots) {
-      doc += `\n### 支线结构\n`;
+      doc += `\n### Побочные сюжеты\n`;
       structure.mapping.subPlots.forEach((subplot, index) => {
-        doc += `#### 支线${index + 1}\n`;
+        doc += `#### Побочный сюжет ${index + 1}\n`;
         subplot.elements.forEach(element => {
           doc += `- ${element.name}：${element.description}\n`;
         });
@@ -396,22 +397,62 @@ export class HybridMethodManager {
     }
 
     if (structure.mapping.characterArcs) {
-      doc += `\n### 角色弧线\n`;
+      doc += `\n### Арки персонажей\n`;
       structure.mapping.characterArcs.forEach(arc => {
         doc += `#### ${arc.character}\n`;
         arc.arc.forEach(element => {
-          doc += `- ${element.name}：第${element.chapters[0]}-${element.chapters[1]}章\n`;
+          doc += `- ${element.name}：Главы ${element.chapters[0]}-${element.chapters[1]}\n`;
         });
       });
     }
 
-    doc += `\n## 使用指南\n`;
+    if (structure.mapping.chapterTemplates && structure.mapping.chapterTemplates.length > 0) {
+      doc += `\n### Шаблоны глав\n`;
+      structure.mapping.chapterTemplates.forEach(template => {
+        doc += `#### Метод: ${this.getMethodName(template.method)}\n`;
+        doc += `\`\`\`markdown\n${template.template.trim()}\n\`\`\`\n`;
+      });
+    }
+
+    doc += `\n## Руководящие принципы\n`;
+    structure.guidelines.forEach(guideline => {
+      doc += `- ${guideline}\n`;
+    });
+
+    doc += `\n## Примеры\n`;
+    structure.examples.forEach(example => {
+      doc += `${example}\n`;
+    });
+
+    return doc;
+  }
+
+  /**
+   * Получение названия метода
+   */
+  private getMethodName(method: string): string {
+    const methodNames: Record<string, string> = {
+      'three-act': 'Трехактная структура',
+      'hero-journey': 'Путь Героя',
+      'seven-point': 'Структура по семи точкам',
+      'story-circle': 'Круг Истории',
+      'pixar-formula': 'Формула Пиксар'
+    };
+    return methodNames[method] || method;
+  }
+}
+```
+```typescript
+      });
+    }
+
+    doc += `\n## Руководство по использованию\n`;
     structure.guidelines.forEach(guideline => {
       doc += `- ${guideline}\n`;
     });
 
     if (structure.examples.length > 0) {
-      doc += `\n## 示例\n`;
+      doc += `\n## Примеры\n`;
       structure.examples.forEach(example => {
         doc += example + '\n';
       });
@@ -421,16 +462,17 @@ export class HybridMethodManager {
   }
 
   /**
-   * 获取方法中文名
+   * Получить китайское название метода
    */
   private getMethodName(method: string): string {
     const names: Record<string, string> = {
-      'three-act': '三幕结构',
-      'hero-journey': '英雄之旅',
-      'story-circle': '故事圈',
-      'seven-point': '七点结构',
-      'pixar-formula': '皮克斯公式'
+      'three-act': 'Структура из трёх актов',
+      'hero-journey': 'Путешествие героя',
+      'story-circle': 'Круг историй',
+      'seven-point': 'Структура из семи пунктов',
+      'pixar-formula': 'Формула Пиксар'
     };
     return names[method] || method;
   }
 }
+```

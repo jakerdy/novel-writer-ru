@@ -1,12 +1,13 @@
+```bash
 #!/usr/bin/env bash
-# 通用函数库
+# Общая библиотека функций
 
-# 获取项目根目录
+# Получить корневой каталог проекта
 get_project_root() {
     if [ -f ".specify/config.json" ]; then
         pwd
     else
-        # 向上查找包含 .specify 的目录
+        # Искать вверх по иерархии каталог, содержащий .specify
         current=$(pwd)
         while [ "$current" != "/" ]; do
             if [ -f "$current/.specify/config.json" ]; then
@@ -15,17 +16,17 @@ get_project_root() {
             fi
             current=$(dirname "$current")
         done
-        echo "错误: 未找到小说项目根目录" >&2
+        echo "Ошибка: Корневой каталог проекта романа не найден" >&2
         exit 1
     fi
 }
 
-# 获取当前故事目录
+# Получить текущий каталог истории
 get_current_story() {
     PROJECT_ROOT=$(get_project_root)
     STORIES_DIR="$PROJECT_ROOT/stories"
 
-    # 找到最新的故事目录
+    # Найти самый последний каталог истории
     if [ -d "$STORIES_DIR" ]; then
         latest=$(ls -t "$STORIES_DIR" 2>/dev/null | head -1)
         if [ -n "$latest" ]; then
@@ -34,25 +35,25 @@ get_current_story() {
     fi
 }
 
-# 获取活跃故事名称（只返回名称，不返回路径）
+# Получить имя активной истории (возвращает только имя, а не путь)
 get_active_story() {
     story_dir=$(get_current_story)
     if [ -n "$story_dir" ]; then
         basename "$story_dir"
     else
-        # 如果没有故事，返回默认名称
+        # Если историй нет, вернуть имя по умолчанию
         echo "story-$(date +%Y%m%d)"
     fi
 }
 
-# 创建带编号的目录
+# Создать каталог с нумерацией
 create_numbered_dir() {
     base_dir="$1"
     prefix="$2"
 
     mkdir -p "$base_dir"
 
-    # 找到最高编号
+    # Найти максимальный номер
     highest=0
     for dir in "$base_dir"/*; do
         [ -d "$dir" ] || continue
@@ -64,17 +65,17 @@ create_numbered_dir() {
         fi
     done
 
-    # 返回下一个编号
+    # Вернуть следующий номер
     next=$((highest + 1))
     printf "%03d" "$next"
 }
 
-# 输出 JSON（用于与 AI 助手通信）
+# Вывести JSON (для связи с AI-ассистентом)
 output_json() {
     echo "$1"
 }
 
-# 确保文件存在
+# Убедиться, что файл существует
 ensure_file() {
     file="$1"
     template="$2"
@@ -87,3 +88,4 @@ ensure_file() {
         fi
     fi
 }
+```

@@ -1,7 +1,8 @@
+```javascript
 /**
- * 安全存储
- * 负责安全地存储认证信息（加密保存）
- * 注意：仅存储认证信息，不存储 Prompt
+ * Безопасное хранилище
+ * Отвечает за безопасное хранение учетных данных (зашифрованное сохранение)
+ * Примечание: хранит только учетные данные, не Prompt
  */
 
 import crypto from 'crypto';
@@ -11,74 +12,74 @@ import os from 'os';
 
 export class SecureStorage {
   constructor() {
-    // 存储路径
+    // Путь к хранилищу
     this.storageDir = path.join(os.homedir(), '.novel', 'stardust');
     this.authFile = path.join(this.storageDir, 'auth.enc');
     this.configFile = path.join(this.storageDir, 'config.json');
 
-    // 加密配置
+    // Конфигурация шифрования
     this.algorithm = 'aes-256-gcm';
 
-    // 确保存储目录存在
+    // Убедиться, что каталог хранилища существует
     this.ensureStorageDir();
   }
 
   /**
-   * 确保存储目录存在
+   * Убедиться, что каталог хранилища существует
    */
   async ensureStorageDir() {
     try {
       await fs.ensureDir(this.storageDir);
-      // 设置目录权限（仅用户可读写）
+      // Установить права доступа к каталогу (только чтение и запись для пользователя)
       await fs.chmod(this.storageDir, 0o700);
     } catch (error) {
-      console.error('创建存储目录失败:', error.message);
+      console.error('Не удалось создать каталог хранилища:', error.message);
     }
   }
 
   /**
-   * 保存认证信息
+   * Сохранить учетные данные
    */
   async saveAuth(authData) {
     try {
-      // 加密认证数据
+      // Зашифровать учетные данные
       const encrypted = await this.encrypt(JSON.stringify(authData));
 
-      // 保存到文件
+      // Сохранить в файл
       await fs.writeFile(this.authFile, encrypted, 'utf8');
 
-      // 设置文件权限（仅用户可读写）
+      // Установить права доступа к файлу (только чтение и запись для пользователя)
       await fs.chmod(this.authFile, 0o600);
 
       return true;
     } catch (error) {
-      console.error('保存认证失败:', error.message);
+      console.error('Не удалось сохранить учетные данные:', error.message);
       return false;
     }
   }
 
   /**
-   * 获取认证信息
+   * Получить учетные данные
    */
   async getAuth() {
     try {
-      // 检查文件是否存在
+      // Проверить существование файла
       if (!await fs.pathExists(this.authFile)) {
         return null;
       }
 
-      // 读取加密数据
+      // Прочитать зашифрованные данные
       const encrypted = await fs.readFile(this.authFile, 'utf8');
 
-      // 解密
+      // Расшифровать
       const decrypted = await this.decrypt(encrypted);
 
-      // 解析 JSON
+      // Распарсить JSON
       const authData = JSON.parse(decrypted);
 
-      // 检查是否过期
+      // Проверить на истечение срока действия
       if (authData.expiresAt && Date.now() > authData.expiresAt) {
-        // Token 已过期，但保留 refreshToken
+        // Токен истек, но refreshToken сохранен
         return {
           ...authData,
           token: null,
@@ -88,13 +89,13 @@ export class SecureStorage {
 
       return authData;
     } catch (error) {
-      console.error('读取认证失败:', error.message);
+      console.error('Не удалось прочитать учетные данные:', error.message);
       return null;
     }
   }
 
   /**
-   * 更新认证信息
+   * Обновить учетные данные
    */
   async updateAuth(updates) {
     try {
@@ -102,46 +103,46 @@ export class SecureStorage {
       const updated = { ...current, ...updates };
       return await this.saveAuth(updated);
     } catch (error) {
-      console.error('更新认证失败:', error.message);
+      console.error('Не удалось обновить учетные данные:', error.message);
       return false;
     }
   }
 
   /**
-   * 清除认证信息
+   * Очистить учетные данные
    */
   async clearAuth() {
     try {
       if (await fs.pathExists(this.authFile)) {
-        // 先用随机数据覆写文件内容
+        // Сначала перезаписать содержимое файла случайными данными
         const randomData = crypto.randomBytes(1024);
         await fs.writeFile(this.authFile, randomData);
 
-        // 然后删除文件
+        // Затем удалить файл
         await fs.remove(this.authFile);
       }
       return true;
     } catch (error) {
-      console.error('清除认证失败:', error.message);
+      console.error('Не удалось очистить учетные данные:', error.message);
       return false;
     }
   }
 
   /**
-   * 保存配置（非敏感信息）
+   * Сохранить конфигурацию (неконфиденциальная информация)
    */
   async saveConfig(config) {
     try {
       await fs.writeJson(this.configFile, config, { spaces: 2 });
       return true;
     } catch (error) {
-      console.error('保存配置失败:', error.message);
+      console.error('Не удалось сохранить конфигурацию:', error.message);
       return false;
     }
   }
 
   /**
-   * 获取配置
+   * Получить конфигурацию
    */
   async getConfig() {
     try {
@@ -150,57 +151,57 @@ export class SecureStorage {
       }
       return await fs.readJson(this.configFile);
     } catch (error) {
-      console.error('读取配置失败:', error.message);
+      console.error('Не удалось прочитать конфигурацию:', error.message);
       return {};
     }
   }
 
   /**
-   * 加密数据
+   * Зашифровать данные
    */
   async encrypt(data) {
-    // 获取设备密钥
+    // Получить ключ устройства
     const key = this.getDeviceKey();
 
-    // 生成随机 IV
+    // Сгенерировать случайный IV
     const iv = crypto.randomBytes(16);
 
-    // 创建加密器
+    // Создать шифратор
     const cipher = crypto.createCipheriv(this.algorithm, key, iv);
 
-    // 加密数据
+    // Зашифровать данные
     let encrypted = cipher.update(data, 'utf8', 'hex');
     encrypted += cipher.final('hex');
 
-    // 获取认证标签
+    // Получить тег аутентификации
     const authTag = cipher.getAuthTag();
 
-    // 组合结果：iv:authTag:encrypted
+    // Скомбинировать результат: iv:authTag:encrypted
     return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted}`;
   }
 
   /**
-   * 解密数据
+   * Расшифровать данные
    */
   async decrypt(encryptedData) {
-    // 获取设备密钥
+    // Получить ключ устройства
     const key = this.getDeviceKey();
 
-    // 解析加密数据
+    // Распарсить зашифрованные данные
     const parts = encryptedData.split(':');
     if (parts.length !== 3) {
-      throw new Error('加密数据格式无效');
+      throw new Error('Неверный формат зашифрованных данных');
     }
 
     const iv = Buffer.from(parts[0], 'hex');
     const authTag = Buffer.from(parts[1], 'hex');
     const encrypted = parts[2];
 
-    // 创建解密器
+    // Создать дешифратор
     const decipher = crypto.createDecipheriv(this.algorithm, key, iv);
     decipher.setAuthTag(authTag);
 
-    // 解密数据
+    // Расшифровать данные
     let decrypted = decipher.update(encrypted, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
 
@@ -208,25 +209,25 @@ export class SecureStorage {
   }
 
   /**
-   * 获取设备特征密钥
-   * 基于设备信息生成唯一密钥
+   * Получить ключ устройства
+   * Сгенерировать уникальный ключ на основе информации об устройстве
    */
   getDeviceKey() {
-    // 收集设备特征
+    // Собрать характеристики устройства
     const deviceInfo = [
-      os.hostname(),           // 主机名
-      os.userInfo().username,   // 用户名
-      os.platform(),           // 操作系统
-      os.arch(),              // 架构
-      'stardust-dreams-2024'  // 固定盐值
+      os.hostname(),           // Имя хоста
+      os.userInfo().username,   // Имя пользователя
+      os.platform(),           // Операционная система
+      os.arch(),              // Архитектура
+      'stardust-dreams-2024'  // Фиксированная соль
     ].join(':');
 
-    // 生成 256 位密钥
+    // Сгенерировать 256-битный ключ
     return crypto.createHash('sha256').update(deviceInfo).digest();
   }
 
   /**
-   * 检查存储健康状态
+   * Проверить состояние хранилища
    */
   async checkHealth() {
     const health = {
@@ -237,14 +238,14 @@ export class SecureStorage {
     };
 
     try {
-      // 检查目录
+      // Проверить каталог
       health.storageDir = await fs.pathExists(this.storageDir);
 
-      // 检查文件
+      // Проверить файлы
       health.authFile = await fs.pathExists(this.authFile);
       health.configFile = await fs.pathExists(this.configFile);
 
-      // 检查权限
+      // Проверить права доступа
       if (health.storageDir) {
         const stats = await fs.stat(this.storageDir);
         health.permissions = (stats.mode & 0o777) === 0o700;
@@ -257,8 +258,8 @@ export class SecureStorage {
   }
 
   /**
-   * 导出认证信息（用于调试）
-   * 注意：导出的是加密后的数据
+   * Экспортировать учетные данные (для отладки)
+   * Примечание: экспортируются зашифрованные данные
    */
   async exportAuth() {
     try {
@@ -280,41 +281,41 @@ export class SecureStorage {
   }
 
   /**
-   * 导入认证信息
-   * 注意：需要在同一设备上才能解密
+   * Импортировать учетные данные
+   * Примечание: расшифровка возможна только на том же устройстве
    */
   async importAuth(exportedData) {
     try {
       if (!exportedData || !exportedData.encrypted) {
-        throw new Error('导入数据无效');
+        throw new Error('Неверные данные для импорта');
       }
 
-      // 验证是否可以解密（测试解密）
+      // Проверить возможность расшифровки (тестовая расшифровка)
       await this.decrypt(exportedData.encrypted);
 
-      // 保存到文件
+      // Сохранить в файл
       await fs.writeFile(this.authFile, exportedData.encrypted, 'utf8');
       await fs.chmod(this.authFile, 0o600);
 
       return true;
     } catch (error) {
-      console.error('导入认证失败:', error.message);
+      console.error('Не удалось импортировать учетные данные:', error.message);
       return false;
     }
   }
 
   /**
-   * 清理过期数据
+   * Очистить устаревшие данные
    */
   async cleanup() {
     try {
-      // 清理过期的认证
+      // Очистить устаревшие учетные данные
       const auth = await this.getAuth();
       if (auth && auth.expired) {
         await this.clearAuth();
       }
 
-      // 清理临时文件
+      // Очистить временные файлы
       const tempFiles = await fs.readdir(this.storageDir);
       for (const file of tempFiles) {
         if (file.endsWith('.tmp')) {
@@ -329,5 +330,6 @@ export class SecureStorage {
   }
 }
 
-// 导出单例
+// Экспортировать одиночный экземпляр
 export const secureStorage = new SecureStorage();
+```

@@ -1,42 +1,43 @@
+```powershell
 param(
     [switch]$Json,
     [switch]$PathsOnly
 )
 
-# 澄清故事大纲的支撑脚本
-# 用于 /clarify 命令，扫描并返回当前故事路径
+# Скрипт для уточнения структуры истории
+# Используется для команды /clarify, сканирует и возвращает текущие пути к истории
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-# Get script directory
+# Получить каталог скрипта
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 
-# Source common functions
+# Загрузить общие функции
 . "$ScriptDir\common.ps1"
 
-# Get project root
+# Получить корневой каталог проекта
 $ProjectRoot = Get-ProjectRoot
 Set-Location $ProjectRoot
 
-# Find the current story directory
+# Найти текущий каталог истории
 $StoriesDir = "stories"
 if (-not (Test-Path $StoriesDir -PathType Container)) {
     if ($Json) {
         Write-Output '{"error": "No stories directory found"}'
     } else {
-        Write-Error "错误：未找到 stories 目录，请先运行 /story 创建故事大纲"
+        Write-Error "Ошибка: каталог stories не найден. Пожалуйста, сначала запустите /story для создания структуры истории."
     }
     exit 1
 }
 
-# Get the latest story
+# Получить последнюю историю
 $StoryDirs = Get-ChildItem -Path $StoriesDir -Directory | Sort-Object Name -Descending
 if ($StoryDirs.Count -eq 0) {
     if ($Json) {
         Write-Output '{"error": "No story found"}'
     } else {
-        Write-Error "错误：未找到故事，请先运行 /story 创建故事大纲"
+        Write-Error "Ошибка: история не найдена. Пожалуйста, сначала запустите /story для создания структуры истории."
     }
     exit 1
 }
@@ -44,47 +45,47 @@ if ($StoryDirs.Count -eq 0) {
 $StoryDir = $StoryDirs[0]
 $StoryName = $StoryDir.Name
 
-# Find story file (新格式 specification.md)
+# Найти файл истории (новый формат specification.md)
 $StoryFile = Join-Path $StoryDir.FullName "specification.md"
 if (-not (Test-Path $StoryFile -PathType Leaf)) {
     if ($Json) {
         Write-Output '{"error": "Story file not found (specification.md required)"}'
     } else {
-        Write-Error "错误：未找到故事文件 specification.md"
+        Write-Error "Ошибка: файл истории specification.md не найден."
     }
     exit 1
 }
 
-# Check if clarification already exists
+# Проверить, существует ли уже уточнение
 $ClarificationExists = $false
 $StoryContent = Get-Content $StoryFile -Raw
 if ($StoryContent -match "## 澄清记录") {
     $ClarificationExists = $true
 }
 
-# Count existing clarification sessions
+# Подсчитать существующие сессии уточнения
 $ClarificationCount = 0
 if ($ClarificationExists) {
     $matches = [regex]::Matches($StoryContent, "### 澄清会话")
     $ClarificationCount = $matches.Count
 }
 
-# Convert paths to forward slashes for JSON
+# Преобразовать пути в прямые слеши для JSON
 $StoryFilePath = $StoryFile.Replace('\', '/')
 $StoryDirPath = $StoryDir.FullName.Replace('\', '/')
 $ProjectRootPath = $ProjectRoot.Replace('\', '/')
 
-# Output in JSON format if requested
+# Вывод в формате JSON, если запрошено
 if ($Json) {
     if ($PathsOnly) {
-        # Minimal output for command template
+        # Минимальный вывод для шаблона команды
         $output = @{
             STORY_PATH = $StoryFilePath
             STORY_NAME = $StoryName
             STORY_DIR = $StoryDirPath
         }
     } else {
-        # Full output for analysis
+        # Полный вывод для анализа
         $output = @{
             STORY_PATH = $StoryFilePath
             STORY_NAME = $StoryName
@@ -96,11 +97,12 @@ if ($Json) {
     }
     Write-Output (ConvertTo-Json $output -Compress)
 } else {
-    Write-Output "找到故事：$StoryName"
-    Write-Output "文件路径：$StoryFile"
+    Write-Output "Найдена история: $StoryName"
+    Write-Output "Путь к файлу: $StoryFile"
     if ($ClarificationExists) {
-        Write-Output "已有澄清会话：$ClarificationCount 次"
+        Write-Output "Проведено уточнений: $ClarificationCount раз(а)"
     } else {
-        Write-Output "尚未进行过澄清"
+        Write-Output "Уточнений еще не проводилось"
     }
 }
+```

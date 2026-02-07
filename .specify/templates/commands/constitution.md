@@ -1,10 +1,4 @@
----
-description: 创建或更新小说创作宪法，定义不可妥协的创作原则
-scripts:
-  sh: .specify/scripts/bash/constitution.sh
-  ps: .specify/scripts/powershell/constitution.ps1
----
-
+```markdown
 用户输入可以直接提供或作为命令参数 - 你**必须**在继续之前考虑它（如果不为空）。
 
 用户输入：
@@ -224,3 +218,4 @@ $ARGUMENTS
 4. `/analyze` - 验证需检查宪法合规性
 
 记住：**宪法是最高准则，但也可以与时俱进地修订。**
+```

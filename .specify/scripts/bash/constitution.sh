@@ -1,23 +1,24 @@
+```bash
 #!/bin/bash
 
-# 小说创作宪法管理脚本
-# 用于 /constitution 命令
+# Скрипт управления конституцией романа
+# Используется для команды /constitution
 
 set -e
 
-# Source common functions
+# Исходный код общих функций
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
-# 获取命令参数
+# Получение параметров команды
 COMMAND="${1:-check}"
 
-# Get project root
+# Получение корневого каталога проекта
 PROJECT_ROOT=$(get_project_root)
 cd "$PROJECT_ROOT"
 
-# 定义文件路径
-# 优先使用 memory 目录，如不存在则检查 .specify/memory
+# Определение пути к файлу
+# Приоритет отдается каталогу memory, если он не существует, проверяется .specify/memory
 if [ -f "memory/writing-constitution.md" ]; then
     CONSTITUTION_FILE="memory/writing-constitution.md"
 elif [ -f ".specify/memory/writing-constitution.md" ]; then
@@ -28,44 +29,44 @@ fi
 
 case "$COMMAND" in
     check)
-        # 检查宪法文件是否存在
+        # Проверка существования файла конституции
         if [ -f "$CONSTITUTION_FILE" ]; then
-            echo "✅ 宪法文件已存在：$CONSTITUTION_FILE"
-            # 提取版本信息
-            VERSION=$(grep -E "^- 版本：" "$CONSTITUTION_FILE" 2>/dev/null | cut -d'：' -f2 | tr -d ' ' || echo "未知")
-            UPDATED=$(grep -E "^- 最后修订：" "$CONSTITUTION_FILE" 2>/dev/null | cut -d'：' -f2 | tr -d ' ' || echo "未知")
-            echo "  版本：$VERSION"
-            echo "  最后修订：$UPDATED"
+            echo "✅ Файл конституции существует: $CONSTITUTION_FILE"
+            # Извлечение информации о версии
+            VERSION=$(grep -E "^- Версия：" "$CONSTITUTION_FILE" 2>/dev/null | cut -d'：' -f2 | tr -d ' ' || echo "Неизвестно")
+            UPDATED=$(grep -E "^- Последнее изменение：" "$CONSTITUTION_FILE" 2>/dev/null | cut -d'：' -f2 | tr -d ' ' || echo "Неизвестно")
+            echo "  Версия: $VERSION"
+            echo "  Последнее изменение: $UPDATED"
             exit 0
         else
-            echo "❌ 尚未创建宪法文件"
-            echo "  建议：运行 /constitution 创建创作宪法"
+            echo "❌ Файл конституции еще не создан"
+            echo "  Рекомендация: выполните /constitution для создания конституции романа"
             exit 1
         fi
         ;;
 
     init)
-        # 初始化宪法文件
+        # Инициализация файла конституции
         mkdir -p "$(dirname "$CONSTITUTION_FILE")"
 
         if [ -f "$CONSTITUTION_FILE" ]; then
-            echo "宪法文件已存在，准备更新"
+            echo "Файл конституции уже существует, подготовка к обновлению"
         else
-            echo "准备创建新的宪法文件"
+            echo "Подготовка к созданию нового файла конституции"
         fi
         ;;
 
     validate)
-        # 验证宪法文件格式
+        # Проверка формата файла конституции
         if [ ! -f "$CONSTITUTION_FILE" ]; then
-            echo "错误：宪法文件不存在"
+            echo "Ошибка: файл конституции не существует"
             exit 1
         fi
 
-        echo "验证宪法文件..."
+        echo "Проверка файла конституции..."
 
-        # 检查必要章节
-        REQUIRED_SECTIONS=("核心价值观" "质量标准" "创作风格" "内容规范" "读者契约")
+        # Проверка обязательных разделов
+        REQUIRED_SECTIONS=("Ключевые ценности" "Стандарты качества" "Стиль письма" "Нормы содержания" "Договор с читателем")
         MISSING_SECTIONS=()
 
         for section in "${REQUIRED_SECTIONS[@]}"; do
@@ -75,47 +76,48 @@ case "$COMMAND" in
         done
 
         if [ ${#MISSING_SECTIONS[@]} -gt 0 ]; then
-            echo "⚠️ 缺少以下章节："
+            echo "⚠️ Отсутствуют следующие разделы:"
             for section in "${MISSING_SECTIONS[@]}"; do
                 echo "  - $section"
             done
         else
-            echo "✅ 所有必要章节都存在"
+            echo "✅ Все обязательные разделы присутствуют"
         fi
 
-        # 检查版本信息
-        if grep -q "^- 版本：" "$CONSTITUTION_FILE"; then
-            echo "✅ 版本信息完整"
+        # Проверка информации о версии
+        if grep -q "^- Версия：" "$CONSTITUTION_FILE"; then
+            echo "✅ Информация о версии полная"
         else
-            echo "⚠️ 缺少版本信息"
+            echo "⚠️ Отсутствует информация о версии"
         fi
         ;;
 
     export)
-        # 导出宪法摘要
+        # Экспорт сводки конституции
         if [ ! -f "$CONSTITUTION_FILE" ]; then
-            echo "错误：宪法文件不存在"
+            echo "Ошибка: файл конституции не существует"
             exit 1
         fi
 
-        echo "# 创作宪法摘要"
+        echo "# Сводка конституции романа"
         echo ""
 
-        # 提取核心原则
-        echo "## 核心原则"
-        grep -A 1 "^### 原则" "$CONSTITUTION_FILE" | grep "^**声明**" | cut -d'：' -f2- || echo "（未找到原则声明）"
+        # Извлечение ключевых принципов
+        echo "## Ключевые принципы"
+        grep -A 1 "^### Принципы" "$CONSTITUTION_FILE" | grep "^**Заявление**" | cut -d'：' -f2- || echo "（Заявление о принципах не найдено）"
 
         echo ""
-        echo "## 质量底线"
-        grep -A 1 "^### 标准" "$CONSTITUTION_FILE" | grep "^**要求**" | cut -d'：' -f2- || echo "（未找到质量标准）"
+        echo "## Минимальные стандарты качества"
+        grep -A 1 "^### Стандарты" "$CONSTITUTION_FILE" | grep "^**Требования**" | cut -d'：' -f2- || echo "（Стандарты качества не найдены）"
 
         echo ""
-        echo "详细内容请查看：$CONSTITUTION_FILE"
+        echo "Подробности см. в: $CONSTITUTION_FILE"
         ;;
 
     *)
-        echo "未知命令：$COMMAND"
-        echo "支持的命令：check, init, validate, export"
+        echo "Неизвестная команда: $COMMAND"
+        echo "Поддерживаемые команды: check, init, validate, export"
         exit 1
         ;;
 esac
+```

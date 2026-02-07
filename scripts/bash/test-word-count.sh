@@ -1,3 +1,4 @@
+```bash
 #!/bin/bash
 
 # 测试中文字数统计功能
@@ -180,3 +181,4 @@ echo "  • 不要使用 'wc -w' 统计中文字数"
 echo "  • 使用 'count_chinese_words' 函数获得准确结果"
 echo "  • 在写作完成后验证字数是否达标"
 echo ""
+```

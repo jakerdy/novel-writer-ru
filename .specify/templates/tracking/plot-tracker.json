@@ -1,20 +1,21 @@
+```json
 {
-  "novel": "[小说名称]",
+  "novel": "[Название романа]",
   "lastUpdated": "",
   "currentState": {
     "chapter": 1,
     "volume": 1,
-    "mainPlotStage": "开端",
-    "location": "[当前地点]",
-    "timepoint": "[故事时间]"
+    "mainPlotStage": "Начало",
+    "location": "[Текущее местоположение]",
+    "timepoint": "[Время в истории]"
   },
 
   "plotlines": {
     "main": {
-      "name": "[主线名称]",
-      "description": "[主线描述]",
+      "name": "[Название основной сюжетной линии]",
+      "description": "[Описание основной сюжетной линии]",
       "status": "active",
-      "currentNode": "[当前节点]",
+      "currentNode": "[Текущий узел]",
       "completedNodes": [],
       "upcomingNodes": [],
       "plannedClimax": {
@@ -28,7 +29,7 @@
   "foreshadowing": [
     {
       "id": "foreshadow-001",
-      "content": "[伏笔内容]",
+      "content": "[Содержание намёка]",
       "planted": {
         "chapter": null,
         "description": ""
@@ -60,3 +61,4 @@
     "reminders": []
   }
 }
+```

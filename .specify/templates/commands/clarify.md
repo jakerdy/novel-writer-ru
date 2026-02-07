@@ -1,10 +1,4 @@
----
-description: 通过针对性问答澄清故事大纲中的模糊点，确保创作方向明确
-scripts:
-  sh: .specify/scripts/bash/clarify-story.sh --json --paths-only
-  ps: .specify/scripts/powershell/clarify-story.ps1 -Json -PathsOnly
----
-
+```markdown
 用户输入可以直接提供或作为命令参数 - 你**必须**在继续之前考虑它（如果不为空）。
 
 用户输入：
@@ -173,3 +167,4 @@ $ARGUMENTS
 - **系列规划**：是否为系列作品会影响很多决策
 
 优先级上下文：{ARGS}
+```

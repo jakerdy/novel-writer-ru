@@ -1,37 +1,39 @@
+```yaml
 name: novel-translate
 version: 1.0.0
-description: 中文小说英译插件 - 支持小说内容翻译和本地化润色
+description: Плагин для перевода китайских романов на английский — поддержка перевода контента романа и локализационной доработки
 type: feature
 commands:
   - id: translate
     file: commands/translate.md
-    description: 将中文小说翻译成英文
+    description: Перевести выбранное китайское содержимое на английский
   - id: translate-chapter
     file: commands/translate-chapter.md
-    description: 批量翻译整个章节
+    description: Пакетно перевести всю главу
   - id: polish
     file: commands/polish.md
-    description: 润色英文译文，使其更符合英语母语表达
+    description: Отредактировать английский перевод, чтобы он лучше соответствовал родному английскому выражению
 experts:
   - id: translate
     file: experts/translate.md
-    title: 翻译专家
-    description: 专业的中英文小说翻译顾问
+    title: Эксперт по переводу
+    description: Профессиональный консультант по переводу китайских и английских романов
   - id: localize
     file: experts/localize.md
-    title: 本地化专家
-    description: 文化适配和本地化润色专家
+    title: Эксперт по локализации
+    description: Эксперт по культурной адаптации и локализационной доработке
 dependencies:
   core: ">=0.5.0"
 installation:
   message: |
-    ✅ 翻译插件安装成功！
+    ✅ Плагин перевода успешно установлен!
 
-    可用命令：
-    - /translate - 翻译选中的中文内容
-    - /translate-chapter - 批量翻译整个章节
-    - /polish - 润色英文译文
+    Доступные команды:
+    - /translate - перевести выбранное китайское содержимое
+    - /translate-chapter - пакетно перевести всю главу
+    - /polish - отредактировать английский перевод
 
-    专家模式：
-    - 使用 /expert translate 激活翻译专家
-    - 使用 /expert localize 激活本地化专家
+    Режим эксперта:
+    - используйте /expert translate для активации эксперта по переводу
+    - используйте /expert localize для активации эксперта по локализации
+```

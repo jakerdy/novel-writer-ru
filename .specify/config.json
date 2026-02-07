@@ -1,8 +1,10 @@
+```json
 {
-  "name": "novel",
-  "type": "novel",
+  "name": "роман",
+  "type": "роман",
   "ai": "claude",
   "method": "three-act",
   "created": "2025-09-29T14:08:04.966Z",
   "version": "0.8.9"
 }
+```

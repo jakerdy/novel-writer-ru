@@ -1,78 +1,79 @@
-# 章节配置系统 - 技术规范
+```
+# Система конфигурации глав — Техническая спецификация
 
-## 文档信息
+## Информация о документе
 
-- **文档名称**: 章节配置系统技术规范
-- **版本**: v1.0.0
-- **创建日期**: 2025-10-14
-- **关联PRD**: [章节配置系统PRD](./chapter-config-system.md)
-- **目标读者**: 开发人员、技术负责人
+- **Название документа**: Техническая спецификация системы конфигурации глав
+- **Версия**: v1.0.0
+- **Дата создания**: 2025-10-14
+- **Связанный PRD**: [PRD системы конфигурации глав](./chapter-config-system.md)
+- **Целевая аудитория**: Разработчики, технические руководители
 
 ---
 
-## 一、YAML Schema完整定义
+## I. Полное определение YAML Schema
 
-### 1.1 JSON Schema表示
+### 1.1 Представление JSON Schema
 
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "ChapterConfig",
-  "description": "章节配置文件Schema",
+  "description": "Схема конфигурации главы",
   "type": "object",
   "required": ["chapter", "title", "plot", "wordcount"],
   "properties": {
     "chapter": {
       "type": "integer",
       "minimum": 1,
-      "description": "章节号"
+      "description": "Номер главы"
     },
     "title": {
       "type": "string",
       "minLength": 1,
       "maxLength": 100,
-      "description": "章节标题"
+      "description": "Заголовок главы"
     },
     "characters": {
       "type": "array",
-      "description": "出场角色列表",
+      "description": "Список персонажей, появляющихся в главе",
       "items": {
         "$ref": "#/definitions/Character"
       }
     },
     "scene": {
       "$ref": "#/definitions/Scene",
-      "description": "场景配置"
+      "description": "Конфигурация сцены"
     },
     "plot": {
       "$ref": "#/definitions/Plot",
-      "description": "剧情配置"
+      "description": "Конфигурация сюжета"
     },
     "style": {
       "$ref": "#/definitions/Style",
-      "description": "写作风格配置"
+      "description": "Конфигурация стиля письма"
     },
     "wordcount": {
       "$ref": "#/definitions/Wordcount",
-      "description": "字数要求"
+      "description": "Требования к количеству слов"
     },
     "special_requirements": {
       "type": "string",
-      "description": "特殊写作要求"
+      "description": "Особые требования к написанию"
     },
     "preset_used": {
       "type": "string",
-      "description": "使用的预设ID"
+      "description": "Используемый ID пресета"
     },
     "created_at": {
       "type": "string",
       "format": "date-time",
-      "description": "创建时间"
+      "description": "Время создания"
     },
     "updated_at": {
       "type": "string",
       "format": "date-time",
-      "description": "更新时间"
+      "description": "Время обновления"
     }
   },
   "definitions": {
@@ -83,24 +84,24 @@
         "id": {
           "type": "string",
           "pattern": "^[a-z0-9-]+$",
-          "description": "角色ID，引用character-profiles.md"
+          "description": "ID персонажа, ссылка на character-profiles.md"
         },
         "name": {
           "type": "string",
-          "description": "角色名称"
+          "description": "Имя персонажа"
         },
         "focus": {
           "type": "string",
           "enum": ["high", "medium", "low"],
           "default": "medium",
-          "description": "本章重点程度"
+          "description": "Степень важности в данной главе"
         },
         "state_changes": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "本章状态变化"
+          "description": "Изменения состояния в данной главе"
         }
       }
     },
@@ -110,24 +111,24 @@
         "location_id": {
           "type": "string",
           "pattern": "^[a-z0-9-]+$",
-          "description": "地点ID，引用locations.md"
+          "description": "ID локации, ссылка на locations.md"
         },
         "location_name": {
           "type": "string",
-          "description": "地点名称"
+          "description": "Название локации"
         },
         "time": {
           "type": "string",
-          "description": "时间（如'上午10点'、'傍晚'）"
+          "description": "Время (например, '10 утра', 'вечер')"
         },
         "weather": {
           "type": "string",
-          "description": "天气"
+          "description": "Погода"
         },
         "atmosphere": {
           "type": "string",
           "enum": ["tense", "relaxed", "sad", "exciting", "mysterious"],
-          "description": "氛围"
+          "description": "Атмосфера"
         }
       }
     },
@@ -148,13 +149,13 @@
             "world_building",
             "plot_twist"
           ],
-          "description": "剧情类型"
+          "description": "Тип сюжета"
         },
         "summary": {
           "type": "string",
           "minLength": 10,
           "maxLength": 500,
-          "description": "剧情概要"
+          "description": "Краткое изложение сюжета"
         },
         "key_points": {
           "type": "array",
@@ -162,7 +163,7 @@
             "type": "string"
           },
           "minItems": 1,
-          "description": "关键要点"
+          "description": "Ключевые моменты"
         },
         "plotlines": {
           "type": "array",
@@ -170,7 +171,7 @@
             "type": "string",
             "pattern": "^PL-[0-9]+$"
           },
-          "description": "涉及的线索ID"
+          "description": "Задействованные сюжетные линии (ID)"
         },
         "foreshadowing": {
           "type": "array",
@@ -186,7 +187,7 @@
               }
             }
           },
-          "description": "本章伏笔"
+          "description": "Предзнаменования в данной главе"
         }
       }
     },
@@ -197,13 +198,13 @@
           "type": "string",
           "enum": ["fast", "medium", "slow"],
           "default": "medium",
-          "description": "节奏"
+          "description": "Темп"
         },
         "sentence_length": {
           "type": "string",
           "enum": ["short", "medium", "long"],
           "default": "medium",
-          "description": "句子长度"
+          "description": "Длина предложений"
         },
         "focus": {
           "type": "string",
@@ -216,12 +217,12 @@
             "balanced"
           ],
           "default": "balanced",
-          "description": "描写重点"
+          "description": "Фокус описания"
         },
         "tone": {
           "type": "string",
           "enum": ["serious", "humorous", "dark", "light"],
-          "description": "基调"
+          "description": "Тон"
         }
       }
     },
@@ -233,17 +234,17 @@
           "type": "integer",
           "minimum": 1000,
           "maximum": 10000,
-          "description": "目标字数"
+          "description": "Целевое количество слов"
         },
         "min": {
           "type": "integer",
           "minimum": 500,
-          "description": "最小字数"
+          "description": "Минимальное количество слов"
         },
         "max": {
           "type": "integer",
           "maximum": 15000,
-          "description": "最大字数"
+          "description": "Максимальное количество слов"
         }
       }
     }
@@ -251,209 +252,209 @@
 }
 ```
 
-### 1.2 TypeScript类型定义
+### 1.2 Определение типов TypeScript
 
 ```typescript
 /**
- * 章节配置接口
+ * Интерфейс конфигурации главы
  */
 export interface ChapterConfig {
-  /** 章节号 */
+  /** Номер главы */
   chapter: number;
 
-  /** 章节标题 */
+  /** Заголовок главы */
   title: string;
 
-  /** 出场角色 */
+  /** Появляющиеся персонажи */
   characters?: Character[];
 
-  /** 场景配置 */
+  /** Конфигурация сцены */
   scene?: Scene;
 
-  /** 剧情配置 */
+  /** Конфигурация сюжета */
   plot: Plot;
 
-  /** 写作风格 */
+  /** Стиль письма */
   style?: Style;
 
-  /** 字数要求 */
+  /** Требования к количеству слов */
   wordcount: Wordcount;
 
-  /** 特殊要求 */
+  /** Особые требования */
   special_requirements?: string;
 
-  /** 使用的预设 */
+  /** Используемый пресет */
   preset_used?: string;
 
-  /** 创建时间 */
+  /** Время создания */
   created_at?: string;
 
-  /** 更新时间 */
+  /** Время обновления */
   updated_at?: string;
 }
 
 /**
- * 角色配置
+ * Конфигурация персонажа
  */
 export interface Character {
-  /** 角色ID（引用character-profiles.md） */
+  /** ID персонажа (ссылка на character-profiles.md) */
   id: string;
 
-  /** 角色名称 */
+  /** Имя персонажа */
   name: string;
 
-  /** 本章重点程度 */
+  /** Степень важности в данной главе */
   focus?: 'high' | 'medium' | 'low';
 
-  /** 本章状态变化 */
+  /** Изменения состояния в данной главе */
   state_changes?: string[];
 }
 
 /**
- * 场景配置
+ * Конфигурация сцены
  */
 export interface Scene {
-  /** 地点ID（引用locations.md） */
+  /** ID локации (ссылка на locations.md) */
   location_id?: string;
 
-  /** 地点名称 */
+  /** Название локации */
   location_name?: string;
 
-  /** 时间 */
+  /** Время */
   time?: string;
 
-  /** 天气 */
+  /** Погода */
   weather?: string;
 
-  /** 氛围 */
+  /** Атмосфера */
   atmosphere?: 'tense' | 'relaxed' | 'sad' | 'exciting' | 'mysterious';
 }
 
 /**
- * 剧情配置
+ * Конфигурация сюжета
  */
 export interface Plot {
-  /** 剧情类型 */
+  /** Тип сюжета */
   type: PlotType;
 
-  /** 剧情概要 */
+  /** Краткое изложение сюжета */
   summary: string;
 
-  /** 关键要点 */
+  /** Ключевые моменты */
   key_points?: string[];
 
-  /** 涉及的线索 */
+  /** Задействованные сюжетные линии */
   plotlines?: string[];
 
-  /** 伏笔 */
+  /** Предзнаменования */
   foreshadowing?: Foreshadowing[];
 }
 
 /**
- * 剧情类型枚举
+ * Перечисление типов сюжета
  */
 export type PlotType =
-  | 'ability_showcase'      // 能力展现
-  | 'relationship_dev'      // 关系发展
-  | 'conflict_combat'       // 冲突对抗
-  | 'mystery_suspense'      // 悬念铺垫
-  | 'transition'            // 过渡承接
-  | 'climax'                // 高潮对决
-  | 'emotional_scene'       // 情感戏
-  | 'world_building'        // 世界观展开
-  | 'plot_twist';           // 剧情反转
+  | 'ability_showcase'      // Демонстрация способностей
+  | 'relationship_dev'      // Развитие отношений
+  | 'conflict_combat'       // Конфликт, схватка
+  | 'mystery_suspense'      // Тайна, напряжение
+  | 'transition'            // Переход, связка
+  | 'climax'                // Кульминация, противостояние
+  | 'emotional_scene'       // Эмоциональная сцена
+  | 'world_building'        // Раскрытие мира
+  | 'plot_twist';           // Сюжетный поворот
 
 /**
- * 伏笔配置
+ * Конфигурация предзнаменования
  */
 export interface Foreshadowing {
-  /** 伏笔ID */
+  /** ID предзнаменования */
   id: string;
 
-  /** 伏笔内容 */
+  /** Содержание предзнаменования */
   content: string;
 }
 
 /**
- * 写作风格配置
+ * Конфигурация стиля письма
  */
 export interface Style {
-  /** 节奏 */
+  /** Темп */
   pace?: 'fast' | 'medium' | 'slow';
 
-  /** 句子长度 */
+  /** Длина предложений */
   sentence_length?: 'short' | 'medium' | 'long';
 
-  /** 描写重点 */
+  /** Фокус описания */
   focus?: 'action' | 'dialogue' | 'psychology' | 'description' | 'dialogue_action' | 'balanced';
 
-  /** 基调 */
+  /** Тон */
   tone?: 'serious' | 'humorous' | 'dark' | 'light';
 }
 
 /**
- * 字数配置
+ * Конфигурация количества слов
  */
 export interface Wordcount {
-  /** 目标字数 */
+  /** Целевое количество слов */
   target: number;
 
-  /** 最小字数 */
+  /** Минимальное количество слов */
   min?: number;
 
-  /** 最大字数 */
+  /** Максимальное количество слов */
   max?: number;
 }
 
 /**
- * 预设配置接口
+ * Интерфейс конфигурации пресета
  */
 export interface Preset {
-  /** 预设ID */
+  /** ID пресета */
   id: string;
 
-  /** 预设名称 */
+  /** Название пресета */
   name: string;
 
-  /** 描述 */
+  /** Описание */
   description: string;
 
-  /** 类别 */
+  /** Категория */
   category: 'scene' | 'style' | 'chapter';
 
-  /** 作者 */
+  /** Автор */
   author: string;
 
-  /** 版本 */
+  /** Версия */
   version: string;
 
-  /** 默认配置 */
+  /** Конфигурация по умолчанию */
   defaults: Partial<ChapterConfig>;
 
-  /** 推荐设置 */
+  /** Рекомендуемые настройки */
   recommended?: {
     plot_types?: PlotType[];
     atmosphere?: Scene['atmosphere'][];
   };
 
-  /** 兼容性 */
+  /** Совместимые жанры */
   compatible_genres?: string[];
 
-  /** 使用提示 */
+  /** Советы по использованию */
   usage_tips?: string[];
 }
 ```
 
 ---
 
-## 二、核心类设计
+## II. Проектирование основных классов
 
 ### 2.1 ChapterConfigManager
 
 ```typescript
 /**
- * 章节配置管理器
- * 负责配置的创建、读取、验证、更新、删除
+ * Менеджер конфигурации глав
+ * Отвечает за создание, чтение, проверку, обновление, удаление конфигураций
  */
 export class ChapterConfigManager {
   private projectPath: string;
@@ -467,16 +468,16 @@ export class ChapterConfigManager {
   }
 
   /**
-   * 创建章节配置
+   * Создание конфигурации главы
    */
   async createConfig(
     chapter: number,
     options: CreateConfigOptions
   ): Promise<ChapterConfig> {
-    // 1. 初始化配置
+    // 1. Инициализация конфигурации
     let config: ChapterConfig = {
       chapter,
-      title: options.title || `第${chapter}章`,
+      title: options.title || `Глава ${chapter}`,
       characters: [],
       scene: {},
       plot: {
@@ -497,13 +498,13 @@ export class ChapterConfigManager {
       created_at: new Date().toISOString()
     };
 
-    // 2. 应用预设（如果指定）
+    // 2. Применение пресета (если указан)
     if (options.preset) {
       const preset = await this.presetManager.loadPreset(options.preset);
       config = this.applyPreset(preset, config);
     }
 
-    // 3. 合并用户输入
+    // 3. Объединение пользовательского ввода
     if (options.characters) {
       config.characters = await this.loadCharacterDetails(options.characters);
     }
@@ -512,13 +513,13 @@ export class ChapterConfigManager {
       config.scene = await this.loadSceneDetails(options.scene);
     }
 
-    // 4. 验证配置
+    // 4. Проверка конфигурации
     const validation = await this.validator.validate(config);
     if (!validation.valid) {
-      throw new Error(`配置验证失败: ${validation.errors.join(', ')}`);
+      throw new Error(`Ошибка проверки конфигурации: ${validation.errors.join(', ')}`);
     }
 
-    // 5. 保存到文件
+    // 5. Сохранение в файл
     const configPath = this.getConfigPath(chapter);
     await fs.ensureDir(path.dirname(configPath));
     await fs.writeFile(configPath, yaml.dump(config, { indent: 2 }), 'utf-8');
@@ -527,7 +528,7 @@ export class ChapterConfigManager {
   }
 
   /**
-   * 加载章节配置
+   * Загрузка конфигурации главы
    */
   async loadConfig(chapter: number): Promise<ChapterConfig | null> {
     const configPath = this.getConfigPath(chapter);
@@ -539,468 +540,138 @@ export class ChapterConfigManager {
     const content = await fs.readFile(configPath, 'utf-8');
     const config = yaml.load(content) as ChapterConfig;
 
-    // 验证配置
+    // Проверка конфигурации
     const validation = await this.validator.validate(config);
     if (!validation.valid) {
-      console.warn(`配置文件存在问题: ${validation.errors.join(', ')}`);
-    }
-
-    return config;
-  }
-
-  /**
-   * 更新章节配置
-   */
-  async updateConfig(
-    chapter: number,
-    updates: Partial<ChapterConfig>
-  ): Promise<ChapterConfig> {
-    const config = await this.loadConfig(chapter);
-    if (!config) {
-      throw new Error(`配置文件不存在: chapter ${chapter}`);
-    }
-
-    const updatedConfig = {
-      ...config,
-      ...updates,
-      updated_at: new Date().toISOString()
-    };
-
-    // 验证更新后的配置
-    const validation = await this.validator.validate(updatedConfig);
-    if (!validation.valid) {
-      throw new Error(`更新后配置无效: ${validation.errors.join(', ')}`);
-    }
-
-    // 保存
-    const configPath = this.getConfigPath(chapter);
-    await fs.writeFile(
-      configPath,
-      yaml.dump(updatedConfig, { indent: 2 }),
-      'utf-8'
-    );
-
-    return updatedConfig;
-  }
-
-  /**
-   * 删除章节配置
-   */
-  async deleteConfig(chapter: number): Promise<void> {
-    const configPath = this.getConfigPath(chapter);
-
-    if (!await fs.pathExists(configPath)) {
-      throw new Error(`配置文件不存在: chapter ${chapter}`);
-    }
-
-    await fs.remove(configPath);
-  }
-
-  /**
-   * 列出所有配置
-   */
-  async listConfigs(): Promise<ChapterConfigSummary[]> {
-    const chaptersDir = path.join(
+```
+```json
+    const locationsPath = path.join(
       this.projectPath,
-      'stories',
-      '*',
-      'chapters'
+      'spec',
+      'knowledge',
+      'locations.md'
     );
 
-    const configFiles = await glob(path.join(chaptersDir, '*.yaml'));
-
-    const summaries: ChapterConfigSummary[] = [];
-
-    for (const file of configFiles) {
-      const content = await fs.readFile(file, 'utf-8');
-      const config = yaml.load(content) as ChapterConfig;
-
-      summaries.push({
-        chapter: config.chapter,
-        title: config.title,
-        plotType: config.plot.type,
-        location: config.scene?.location_name || '-',
-        wordcount: config.wordcount.target,
-        preset: config.preset_used,
-        createdAt: config.created_at
-      });
+    if (!await fs.pathExists(locationsPath)) {
+      return false;
     }
 
-    return summaries.sort((a, b) => a.chapter - b.chapter);
+    const content = await fs.readFile(locationsPath, 'utf-8');
+    // 检查是否包含该地点ID（简化实现）
+    return content.includes(`id: ${id}`) || content.includes(`ID: ${id}`);
   }
 
-  /**
-   * 复制配置
-   */
-  async copyConfig(
-    fromChapter: number,
-    toChapter: number,
-    modifications?: Partial<ChapterConfig>
-  ): Promise<ChapterConfig> {
-    const sourceConfig = await this.loadConfig(fromChapter);
-    if (!sourceConfig) {
-      throw new Error(`源配置不存在: chapter ${fromChapter}`);
-    }
-
-    const newConfig: ChapterConfig = {
-      ...sourceConfig,
-      chapter: toChapter,
-      ...modifications,
-      created_at: new Date().toISOString(),
-      updated_at: undefined
-    };
-
-    return this.createConfig(toChapter, {
-      title: newConfig.title,
-      plotType: newConfig.plot.type,
-      plotSummary: newConfig.plot.summary,
-      keyPoints: newConfig.plot.key_points,
-      wordcount: newConfig.wordcount.target,
-      // ...
-    } as CreateConfigOptions);
-  }
-
-  // ========== 私有辅助方法 ==========
-
-  private getConfigPath(chapter: number): string {
-    // 查找项目中的stories目录
-    const storiesDir = path.join(this.projectPath, 'stories');
-    const storyDirs = fs.readdirSync(storiesDir);
-
-    if (storyDirs.length === 0) {
-      throw new Error('未找到故事目录');
-    }
-
-    // 使用第一个故事目录（通常只有一个）
-    const storyDir = storyDirs[0];
-    return path.join(
-      storiesDir,
-      storyDir,
-      'chapters',
-      `chapter-${chapter}-config.yaml`
+  private async checkPlotlineExists(id: string): Promise<boolean> {
+    const specificationPath = path.join(
+      this.projectPath,
+      'spec',
+      'specification.md'
     );
-  }
 
-  private applyPreset(
-    preset: Preset,
-    config: ChapterConfig
-  ): ChapterConfig {
-    return {
-      ...config,
-      ...preset.defaults,
-      preset_used: preset.id,
-      // 合并special_requirements
-      special_requirements: [
-        preset.defaults.special_requirements,
-        config.special_requirements
-      ].filter(Boolean).join('\n\n')
-    };
-  }
+    if (!await fs.pathExists(specificationPath)) {
+      return false;
+    }
 
-  private async loadCharacterDetails(
-    characterIds: string[]
-  ): Promise<Character[]> {
-    // 从character-profiles.md加载详情
-    // 实现省略...
-    return [];
-  }
-
-  private async loadSceneDetails(
-    sceneId: string
-  ): Promise<Scene> {
-    // 从locations.md加载详情
-    // 实现省略...
-    return {};
+    const content = await fs.readFile(specificationPath, 'utf-8');
+    // 检查是否包含该线索ID（简化实现）
+    return content.includes(`id: ${id}`) || content.includes(`ID: ${id}`);
   }
 }
 
 /**
- * 配置摘要接口
+ * 验证结果接口
  */
-export interface ChapterConfigSummary {
+export interface ValidationResult {
+  valid: boolean;
+  errors: string[];
+  warnings: string[];
+}
+
+// ========== 类型定义 ==========
+
+/**
+ * 章节配置接口
+ */
+export interface ChapterConfig {
   chapter: number;
   title: string;
-  plotType: PlotType;
-  location: string;
-  wordcount: number;
-  preset?: string;
-  createdAt?: string;
-}
-
-/**
- * 创建配置选项
- */
-export interface CreateConfigOptions {
-  title?: string;
-  characters?: string[];
-  scene?: string;
-  plotType?: PlotType;
-  plotSummary?: string;
-  keyPoints?: string[];
-  preset?: string;
-  wordcount?: number;
+  plot: Plot;
+  characters?: Character[];
+  scene?: Scene;
+  wordcount: Wordcount;
+  preset_used?: string;
+  created_at?: string;
+  updated_at?: string;
   style?: Partial<Style>;
-  specialRequirements?: string;
-}
-```
-
-### 2.2 PresetManager
-
-```typescript
-/**
- * 预设管理器
- * 负责预设的加载、创建、导入、导出
- */
-export class PresetManager {
-  private presetDirs: string[];
-
-  constructor() {
-    this.presetDirs = [
-      path.join(process.cwd(), 'stories', '*', 'presets'),  // 项目本地
-      path.join(os.homedir(), '.novel', 'presets', 'user'), // 用户自定义
-      path.join(os.homedir(), '.novel', 'presets', 'community'), // 社区
-      path.join(os.homedir(), '.novel', 'presets', 'official'), // 官方
-      path.join(__dirname, '..', '..', 'presets')  // 内置
-    ];
-  }
-
-  /**
-   * 加载预设
-   */
-  async loadPreset(presetId: string): Promise<Preset> {
-    for (const dir of this.presetDirs) {
-      const presetPath = await this.findPresetInDir(dir, presetId);
-      if (presetPath) {
-        const content = await fs.readFile(presetPath, 'utf-8');
-        return yaml.load(content) as Preset;
-      }
-    }
-
-    throw new Error(`预设未找到: ${presetId}`);
-  }
-
-  /**
-   * 列出所有预设
-   */
-  async listPresets(category?: string): Promise<PresetInfo[]> {
-    const presets: PresetInfo[] = [];
-    const seen = new Set<string>();
-
-    for (const dir of this.presetDirs) {
-      if (!await fs.pathExists(dir)) continue;
-
-      const files = await glob(path.join(dir, '**', '*.yaml'));
-
-      for (const file of files) {
-        const content = await fs.readFile(file, 'utf-8');
-        const preset = yaml.load(content) as Preset;
-
-        // 跳过重复ID（优先级高的已加载）
-        if (seen.has(preset.id)) continue;
-
-        // 类别过滤
-        if (category && preset.category !== category) continue;
-
-        seen.add(preset.id);
-        presets.push({
-          id: preset.id,
-          name: preset.name,
-          description: preset.description,
-          category: preset.category,
-          author: preset.author,
-          source: this.getPresetSource(file)
-        });
-      }
-    }
-
-    return presets;
-  }
-
-  /**
-   * 创建预设
-   */
-  async createPreset(preset: Preset, target: 'user' | 'project'): Promise<void> {
-    const targetDir = target === 'user'
-      ? path.join(os.homedir(), '.novel', 'presets', 'user')
-      : path.join(process.cwd(), 'stories', '*', 'presets');
-
-    await fs.ensureDir(targetDir);
-
-    const presetPath = path.join(targetDir, `${preset.id}.yaml`);
-    await fs.writeFile(presetPath, yaml.dump(preset, { indent: 2 }), 'utf-8');
-  }
-
-  /**
-   * 导入预设
-   */
-  async importPreset(file: string, target: 'user' | 'community'): Promise<void> {
-    const content = await fs.readFile(file, 'utf-8');
-    const preset = yaml.load(content) as Preset;
-
-    const targetDir = path.join(
-      os.homedir(),
-      '.novel',
-      'presets',
-      target
-    );
-
-    await fs.ensureDir(targetDir);
-    await fs.copy(file, path.join(targetDir, path.basename(file)));
-  }
-
-  /**
-   * 导出预设
-   */
-  async exportPreset(presetId: string, outputPath: string): Promise<void> {
-    const preset = await this.loadPreset(presetId);
-    await fs.writeFile(outputPath, yaml.dump(preset, { indent: 2 }), 'utf-8');
-  }
-
-  // ========== 私有方法 ==========
-
-  private async findPresetInDir(
-    dir: string,
-    presetId: string
-  ): Promise<string | null> {
-    if (!await fs.pathExists(dir)) return null;
-
-    const files = await glob(path.join(dir, '**', `${presetId}.yaml`));
-    return files.length > 0 ? files[0] : null;
-  }
-
-  private getPresetSource(filePath: string): PresetSource {
-    if (filePath.includes('.novel/presets/official')) return 'official';
-    if (filePath.includes('.novel/presets/community')) return 'community';
-    if (filePath.includes('.novel/presets/user')) return 'user';
-    if (filePath.includes('stories')) return 'project';
-    return 'builtin';
-  }
+  special_requirements?: string;
 }
 
 /**
- * 预设信息接口
+ * 剧情接口
  */
-export interface PresetInfo {
+export interface Plot {
+  type: PlotType;
+  summary: string;
+  key_points?: string[];
+  plotlines?: string[];
+}
+
+/**
+ * 剧情类型
+ */
+export type PlotType = 'linear' | 'non-linear' | 'episodic';
+
+/**
+ * 角色接口
+ */
+export interface Character {
+  id: string;
+  name: string;
+  description?: string;
+  role?: string;
+}
+
+/**
+ * 场景接口
+ */
+export interface Scene {
+  location_id?: string;
+  location_name?: string;
+  time_of_day?: string;
+  atmosphere?: string;
+}
+
+/**
+ * 字数接口
+ */
+export interface Wordcount {
+  min?: number;
+  target?: number;
+  max?: number;
+}
+
+/**
+ * 风格接口
+ */
+export interface Style {
+  tone: string;
+  pace: string;
+  point_of_view: string;
+}
+
+/**
+ * 预设接口
+ */
+export interface Preset {
   id: string;
   name: string;
   description: string;
   category: string;
   author: string;
-  source: PresetSource;
+  defaults: Partial<ChapterConfig>;
 }
-
-export type PresetSource = 'official' | 'community' | 'user' | 'project' | 'builtin';
 ```
-
-### 2.3 ConfigValidator
-
 ```typescript
-/**
- * 配置验证器
- * 负责验证配置的完整性、一致性、引用完整性
- */
-export class ConfigValidator {
-  private projectPath: string;
-
-  constructor(projectPath: string) {
-    this.projectPath = projectPath;
-  }
-
-  /**
-   * 验证配置
-   */
-  async validate(config: ChapterConfig): Promise<ValidationResult> {
-    const errors: string[] = [];
-    const warnings: string[] = [];
-
-    // 1. 必填字段检查
-    if (!config.chapter) errors.push('缺少章节号');
-    if (!config.title || config.title.trim() === '') errors.push('缺少章节标题');
-    if (!config.plot || !config.plot.summary) errors.push('缺少剧情概要');
-    if (!config.wordcount || !config.wordcount.target) errors.push('缺少目标字数');
-
-    // 2. 数据类型和范围检查
-    if (config.chapter < 1) errors.push('章节号必须大于0');
-    if (config.wordcount.target < 1000 || config.wordcount.target > 10000) {
-      warnings.push('目标字数建议在1000-10000之间');
-    }
-
-    // 3. 引用完整性检查
-    if (config.characters) {
-      for (const char of config.characters) {
-        const exists = await this.checkCharacterExists(char.id);
-        if (!exists) {
-          errors.push(`角色ID "${char.id}" 不存在于 character-profiles.md`);
-        }
-      }
-    }
-
-    if (config.scene?.location_id) {
-      const exists = await this.checkLocationExists(config.scene.location_id);
-      if (!exists) {
-        errors.push(`地点ID "${config.scene.location_id}" 不存在于 locations.md`);
-      }
-    }
-
-    if (config.plot.plotlines) {
-      for (const plotline of config.plot.plotlines) {
-        const exists = await this.checkPlotlineExists(plotline);
-        if (!exists) {
-          errors.push(`线索ID "${plotline}" 不存在于 specification.md`);
-        }
-      }
-    }
-
-    // 4. 逻辑一致性检查
-    const { min, target, max } = config.wordcount;
-    if (min && target && min > target) {
-      errors.push('最小字数不能大于目标字数');
-    }
-    if (target && max && target > max) {
-      errors.push('目标字数不能大于最大字数');
-    }
-
-    // 5. 最佳实践建议
-    if (!config.characters || config.characters.length === 0) {
-      warnings.push('建议至少指定一个出场角色');
-    }
-
-    if (!config.plot.key_points || config.plot.key_points.length < 3) {
-      warnings.push('建议至少列出3个关键要点');
-    }
-
-    if (!config.scene) {
-      warnings.push('建议配置场景信息');
-    }
-
-    return {
-      valid: errors.length === 0,
-      errors,
-      warnings
-    };
-  }
-
-  // ========== 私有方法 ==========
-
-  private async checkCharacterExists(id: string): Promise<boolean> {
-    const profilesPath = path.join(
-      this.projectPath,
-      'spec',
-      'knowledge',
-      'character-profiles.md'
-    );
-
-    if (!await fs.pathExists(profilesPath)) {
-      return false;
-    }
-
-    const content = await fs.readFile(profilesPath, 'utf-8');
-    // 检查是否包含该角色ID（简化实现）
-    return content.includes(`id: ${id}`) || content.includes(`ID: ${id}`);
-  }
-
-  private async checkLocationExists(id: string): Promise<boolean> {
-    const locationsPath = path.join(
       this.projectPath,
       'spec',
       'knowledge',
@@ -1032,7 +703,7 @@ export class ConfigValidator {
 }
 
 /**
- * 验证结果接口
+ * Интерфейс результата валидации
  */
 export interface ValidationResult {
   valid: boolean;
@@ -1043,9 +714,9 @@ export interface ValidationResult {
 
 ---
 
-## 三、CLI命令实现
+## III. Реализация команд CLI
 
-### 3.1 命令入口文件
+### 3.1 Входной файл команды
 
 ```typescript
 // src/commands/chapter-config.ts
@@ -1058,25 +729,25 @@ import { ChapterConfigManager } from '../core/chapter-config.js';
 import { PresetManager } from '../core/preset-manager.js';
 
 /**
- * 注册chapter-config命令
+ * Регистрация команд chapter-config
  */
 export function registerChapterConfigCommands(program: Command): void {
   const chapterConfig = program
     .command('chapter-config')
-    .description('章节配置管理');
+    .description('Управление конфигурацией глав');
 
-  // create 命令
+  // Команда create
   chapterConfig
     .command('create <chapter>')
-    .option('-i, --interactive', '交互式创建')
-    .option('-p, --preset <preset-id>', '使用预设')
-    .option('--from-prompt', '从自然语言生成')
-    .description('创建章节配置')
+    .option('-i, --interactive', 'Интерактивное создание')
+    .option('-p, --preset <preset-id>', 'Использовать пресет')
+    .option('--from-prompt', 'Генерация из естественного языка')
+    .description('Создать конфигурацию главы')
     .action(async (chapter, options) => {
       try {
         const chapterNum = parseInt(chapter);
         if (isNaN(chapterNum)) {
-          console.error(chalk.red('章节号必须是数字'));
+          console.error(chalk.red('Номер главы должен быть числом'));
           process.exit(1);
         }
 
@@ -1085,143 +756,143 @@ export function registerChapterConfigCommands(program: Command): void {
         } else if (options.preset) {
           await createConfigWithPreset(chapterNum, options.preset);
         } else {
-          console.error(chalk.red('请指定 --interactive 或 --preset'));
+          console.error(chalk.red('Укажите --interactive или --preset'));
           process.exit(1);
         }
       } catch (error: any) {
-        console.error(chalk.red(`创建失败: ${error.message}`));
+        console.error(chalk.red(`Ошибка создания: ${error.message}`));
         process.exit(1);
       }
     });
 
-  // list 命令
+  // Команда list
   chapterConfig
     .command('list')
-    .option('--format <type>', '输出格式: table|json|yaml', 'table')
-    .description('列出所有章节配置')
+    .option('--format <type>', 'Формат вывода: table|json|yaml', 'table')
+    .description('Список всех конфигураций глав')
     .action(async (options) => {
       try {
         await listConfigs(options.format);
       } catch (error: any) {
-        console.error(chalk.red(`列出失败: ${error.message}`));
+        console.error(chalk.red(`Ошибка списка: ${error.message}`));
         process.exit(1);
       }
     });
 
-  // validate 命令
+  // Команда validate
   chapterConfig
     .command('validate <chapter>')
-    .description('验证章节配置')
+    .description('Проверить конфигурацию главы')
     .action(async (chapter) => {
       try {
         const chapterNum = parseInt(chapter);
         await validateConfig(chapterNum);
       } catch (error: any) {
-        console.error(chalk.red(`验证失败: ${error.message}`));
+        console.error(chalk.red(`Ошибка проверки: ${error.message}`));
         process.exit(1);
       }
     });
 
-  // copy 命令
+  // Команда copy
   chapterConfig
     .command('copy <from> <to>')
-    .option('-i, --interactive', '交互式修改差异')
-    .description('复制章节配置')
+    .option('-i, --interactive', 'Интерактивное изменение различий')
+    .description('Копировать конфигурацию главы')
     .action(async (from, to, options) => {
       try {
         const fromChapter = parseInt(from);
         const toChapter = parseInt(to);
         await copyConfig(fromChapter, toChapter, options.interactive);
       } catch (error: any) {
-        console.error(chalk.red(`复制失败: ${error.message}`));
+        console.error(chalk.red(`Ошибка копирования: ${error.message}`));
         process.exit(1);
       }
     });
 
-  // edit 命令
+  // Команда edit
   chapterConfig
     .command('edit <chapter>')
-    .option('-e, --editor <editor>', '指定编辑器', 'vim')
-    .description('编辑章节配置')
+    .option('-e, --editor <editor>', 'Указать редактор', 'vim')
+    .description('Редактировать конфигурацию главы')
     .action(async (chapter, options) => {
       try {
         const chapterNum = parseInt(chapter);
         await editConfig(chapterNum, options.editor);
       } catch (error: any) {
-        console.error(chalk.red(`编辑失败: ${error.message}`));
+        console.error(chalk.red(`Ошибка редактирования: ${error.message}`));
         process.exit(1);
       }
     });
 
-  // delete 命令
+  // Команда delete
   chapterConfig
     .command('delete <chapter>')
-    .description('删除章节配置')
+    .description('Удалить конфигурацию главы')
     .action(async (chapter) => {
       try {
         const chapterNum = parseInt(chapter);
         await deleteConfig(chapterNum);
       } catch (error: any) {
-        console.error(chalk.red(`删除失败: ${error.message}`));
+        console.error(chalk.red(`Ошибка удаления: ${error.message}`));
         process.exit(1);
       }
     });
 }
 
 /**
- * 交互式创建配置
+ * Интерактивное создание конфигурации
  */
 async function createConfigInteractive(chapter: number): Promise<void> {
-  // 实现见前文 2.4.2 节
-  console.log(chalk.cyan(`\n📝 创建第${chapter}章配置\n`));
+  // Реализация см. в разделе 2.4.2 выше
+  console.log(chalk.cyan(`\n📝 Создание конфигурации главы ${chapter}\n`));
 
-  // ...（完整实现省略）
+  // ... (полная реализация опущена)
 }
 
 /**
- * 使用预设创建配置
+ * Создание конфигурации с использованием пресета
  */
 async function createConfigWithPreset(
   chapter: number,
   presetId: string
 ): Promise<void> {
-  const spinner = ora('加载预设...').start();
+  const spinner = ora('Загрузка пресета...').start();
 
   try {
     const presetManager = new PresetManager();
     const preset = await presetManager.loadPreset(presetId);
 
-    spinner.succeed(chalk.green(`已加载预设: ${preset.name}`));
+    spinner.succeed(chalk.green(`Пресет загружен: ${preset.name}`));
 
-    // 提示用户补充必要信息
+    // Запрос у пользователя необходимой информации
     const answers = await inquirer.prompt([
       {
         type: 'input',
         name: 'title',
-        message: '章节标题:',
+        message: 'Название главы:',
         validate: (input) => input.length > 0
       },
       {
         type: 'input',
         name: 'characters',
-        message: '出场角色 (逗号分隔):',
+        message: 'Участвующие персонажи (через запятую):',
         validate: (input) => input.length > 0
       },
       {
         type: 'input',
         name: 'scene',
-        message: '场景:',
+        message: 'Сцена:',
         validate: (input) => input.length > 0
       },
       {
         type: 'input',
         name: 'plotSummary',
-        message: '剧情概要:',
+        message: 'Краткое содержание сюжета:',
         validate: (input) => input.length > 10
       }
     ]);
 
-    // 创建配置
+    // Создание конфигурации
     const manager = new ChapterConfigManager(process.cwd());
     const config = await manager.createConfig(chapter, {
       title: answers.title,
@@ -1231,19 +902,19 @@ async function createConfigWithPreset(
       preset: presetId
     });
 
-    console.log(chalk.green(`\n✅ 配置已保存`));
-    console.log(chalk.gray(`文件: ${getConfigPath(chapter)}`));
+    console.log(chalk.green(`\n✅ Конфигурация сохранена`));
+    console.log(chalk.gray(`Файл: ${getConfigPath(chapter)}`));
   } catch (error: any) {
-    spinner.fail(chalk.red(`创建失败: ${error.message}`));
+    spinner.fail(chalk.red(`Ошибка создания: ${error.message}`));
     process.exit(1);
   }
 }
 
 /**
- * 列出所有配置
+ * Список всех конфигураций
  */
 async function listConfigs(format: string): Promise<void> {
-  const spinner = ora('加载配置列表...').start();
+  const spinner = ora('Загрузка списка конфигураций...').start();
 
   try {
     const manager = new ChapterConfigManager(process.cwd());
@@ -1252,21 +923,21 @@ async function listConfigs(format: string): Promise<void> {
     spinner.stop();
 
     if (configs.length === 0) {
-      console.log(chalk.yellow('\n暂无章节配置'));
+      console.log(chalk.yellow('\nНет конфигураций глав'));
       return;
     }
 
-    console.log(chalk.cyan(`\n📋 已有章节配置 (${configs.length}个):\n`));
+    console.log(chalk.cyan(`\n📋 Имеющиеся конфигурации глав (${configs.length}):\n`));
 
     if (format === 'table') {
-      // 表格输出
+      // Табличный вывод
       console.table(configs.map(c => ({
-        '章节': `第${c.chapter}章`,
-        '标题': c.title,
-        '类型': c.plotType,
-        '场景': c.location,
-        '字数': c.wordcount,
-        '预设': c.preset || '-'
+        'Глава': `Глава ${c.chapter}`,
+        'Название': c.title,
+        'Тип сюжета': c.plotType,
+        'Сцена': c.location,
+        'Кол-во слов': c.wordcount,
+        'Пресет': c.preset || '-'
       })));
     } else if (format === 'json') {
       console.log(JSON.stringify(configs, null, 2));
@@ -1274,22 +945,22 @@ async function listConfigs(format: string): Promise<void> {
       console.log(yaml.dump(configs));
     }
   } catch (error: any) {
-    spinner.fail(chalk.red(`加载失败: ${error.message}`));
+    spinner.fail(chalk.red(`Ошибка загрузки: ${error.message}`));
     process.exit(1);
   }
 }
 
 /**
- * 验证配置
+ * Проверка конфигурации
  */
 async function validateConfig(chapter: number): Promise<void> {
-  console.log(chalk.cyan(`\n🔍 验证配置文件: chapter-${chapter}-config.yaml\n`));
+  console.log(chalk.cyan(`\n🔍 Проверка файла конфигурации: chapter-${chapter}-config.yaml\n`));
 
   const manager = new ChapterConfigManager(process.cwd());
   const config = await manager.loadConfig(chapter);
 
   if (!config) {
-    console.error(chalk.red('❌ 配置文件不存在'));
+    console.error(chalk.red('❌ Файл конфигурации не существует'));
     process.exit(1);
   }
 
@@ -1297,9 +968,9 @@ async function validateConfig(chapter: number): Promise<void> {
   const result = await validator.validate(config);
 
   if (result.valid) {
-    console.log(chalk.green('✅ 验证通过！\n'));
+    console.log(chalk.green('✅ Проверка пройдена!\n'));
   } else {
-    console.log(chalk.red(`❌ 验证失败 (${result.errors.length}个错误):\n`));
+    console.log(chalk.red(`❌ Проверка не удалась (${result.errors.length} ошибок):\n`));
     result.errors.forEach((error, index) => {
       console.log(chalk.red(`  ${index + 1}. ${error}`));
     });
@@ -1307,7 +978,7 @@ async function validateConfig(chapter: number): Promise<void> {
   }
 
   if (result.warnings.length > 0) {
-    console.log(chalk.yellow(`⚠️  警告 (${result.warnings.length}个):\n`));
+    console.log(chalk.yellow(`⚠️  Предупреждения (${result.warnings.length}):\n`));
     result.warnings.forEach((warning, index) => {
       console.log(chalk.yellow(`  ${index + 1}. ${warning}`));
     });
@@ -1320,7 +991,7 @@ async function validateConfig(chapter: number): Promise<void> {
 }
 
 /**
- * 复制配置
+ * Копирование конфигурации
  */
 async function copyConfig(
   from: number,
@@ -1329,13 +1000,13 @@ async function copyConfig(
 ): Promise<void> {
   const manager = new ChapterConfigManager(process.cwd());
 
-  console.log(chalk.cyan(`\n📋 复制配置: 第${from}章 → 第${to}章\n`));
+  console.log(chalk.cyan(`\n📋 Копирование конфигурации: Глава ${from} → Глава ${to}\n`));
 
   if (interactive) {
-    // 交互式修改差异
+    // Интерактивное изменение различий
     const sourceConfig = await manager.loadConfig(from);
     if (!sourceConfig) {
-      console.error(chalk.red('源配置不存在'));
+      console.error(chalk.red('Исходная конфигурация не существует'));
       process.exit(1);
     }
 
@@ -1343,16 +1014,16 @@ async function copyConfig(
       {
         type: 'input',
         name: 'title',
-        message: '新标题:',
+        message: 'Новое название:',
         default: sourceConfig.title
       },
       {
         type: 'input',
         name: 'plotSummary',
-        message: '剧情概要:',
+        message: 'Краткое содержание сюжета:',
         default: sourceConfig.plot.summary
       }
-      // ...更多字段
+      // ... больше полей
     ]);
 
     await manager.copyConfig(from, to, answers);
@@ -1360,21 +1031,21 @@ async function copyConfig(
     await manager.copyConfig(from, to);
   }
 
-  console.log(chalk.green(`\n✅ 配置已复制`));
+  console.log(chalk.green(`\n✅ Конфигурация скопирована`));
 }
 
 /**
- * 编辑配置
+ * Редактирование конфигурации
  */
 async function editConfig(chapter: number, editor: string): Promise<void> {
   const configPath = getConfigPath(chapter);
 
   if (!await fs.pathExists(configPath)) {
-    console.error(chalk.red('配置文件不存在'));
+    console.error(chalk.red('Файл конфигурации не существует'));
     process.exit(1);
   }
 
-  // 调用编辑器
+  // Вызов редактора
   const { spawn } = await import('child_process');
   const child = spawn(editor, [configPath], {
     stdio: 'inherit'
@@ -1382,59 +1053,59 @@ async function editConfig(chapter: number, editor: string): Promise<void> {
 
   child.on('exit', (code) => {
     if (code === 0) {
-      console.log(chalk.green('\n✅ 编辑完成'));
+      console.log(chalk.green('\n✅ Редактирование завершено'));
     } else {
-      console.error(chalk.red('\n❌ 编辑失败'));
+      console.error(chalk.red('\n❌ Ошибка редактирования'));
       process.exit(1);
     }
   });
 }
 
 /**
- * 删除配置
+ * Удаление конфигурации
  */
 async function deleteConfig(chapter: number): Promise<void> {
   const answers = await inquirer.prompt([
     {
       type: 'confirm',
       name: 'confirm',
-      message: `确认删除第${chapter}章配置?`,
+      message: `Подтвердите удаление конфигурации главы ${chapter}?`,
       default: false
     }
   ]);
 
   if (!answers.confirm) {
-    console.log(chalk.yellow('已取消'));
+    console.log(chalk.yellow('Отменено'));
     return;
   }
 
   const manager = new ChapterConfigManager(process.cwd());
   await manager.deleteConfig(chapter);
 
-  console.log(chalk.green(`\n✅ 配置已删除`));
+  console.log(chalk.green(`\n✅ Конфигурация удалена`));
 }
 
-// 辅助函数
+// Вспомогательная функция
 function getConfigPath(chapter: number): string {
-  // 实现省略...
+  // Реализация опущена...
   return '';
 }
 ```
 
 ---
 
-## 四、write.md模板集成
+## IV. Интеграция шаблона write.md
 
-### 4.1 模板修改方案
+### 4.1 План модификации шаблона
 
-**修改位置**: `templates/commands/write.md`
+**Место изменения**: `templates/commands/write.md`
 
-**修改内容**:
+**Содержание изменения**:
 
 ```markdown
 ---
-description: 基于任务清单执行章节写作，自动加载上下文和验证规则
-argument-hint: [章节编号或任务ID]
+description: Выполнение написания главы на основе списка задач, автоматическая загрузка контекста и правил проверки
+argument-hint: [номер главы или ID задачи]
 allowed-tools: Read(//**), Write(//stories/**/content/**), Bash(ls:*), Bash(find:*), Bash(wc:*), Bash(grep:*), Bash(*)
 model: claude-sonnet-4-5-20250929
 scripts:
@@ -1442,245 +1113,244 @@ scripts:
   ps: .specify/scripts/powershell/check-writing-state.ps1
 ---
 
-基于七步方法论流程执行章节写作。
+Выполнение написания главы по методологии семи шагов.
 ---
 
-## 前置检查
+## Предварительные проверки
 
-1. 运行脚本 `{SCRIPT}` 检查创作状态
+1. Запуск скрипта `{SCRIPT}` для проверки состояния написания
 
-2. **🆕 检查章节配置文件**（新增）
+2. **🆕 Проверка файла конфигурации главы** (добавлено)
    ```bash
-   # 检查是否存在配置文件
-   chapter_num="$CHAPTER_NUMBER"  # 从$ARGUMENTS解析
+   # Проверка наличия файла конфигурации
+   chapter_num="$CHAPTER_NUMBER"  # Извлекается из $ARGUMENTS
    config_file="stories/*/chapters/chapter-${chapter_num}-config.yaml"
 
    if [ -f "$config_file" ]; then
-     echo "✅ 发现配置文件，加载中..."
-     # 读取配置文件
+     echo "✅ Файл конфигурации найден, загрузка..."
+     # Чтение файла конфигурации
      CONFIG_CONTENT=$(cat "$config_file")
    else
-     echo "ℹ️  无配置文件，使用自然语言模式"
+     echo "ℹ️  Файл конфигурации отсутствует, режим естественного языка"
      CONFIG_CONTENT=""
    fi
    ```
 
-### 查询协议（必读顺序）
+### Протокол запросов (обязательный порядок чтения)
+⚠️ **Важно**: Строго следуйте следующему порядку запросов к документации, чтобы обеспечить полноту контекста и правильность приоритетов.
 
-⚠️ **重要**：请严格按照以下顺序查询文档，确保上下文完整且优先级正确。
+**Порядок запросов**:
 
-**查询顺序**：
+1. **🆕 Сначала запрос (Конфигурация главы - если существует)** (Новое):
+   - `stories/*/chapters/chapter-X-config.yaml` (Файл конфигурации главы)
+   - Если файл конфигурации существует, разберите и извлеките:
+     - Список идентификаторов появляющихся персонажей
+     - Идентификатор сцены
+     - Тип сюжета, краткое содержание, ключевые моменты
+     - Параметры стиля письма
+     - Требования к количеству слов
+     - Особые требования
 
-1. **🆕 先查（章节配置 - 如果存在）**（新增）：
-   - `stories/*/chapters/chapter-X-config.yaml`（章节配置文件）
-   - 如果配置文件存在，解析并提取：
-     - 出场角色ID列表
-     - 场景ID
-     - 剧情类型、概要、关键要点
-     - 写作风格参数
-     - 字数要求
-     - 特殊要求
+2. **Сначала запрос (Высший приоритет)**:
+   - `memory/novel-constitution.md` (Конституция творчества - высший принцип)
+   - `memory/style-reference.md` (Справочник по стилю - если сгенерирован через `/book-internalize`)
 
-2. **先查（最高优先级）**：
-   - `memory/novel-constitution.md`（创作宪法 - 最高原则）
-   - `memory/style-reference.md`（风格参考 - 如果通过 `/book-internalize` 生成）
+3. **Затем запрос (Спецификации и планы)**:
+   - `stories/*/specification.md` (Спецификация истории)
+   - `stories/*/creative-plan.md` (План творчества)
+   - `stories/*/tasks.md` (Текущие задачи)
 
-3. **再查（规格和计划）**：
-   - `stories/*/specification.md`（故事规格）
-   - `stories/*/creative-plan.md`（创作计划）
-   - `stories/*/tasks.md`（当前任务）
-
-4. **🆕 根据配置加载详细信息**（新增）：
-   如果配置文件指定了角色和场景，加载详细信息：
+4. **🆕 Загрузка подробной информации на основе конфигурации** (Новое):
+   Если конфигурация указывает персонажей и сцены, загрузите подробную информацию:
 
    ```
-   # 加载角色详情
-   对于配置中的每个角色ID：
-   1. 从 spec/knowledge/character-profiles.md 查找角色完整档案
-   2. 从 spec/tracking/character-state.json 获取最新状态
-   3. 合并信息供后续使用
+   # Загрузка деталей персонажей
+   Для каждого ID персонажа в конфигурации:
+   1. Найдите полный профиль персонажа в spec/knowledge/character-profiles.md
+   2. Получите последнее состояние из spec/tracking/character-state.json
+   3. Объедините информацию для последующего использования
 
-   # 加载场景详情
-   如果配置指定了 scene.location_id：
-   1. 从 spec/knowledge/locations.md 查找场景详细描述
-   2. 提取场景的环境、氛围、特征
+   # Загрузка деталей сцены
+   Если конфигурация указывает scene.location_id:
+   1. Найдите подробное описание сцены в spec/knowledge/locations.md
+   2. Извлеките окружение, атмосферу, особенности сцены
 
-   # 加载线索详情
-   如果配置指定了 plot.plotlines：
-   1. 从 stories/*/specification.md 查找线索定义
-   2. 获取线索的当前状态和目标
+   # Загрузка деталей сюжетных линий
+   Если конфигурация указывает plot.plotlines:
+   1. Найдите определение сюжетной линии в stories/*/specification.md
+   2. Получите текущее состояние и цели сюжетной линии
    ```
 
-5. **再查（状态和数据）**：
-   - `spec/tracking/character-state.json`（角色状态）
-   - `spec/tracking/relationships.json`（关系网络）
-   - `spec/tracking/plot-tracker.json`（情节追踪 - 如有）
-   - `spec/tracking/validation-rules.json`（验证规则 - 如有）
+5. **Затем запрос (Состояния и данные)**:
+   - `spec/tracking/character-state.json` (Состояние персонажей)
+   - `spec/tracking/relationships.json` (Сеть отношений)
+   - `spec/tracking/plot-tracker.json` (Отслеживание сюжета - если существует)
+   - `spec/tracking/validation-rules.json` (Правила валидации - если существует)
 
-6. **再查（知识库）**：
-   - `spec/knowledge/` 相关文件（世界观、角色档案等）
-   - `stories/*/content/`（前文内容 - 了解前情）
+6. **Затем запрос (База знаний)**:
+   - Файлы, связанные с `spec/knowledge/` (Мировоззрение, профили персонажей и т. д.)
+   - `stories/*/content/` (Предыдущий контент - для понимания предыдущих событий)
 
-7. **再查（写作规范）**：
-   - `memory/personal-voice.md`（个人语料 - 如有）
-   - `spec/knowledge/natural-expression.md`（自然化表达 - 如有）
-   - `spec/presets/anti-ai-detection.md`（反AI检测规范）
+7. **Затем запрос (Нормы письма)**:
+   - `memory/personal-voice.md` (Личные материалы - если существуют)
+   - `spec/knowledge/natural-expression.md` (Естественное выражение - если существует)
+   - `spec/presets/anti-ai-detection.md` (Нормы по обнаружению ИИ)
 
-8. **条件查询（前三章专用）**：
-   - **如果章节编号 ≤ 3 或总字数 < 10000字**，额外查询：
-     - `spec/presets/golden-opening.md`（黄金开篇法则）
-     - 并严格遵循其中的五大法则
+8. **Условный запрос (Только для первых трех глав)**:
+   - **Если номер главы ≤ 3 или общее количество слов < 10000 слов**, дополнительно запросите:
+     - `spec/presets/golden-opening.md` (Правила золотого начала)
+     - И строго следуйте пяти правилам, изложенным в нем
 
-## 写作执行流程
+## Процесс выполнения письма
 
-### 1. 选择写作任务
-从 `tasks.md` 中选择状态为 `pending` 的写作任务，标记为 `in_progress`。
+### 1. Выбор задачи для письма
+Выберите задачу с состоянием `pending` из `tasks.md` и пометьте ее как `in_progress`.
 
-### 2. 验证前置条件
-- 检查相关依赖任务是否完成
-- 验证必要的设定是否就绪
-- 确认前序章节是否完成
+### 2. Проверка предварительных условий
+- Проверьте, завершены ли связанные зависимые задачи
+- Убедитесь, что необходимые настройки готовы
+- Подтвердите завершение предыдущих глав
 
-### 3. **🆕 构建章节写作提示词**（修改）
+### 3. **🆕 Создание запроса на написание главы** (Изменено)
 
-**如果有配置文件**：
+**При наличии файла конфигурации**:
 
 ```
-📋 本章配置:
+📋 Конфигурация главы:
 
-**基本信息**:
-- 章节: 第{{chapter}}章 - {{title}}
-- 字数要求: {{wordcount.min}}-{{wordcount.max}}字（目标{{wordcount.target}}字）
+**Основная информация**:
+- Глава: Глава {{chapter}} - {{title}}
+- Требования к количеству слов: {{wordcount.min}}-{{wordcount.max}} слов (цель {{wordcount.target}} слов)
 
-**出场角色** ({{characters.length}}人):
+**Появляющиеся персонажи** ({{characters.length}} чел.):
 {{#each characters}}
-- **{{name}}**（{{role}} - {{focus}}重点）
-  [从character-profiles.md读取的详细档案]
-  性格: {{personality}}
-  背景: {{background}}
+- **{{name}}** ({{role}} - фокус на {{focus}})
+  [Подробный профиль, прочитанный из character-profiles.md]
+  Личность: {{personality}}
+  Предыстория: {{background}}
 
-  当前状态:（从character-state.json读取）
-  - 位置: {{location}}
-  - 健康: {{health}}
-  - 心情: {{mood}}
-  - 与其他角色关系: {{relationships}}
+  Текущее состояние: (прочитано из character-state.json)
+  - Местоположение: {{location}}
+  - Здоровье: {{health}}
+  - Настроение: {{mood}}
+  - Отношения с другими персонажами: {{relationships}}
 {{/each}}
 
-**场景设定**:
-- 地点: {{scene.location_name}}
-  [从locations.md读取的场景详情]
-  详细描述: {{location_details}}
-  特征: {{features}}
+**Настройки сцены**:
+- Местоположение: {{scene.location_name}}
+  [Подробное описание сцены, прочитанное из locations.md]
+  Детали: {{location_details}}
+  Особенности: {{features}}
 
-- 时间: {{scene.time}}
-- 天气: {{scene.weather}}
-- 氛围: {{scene.atmosphere}}
+- Время: {{scene.time}}
+- Погода: {{scene.weather}}
+- Атмосфера: {{scene.atmosphere}}
 
-**剧情要求**:
-- 类型: {{plot.type}}（{{plot_type_description}}）
-- 概要: {{plot.summary}}
-- 关键要点:
+**Требования к сюжету**:
+- Тип: {{plot.type}} ({{plot_type_description}})
+- Краткое содержание: {{plot.summary}}
+- Ключевые моменты:
   {{#each plot.key_points}}
   {{index}}. {{this}}
   {{/each}}
 
 {{#if plot.plotlines}}
-- 涉及线索:
+- Задействованные сюжетные линии:
   {{#each plot.plotlines}}
-  - {{this}}: [从specification.md读取线索详情]
+  - {{this}}: [Подробности сюжетной линии, прочитанные из specification.md]
   {{/each}}
 {{/if}}
 
 {{#if plot.foreshadowing}}
-- 本章伏笔:
+- Задел на будущее в этой главе:
   {{#each plot.foreshadowing}}
   - {{id}}: {{content}}
   {{/each}}
 {{/if}}
 
-**写作风格**:
-- 节奏: {{style.pace}}（{{pace_description}}）
-- 句长: {{style.sentence_length}}（{{sentence_description}}）
-- 重点: {{style.focus}}（{{focus_description}}）
-- 基调: {{style.tone}}
+**Стиль письма**:
+- Темп: {{style.pace}} ({{pace_description}})
+- Длина предложений: {{style.sentence_length}} ({{sentence_description}})
+- Фокус: {{style.focus}} ({{focus_description}})
+- Тон: {{style.tone}}
 
 {{#if special_requirements}}
-**特殊要求**:
+**Особые требования**:
 {{special_requirements}}
 {{/if}}
 
 {{#if preset_used}}
-**应用预设**: {{preset_used}}
+**Примененный пресет**: {{preset_used}}
 {{/if}}
 
 ---
 
-[以下加载全局规格文档...]
+[Далее загружаются глобальные спецификации...]
 ```
 
-**如果无配置文件**（向后兼容）：
+**При отсутствии файла конфигурации** (обратная совместимость):
 
 ```
-📋 基于用户输入:
+📋 На основе ввода пользователя:
 
-用户描述: $ARGUMENTS
+Описание пользователя: $ARGUMENTS
 
-[解析自然语言，提取参数]
+[Разбор естественного языка, извлечение параметров]
 
-[加载全局规格文档...]
+[Загрузка глобальных спецификаций...]
 ```
 
-### 4. 写作前提醒
-**基于宪法原则提醒**：
-- 核心价值观要点
-- 质量标准要求
-- 风格一致性准则
+### 4. Напоминания перед написанием
+**Напоминания на основе принципов Конституции**:
+- Ключевые моменты основных ценностей
+- Требования к качеству
+- Принципы единообразия стиля
 
-**基于规格要求提醒**：
-- P0 必须包含的元素
-- 目标读者特征
-- 内容红线提醒
+**Напоминания на основе требований спецификации**:
+- Элементы, которые обязательно должны быть включены (P0)
+- Характеристики целевой аудитории
+- Предупреждения о красных линиях контента
 
-**分段格式规范（重要）**：
-[保持原有内容]
+**Правила форматирования абзацев (Важно)**:
+[Сохранить исходное содержание]
 
-**反AI检测写作规范（基于腾讯朱雀标准）**：
-[保持原有内容]
+**Правила письма для обнаружения ИИ (на основе стандарта Tencent Zhuque)**:
+[Сохранить исходное содержание]
 
-### 5. 根据计划创作内容：
-   - **开场**：吸引读者，承接前文
-   - **发展**：推进情节，深化人物
-   - **转折**：制造冲突或悬念
-   - **收尾**：适当收束，引出下文
+### 5. Создание контента в соответствии с планом:
+   - **Начало**: Привлечь читателя, связать с предыдущим контентом
+   - **Развитие**: Продвигать сюжет, углублять персонажей
+   - **Поворот**: Создать конфликт или интригу
+   - **Завершение**: Соответствующим образом завершить, намекнуть на продолжение
 
-### 6. 质量自检
-[保持原有内容]
+### 6. Самопроверка качества
+[Сохранить исходное содержание]
 
-### 7. 保存和更新
-- 将章节内容保存到 `stories/*/content/`
-- **🆕 如果使用了配置文件，更新 `updated_at` 时间戳**（新增）
-- 更新任务状态为 `completed`
-- 记录完成时间和字数
+### 7. Сохранение и обновление
+- Сохраните контент главы в `stories/*/content/`
+- **🆕 Если использовался файл конфигурации, обновите временную метку `updated_at`** (Новое)
+- Обновите статус задачи на `completed`
+- Запишите время завершения и количество слов
 
-[其余内容保持不变...]
+[Остальное содержание остается неизменным...]
 ```
 
-### 4.2 配置加载逻辑实现
+### 4.2 Реализация логики загрузки конфигурации
 
-在write.md模板中，AI需要执行以下逻辑：
+В шаблоне write.md ИИ должен выполнить следующую логику:
 
 ```typescript
-// 伪代码：AI执行逻辑
+// Псевдокод: Логика выполнения ИИ
 
-// 1. 解析章节号
+// 1. Разбор номера главы
 const chapterNum = parseChapterNumber($ARGUMENTS);
 
-// 2. 检查配置文件
+// 2. Проверка файла конфигурации
 const configPath = `stories/*/chapters/chapter-${chapterNum}-config.yaml`;
 const config = await loadYamlFile(configPath);
 
 if (config) {
-  // 3. 加载角色详情
+  // 3. Загрузка деталей персонажей
   for (const char of config.characters) {
     const profile = await extractFromMarkdown(
       'spec/knowledge/character-profiles.md',
@@ -1690,7 +1360,7 @@ if (config) {
     char.details = { ...profile, ...state };
   }
 
-  // 4. 加载场景详情
+  // 4. Загрузка деталей сцены
   if (config.scene.location_id) {
     config.scene.details = await extractFromMarkdown(
       'spec/knowledge/locations.md',
@@ -1698,7 +1368,7 @@ if (config) {
     );
   }
 
-  // 5. 加载线索详情
+  // 5. Загрузка деталей сюжетных линий
   if (config.plot.plotlines) {
     for (const plotlineId of config.plot.plotlines) {
       const plotline = await extractFromMarkdown(
@@ -1709,26 +1379,26 @@ if (config) {
     }
   }
 
-  // 6. 构建结构化提示词
+  // 6. Построение структурированного запроса
   const prompt = buildPromptFromConfig(config);
 } else {
-  // 7. 使用自然语言模式
+  // 7. Использование режима естественного языка
   const prompt = parseNaturalLanguage($ARGUMENTS);
 }
 
-// 8. 加载全局规格
+// 8. Загрузка глобальных спецификаций
 const globalSpecs = await loadGlobalSpecs();
 
-// 9. 合并提示词
+// 9. Объединение запросов
 const fullPrompt = mergePrompts(prompt, globalSpecs);
 
-// 10. 生成章节内容
+// 10. Генерация контента главы
 const content = await generateChapterContent(fullPrompt);
 
-// 11. 保存
+// 11. Сохранение
 await saveChapterContent(chapterNum, content);
 
-// 12. 更新配置文件时间戳
+// 12. Обновление временной метки файла конфигурации
 if (config) {
   config.updated_at = new Date().toISOString();
   await saveYamlFile(configPath, config);
@@ -1737,20 +1407,20 @@ if (config) {
 
 ---
 
-## 五、测试策略
+## Пять. Стратегия тестирования
 
-### 5.1 单元测试
+### 5.1 Модульное тестирование
 
-**测试范围**:
-- ChapterConfigManager 所有方法
-- PresetManager 所有方法
-- ConfigValidator 所有验证规则
+**Область тестирования**:
+- Все методы ChapterConfigManager
+- Все методы PresetManager
+- Все правила валидации ConfigValidator
 
-**测试框架**: Jest
+**Фреймворк тестирования**: Jest
 
-**测试覆盖率目标**: > 80%
+**Цель покрытия тестами**: > 80%
 
-**测试示例**:
+**Пример теста**:
 
 ```typescript
 // test/chapter-config.test.ts
@@ -1765,21 +1435,21 @@ describe('ChapterConfigManager', () => {
   describe('createConfig', () => {
     it('should create config with valid parameters', async () => {
       const config = await manager.createConfig(5, {
-        title: '测试章节',
+        title: 'Тестовая глава',
         plotType: 'ability_showcase',
-        plotSummary: '测试剧情概要',
+        plotSummary: 'Краткое содержание тестового сюжета',
         wordcount: 3000
       });
 
       expect(config.chapter).toBe(5);
-      expect(config.title).toBe('测试章节');
+      expect(config.title).toBe('Тестовая глава');
       expect(config.plot.type).toBe('ability_showcase');
       expect(config.wordcount.target).toBe(3000);
     });
 
     it('should apply preset correctly', async () => {
       const config = await manager.createConfig(5, {
-        title: '动作章节',
+        title: 'Экшен глава',
         preset: 'action-intense'
       });
 
@@ -1800,82 +1470,82 @@ describe('ChapterConfigManager', () => {
     });
 
     it('should load existing config correctly', async () => {
-      // 先创建
-      await manager.createConfig(5, { title: '测试' });
+      // Сначала создаем
+      await manager.createConfig(5, { title: 'Тест' });
 
-      // 再加载
+      // Затем загружаем
       const config = await manager.loadConfig(5);
       expect(config).not.toBeNull();
       expect(config!.chapter).toBe(5);
     });
   });
 
-  // 更多测试...
+  // Больше тестов...
 });
 ```
 
-### 5.2 集成测试
+### 5.2 Интеграционное тестирование
 
-**测试场景**:
+**Сценарии тестирования**:
 
-1. **完整工作流测试**:
+1. **Полный рабочий процесс**:
    ```
-   创建配置 → 加载配置 → 验证配置 → 更新配置 → 删除配置
-   ```
-
-2. **预设应用测试**:
-   ```
-   列出预设 → 选择预设 → 创建配置 → 验证预设参数生效
+   Создание конфигурации → Загрузка конфигурации → Валидация конфигурации → Обновление конфигурации → Удаление конфигурации
    ```
 
-3. **CLI命令测试**:
+2. **Применение пресетов**:
    ```
-   执行各个CLI命令 → 验证输出 → 检查文件变化
-   ```
-
-4. **与write.md集成测试**:
-   ```
-   创建配置 → 执行/write命令 → 验证AI加载了配置 → 检查生成内容
+   Список пресетов → Выбор пресета → Создание конфигурации → Проверка применения параметров пресета
    ```
 
-### 5.3 端到端测试
-
-**测试场景**:
-
-1. **新用户首次使用**:
+3. **Тестирование команд CLI**:
    ```
-   1. 安装novel-writer-cn
+   Выполнение различных команд CLI → Проверка вывода → Проверка изменений в файлах
+   ```
+
+4. **Интеграционное тестирование с write.md**:
+   ```
+   Создание конфигурации → Выполнение команды /write → Проверка загрузки конфигурации ИИ → Проверка сгенерированного контента
+   ```
+
+### 5.3 Сквозное тестирование
+
+**Сценарии тестирования**:
+
+1. **Первое использование новым пользователем**:
+   ```
+   1. Установка novel-writer-cn
    2. novel init my-story
    3. novel chapter-config create 1 --interactive
-   4. 在AI编辑器执行 /write 第1章
-   5. 验证生成的章节内容符合配置
+   4. Выполнение команды /write для главы 1 в редакторе ИИ
+   5. Проверка, соответствует ли сгенерированный контент главы конфигурации
    ```
 
-2. **使用预设快速创建**:
+2. **Быстрое создание с использованием пресета**:
    ```
    1. novel preset list
    2. novel chapter-config create 5 --preset action-intense
-   3. /write 第5章
-   4. 验证快节奏动作场景
+   3. /write Глава 5
+   4. Проверка сцены экшена с быстрым темпом
    ```
 
-3. **配置复用**:
+3. **Повторное использование конфигурации**:
    ```
    1. novel chapter-config copy 5 10
-   2. 修改差异部分
-   3. /write 第10章
-   4. 验证保持了风格一致性
+   2. Изменение отличающихся частей
+   3. /write Глава 10
+   4. Проверка единообразия стиля
    ```
 
 ---
 
-## 六、性能优化
+## Шесть. Оптимизация производительности
 
-### 6.1 配置文件缓存
+### 6.1 Кэширование файлов конфигурации
 
 ```typescript
 /**
- * 配置缓存管理器
+ * Менеджер кэша конфигурации
  */
 export class ConfigCache {
   private cache: Map<number, {
@@ -1908,12 +1578,12 @@ export class ConfigCache {
 }
 ```
 
-### 6.2 预设预加载
+### 6.2 Предварительная загрузка пресетов
 
 ```typescript
 /**
- * 预设预加载器
- * 应用启动时预加载所有官方预设
+ * Предзагрузчик пресетов
+ * Предварительно загружает все официальные пресеты при запуске приложения
  */
 export class PresetPreloader {
   private preloadedPresets: Map<string, Preset> = new Map();
@@ -1935,13 +1605,16 @@ export class PresetPreloader {
 }
 ```
 
-### 6.3 YAML解析优化
+### 6.3 Оптимизация парсинга YAML
 
 ```typescript
 /**
- * 使用更快的YAML解析器
+```
+```typescript
+/**
+ * Использование более быстрого YAML-парсер
  */
-import { parse } from 'yaml'; // 使用yaml库替代js-yaml
+import { parse } from 'yaml'; // Используем библиотеку yaml вместо js-yaml
 
 export async function loadYamlFast(filePath: string): Promise<any> {
   const content = await fs.readFile(filePath, 'utf-8');
@@ -1951,60 +1624,60 @@ export async function loadYamlFast(filePath: string): Promise<any> {
 
 ---
 
-## 七、安全性考虑
+## VII. Вопросы безопасности
 
-### 7.1 输入验证
+### 7.1 Проверка входных данных
 
 ```typescript
 /**
- * 输入清洗和验证
+ * Очистка и проверка входных данных
  */
 export class InputSanitizer {
   /**
-   * 清洗章节号
+   * Очистка номера главы
    */
   sanitizeChapterNumber(input: any): number {
     const num = parseInt(String(input));
     if (isNaN(num) || num < 1 || num > 9999) {
-      throw new Error('章节号必须在1-9999之间');
+      throw new Error('Номер главы должен быть в диапазоне 1-9999');
     }
     return num;
   }
 
   /**
-   * 清洗文件路径
+   * Очистка пути к файлу
    */
   sanitizeFilePath(input: string): string {
-    // 防止路径遍历攻击
+    // Предотвращение атак обхода каталогов
     const normalized = path.normalize(input);
     if (normalized.includes('..')) {
-      throw new Error('非法路径');
+      throw new Error('Недопустимый путь');
     }
     return normalized;
   }
 
   /**
-   * 清洗YAML内容
+   * Очистка содержимого YAML
    */
   sanitizeYamlContent(content: string): string {
-    // 移除潜在的代码注入
+    // Удаление потенциальных внедрений кода
     if (content.includes('!<tag:')) {
-      throw new Error('不支持YAML标签');
+      throw new Error('YAML-теги не поддерживаются');
     }
     return content;
   }
 }
 ```
 
-### 7.2 权限控制
+### 7.2 Контроль доступа
 
 ```typescript
 /**
- * 文件操作权限检查
+ * Проверка прав доступа к файлам
  */
 export class PermissionChecker {
   /**
-   * 检查文件是否在项目范围内
+   * Проверка, находится ли файл в пределах проекта
    */
   isWithinProject(filePath: string, projectPath: string): boolean {
     const resolved = path.resolve(filePath);
@@ -2013,7 +1686,7 @@ export class PermissionChecker {
   }
 
   /**
-   * 检查文件是否可写
+   * Проверка, доступен ли файл для записи
    */
   async isWritable(filePath: string): Promise<boolean> {
     try {
@@ -2028,13 +1701,13 @@ export class PermissionChecker {
 
 ---
 
-## 八、错误处理
+## VIII. Обработка ошибок
 
-### 8.1 错误类型定义
+### 8.1 Определение типов ошибок
 
 ```typescript
 /**
- * 自定义错误类
+ * Пользовательский класс ошибок
  */
 export class ConfigError extends Error {
   constructor(
@@ -2056,35 +1729,35 @@ export class ValidationError extends ConfigError {
 
 export class PresetNotFoundError extends ConfigError {
   constructor(presetId: string) {
-    super(`预设未找到: ${presetId}`, 'PRESET_NOT_FOUND', { presetId });
+    super(`Предустановка не найдена: ${presetId}`, 'PRESET_NOT_FOUND', { presetId });
     this.name = 'PresetNotFoundError';
   }
 }
 ```
 
-### 8.2 错误处理策略
+### 8.2 Стратегия обработки ошибок
 
 ```typescript
 /**
- * 全局错误处理器
+ * Глобальный обработчик ошибок
  */
 export class ErrorHandler {
   handle(error: Error): void {
     if (error instanceof ValidationError) {
-      console.error(chalk.red(`验证失败:`));
+      console.error(chalk.red(`Ошибка валидации:`));
       error.errors.forEach((err, index) => {
         console.error(chalk.red(`  ${index + 1}. ${err}`));
       });
     } else if (error instanceof PresetNotFoundError) {
-      console.error(chalk.red(`预设不存在: ${error.details.presetId}`));
-      console.log(chalk.gray('\n提示: 使用 novel preset list 查看可用预设'));
+      console.error(chalk.red(`Предустановка не найдена: ${error.details.presetId}`));
+      console.log(chalk.gray('\nПодсказка: используйте `novel preset list` для просмотра доступных предустановок'));
     } else if (error instanceof ConfigError) {
-      console.error(chalk.red(`配置错误: ${error.message}`));
+      console.error(chalk.red(`Ошибка конфигурации: ${error.message}`));
       if (error.details) {
         console.error(chalk.gray(JSON.stringify(error.details, null, 2)));
       }
     } else {
-      console.error(chalk.red(`未知错误: ${error.message}`));
+      console.error(chalk.red(`Неизвестная ошибка: ${error.message}`));
       console.error(error.stack);
     }
 
@@ -2095,12 +1768,12 @@ export class ErrorHandler {
 
 ---
 
-## 九、部署和发布
+## IX. Развертывание и выпуск
 
-### 9.1 构建流程
+### 9.1 Процесс сборки
 
 ```bash
-# package.json scripts
+# scripts в package.json
 
 {
   "scripts": {
@@ -2115,29 +1788,29 @@ export class ErrorHandler {
 }
 ```
 
-### 9.2 发布检查清单
+### 9.2 Чек-лист выпуска
 
-- [ ] 单元测试通过（覆盖率 > 80%）
-- [ ] 集成测试通过
-- [ ] 端到端测试通过
-- [ ] 代码lint通过
-- [ ] 文档完整
-- [ ] CHANGELOG更新
-- [ ] 版本号更新
-- [ ] 预设文件打包
+- [ ] Модульные тесты пройдены (покрытие > 80%)
+- [ ] Интеграционные тесты пройдены
+- [ ] Сквозные тесты пройдены
+- [ ] Lint-проверка кода пройдена
+- [ ] Документация полная
+- [ ] CHANGELOG обновлен
+- [ ] Номер версии обновлен
+- [ ] Файлы предустановок упакованы
 
-### 9.3 版本兼容性
+### 9.3 Совместимость версий
 
 ```typescript
 /**
- * 配置文件版本管理
+ * Управление версиями конфигурационных файлов
  */
 export const CONFIG_VERSION = '1.0.0';
 
 export function migrateConfig(config: any): ChapterConfig {
-  // 从旧版本迁移到当前版本
+  // Миграция из старой версии в текущую
   if (!config.version || config.version < '1.0.0') {
-    // 执行迁移逻辑
+    // Выполнение логики миграции
     config = migrateFrom_0_x(config);
   }
 
@@ -2148,13 +1821,13 @@ export function migrateConfig(config: any): ChapterConfig {
 
 ---
 
-## 十、监控和调试
+## X. Мониторинг и отладка
 
-### 10.1 日志系统
+### 10.1 Система логирования
 
 ```typescript
 /**
- * 结构化日志
+ * Структурированное логирование
  */
 export class Logger {
   private level: 'debug' | 'info' | 'warn' | 'error';
@@ -2194,11 +1867,11 @@ export class Logger {
 }
 ```
 
-### 10.2 性能监控
+### 10.2 Мониторинг производительности
 
 ```typescript
 /**
- * 性能计时器
+ * Таймер производительности
  */
 export class PerformanceTimer {
   private timers: Map<string, number> = new Map();
@@ -2210,7 +1883,7 @@ export class PerformanceTimer {
   end(name: string): number {
     const start = this.timers.get(name);
     if (!start) {
-      throw new Error(`Timer ${name} not started`);
+      throw new Error(`Таймер ${name} не запущен`);
     }
 
     const duration = Date.now() - start;
@@ -2230,9 +1903,9 @@ export class PerformanceTimer {
 
 ---
 
-## 附录
+## Приложение
 
-### A. 完整的TypeScript类型导出
+### A. Полный экспорт типов TypeScript
 
 ```typescript
 // src/types/index.ts
@@ -2243,11 +1916,11 @@ export * from './validation';
 export * from './errors';
 ```
 
-### B. CLI命令完整列表
+### B. Полный список команд CLI
 
-见第三章节内容。
+См. содержание главы III.
 
-### C. 测试覆盖率报告
+### C. Отчет о покрытии тестами
 
 ```bash
 $ npm run test:coverage
@@ -2264,4 +1937,4 @@ All files             |   85.23 |    78.45 |   89.12 |   84.67 |
 
 ---
 
-**END OF TECH SPEC**
+**КОНЕЦ ТЕХНИЧЕСКОЙ СПЕЦИФИКАЦИИ**

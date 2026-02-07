@@ -1,119 +1,111 @@
----
-name: track-init
-description: 初始化追踪系统，基于故事大纲设置追踪数据
-allowed-tools: Read(//stories/**/specification.md), Read(stories/**/specification.md), Read(//stories/**/outline.md), Read(stories/**/outline.md), Read(//stories/**/creative-plan.md), Read(stories/**/creative-plan.md), Write(//spec/tracking/**), Write(spec/tracking/**), Bash(find:*), Bash(grep:*), Bash(wc:*), Bash(*)
-model: claude-sonnet-4-5-20250929
-scripts:
-  sh: .specify/scripts/bash/init-tracking.sh
-  ps: .specify/scripts/powershell/init-tracking.ps1
----
+```markdown
+# Инициализация системы отслеживания
 
-# 初始化追踪系统
+На основе созданного плана истории и структуры глав инициализируются все файлы данных отслеживания.
 
-基于已创建的故事大纲和章节规划，初始化所有追踪数据文件。
+## Когда использовать
 
-## 使用时机
+Выполните эту команду после завершения `/story` и `/outline`, перед началом написания.
 
-在完成 `/story` 和 `/outline` 之后，开始写作之前执行此命令。
+## Процесс инициализации
 
-## 初始化流程
+1. **Чтение базовых данных**
+   - Читает `stories/*/story.md` для получения сеттинга истории
+   - Читает `stories/*/outline.md` для получения структуры глав
+   - Читает `.specify/config.json` для получения метода письма
 
-1. **读取基础数据**
-   - 读取 `stories/*/story.md` 获取故事设定
-   - 读取 `stories/*/outline.md` 获取章节规划
-   - 读取 `.specify/config.json` 获取写作方法
+2. **Инициализация файлов отслеживания**
 
-2. **初始化追踪文件**
+   **Важно**: Приоритетно читает спецификацию управления сюжетными линиями из пятой главы `specification.md` и заполняет ею файлы отслеживания.
 
-   **重要**：优先从 `specification.md` 第五章读取线索管理规格，填充到追踪文件。
+   Создаёт или обновляет `spec/tracking/plot-tracker.json`:
+   - Читает все определения сюжетных линий из `specification.md` раздела 5.1
+   - Читает все точки пересечения из `specification.md` раздела 5.3
+   - Читает все предзнаменования из `specification.md` раздела 5.4
+   - Читает распределение сюжетных линий по главам из `creative-plan.md`
+   - Устанавливает текущий статус (предполагается, что написание ещё не началось)
 
-   创建或更新 `spec/tracking/plot-tracker.json`：
-   - 从 `specification.md 5.1节` 读取所有线索定义
-   - 从 `specification.md 5.3节` 读取所有交汇点
-   - 从 `specification.md 5.4节` 读取所有伏笔
-   - 从 `creative-plan.md` 读取章节段的线索分布
-   - 设置当前状态（假设尚未开始写作）
-
-   **plot-tracker.json 结构**：
+   **Структура `plot-tracker.json`**:
    ```json
    {
-     "novel": "[从specification.md读取故事名称]",
+     "novel": "[Название истории из specification.md]",
      "lastUpdated": "[YYYY-MM-DD]",
      "currentState": {
        "chapter": 0,
        "volume": 1,
-       "mainPlotStage": "[初始阶段]"
+       "mainPlotStage": "[Начальный этап]"
      },
      "plotlines": {
        "main": {
-         "name": "[主线名称]",
+         "name": "[Название основной линии]",
          "status": "active",
-         "currentNode": "[起点]",
+         "currentNode": "[Начальная точка]",
          "completedNodes": [],
-         "upcomingNodes": "[从交汇点和章节规划读取]"
+         "upcomingNodes": "[Считать из точек пересечения и плана глав]"
        },
        "subplots": [
          {
-           "id": "[从5.1读取，如PL-01]",
-           "name": "[线索名称]",
-           "type": "[主线/支线/主线支撑]",
+           "id": "[Из 5.1, например PL-01]",
+           "name": "[Название сюжетной линии]",
+           "type": "[Основная линия/Побочная линия/Поддержка основной линии]",
            "priority": "[P0/P1/P2]",
            "status": "[active/dormant]",
-           "plannedStart": "[起始章节]",
-           "plannedEnd": "[结束章节]",
-           "currentNode": "[当前节点]",
+           "plannedStart": "[Начальная глава]",
+           "plannedEnd": "[Конечная глава]",
+           "currentNode": "[Текущий узел]",
            "completedNodes": [],
-           "upcomingNodes": "[从交汇点表读取]",
-           "intersectionsWith": "[从5.3交汇点表读取相关线索]",
-           "activeChapters": "[从5.2节奏规划读取]"
+           "upcomingNodes": "[Считать из таблицы точек пересечения]",
+           "intersectionsWith": "[Считать соответствующие ID линий из таблицы пересечений 5.3]",
+           "activeChapters": "[Считать из плана ритма 5.2]"
          }
        ]
      },
      "foreshadowing": [
        {
-         "id": "[从5.4读取，如F-001]",
-         "content": "[伏笔内容]",
-         "planted": {"chapter": null, "description": "[埋设说明]"},
+         "id": "[Из 5.4, например F-001]",
+         "content": "[Содержание предзнаменования]",
+         "planted": {"chapter": null, "description": "[Описание установки]"},
          "hints": [],
-         "plannedReveal": {"chapter": "[揭晓章节]", "description": "[揭晓方式]"},
+         "plannedReveal": {"chapter": "[Глава раскрытия]", "description": "[Способ раскрытия]"},
          "status": "planned",
          "importance": "[high/medium/low]",
-         "relatedPlotlines": "[涉及的线索ID列表]"
+         "relatedPlotlines": "[Список ID задействованных сюжетных линий]"
        }
      ],
      "intersections": [
        {
-         "id": "[从5.3读取，如X-001]",
-         "chapter": "[交汇章节]",
-         "plotlines": "[涉及的线索ID列表]",
-         "content": "[交汇内容]",
+         "id": "[Из 5.3, например X-001]",
+         "chapter": "[Глава пересечения]",
+         "plotlines": "[Список ID задействованных сюжетных линий]",
+         "content": "[Содержание пересечения]",
          "status": "upcoming",
-         "impact": "[预期效果]"
+         "impact": "[Ожидаемый эффект]"
        }
      ]
    }
    ```
 
-   创建或更新 `spec/tracking/timeline.json`：
-   - 根据章节规划设置时间节点
-   - 标记重要时间事件
+   Создаёт или обновляет `spec/tracking/timeline.json`:
+   - Устанавливает временные точки на основе плана глав
+   - Отмечает важные временные события
 
-   创建或更新 `spec/tracking/relationships.json`：
-   - 从角色设定提取初始关系
-   - 设置派系分组
+   Создаёт или обновляет `spec/tracking/relationships.json`:
+   - Извлекает начальные отношения из сеттинга персонажей
+   - Устанавливает группировку по фракциям
 
-   创建或更新 `spec/tracking/character-state.json`：
-   - 初始化角色状态
-   - 设置起始位置
+   Создаёт или обновляет `spec/tracking/character-state.json`:
+   - Инициализирует состояние персонажей
+   - Устанавливает начальное местоположение
 
-3. **生成追踪报告**
-   显示初始化结果，确认追踪系统就绪
+3. **Генерация отчёта отслеживания**
+   Отображает результаты инициализации, подтверждая готовность системы отслеживания
 
-## 智能关联
+## Интеллектуальная связь
 
-- 根据写作方法自动设置检查点
-- 英雄之旅：12个阶段的追踪点
-- 三幕结构：三幕转折点
-- 七点结构：7个关键节点
+- Автоматически устанавливает контрольные точки в соответствии с методом письма
+- Путешествие героя: контрольные точки из 12 этапов
+- Трёхчастная структура: точки поворота трёх актов
+- Семиточечная структура: 7 ключевых узлов
 
-追踪系统初始化后，后续写作会自动更新这些数据。
+После инициализации системы отслеживания эти данные будут автоматически обновляться в процессе написания.
+```

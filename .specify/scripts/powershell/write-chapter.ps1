@@ -1,10 +1,10 @@
 #!/usr/bin/env pwsh
-# 写作章节内容
+# Написание содержания главы
 
 $STORIES_DIR = "stories"
 $MEMORY_DIR = "memory"
 
-# 查找最新的故事目录
+# Поиск последней директории с историями
 function Get-LatestStory {
     $latest = Get-ChildItem -Path $STORIES_DIR -Directory |
               Sort-Object Name -Descending |
@@ -16,7 +16,7 @@ function Get-LatestStory {
     return $null
 }
 
-# 从 outline.md 解析卷册信息
+# Парсинг информации о томе из outline.md
 function Parse-VolumeInfo {
     param(
         [string]$OutlineFile,
@@ -27,7 +27,7 @@ function Parse-VolumeInfo {
         $content = Get-Content $OutlineFile -Raw
         $volumeNum = 1
 
-        # 匹配卷册和章节范围
+        # Соответствие диапазонам томов и глав
         $pattern = '###\s+第.*?卷.*?\n[\s\S]*?章节范围.*?第(\d+)-(\d+)章'
         $matches = [regex]::Matches($content, $pattern)
 
@@ -42,12 +42,12 @@ function Parse-VolumeInfo {
         }
     }
 
-    # 默认规则：每60章一卷
+    # Правило по умолчанию: 60 глав на том
     $volume = [math]::Floor(($ChapterNum - 1) / 60) + 1
     return "volume-$volume"
 }
 
-# 确定章节所属卷册
+# Определение тома, к которому относится глава
 function Get-Volume {
     param([int]$ChapterNum)
 
@@ -55,12 +55,12 @@ function Get-Volume {
     return Parse-VolumeInfo -OutlineFile $outlineFile -ChapterNum $ChapterNum
 }
 
-# 获取下一个待写章节
+# Получение следующей главы для написания
 function Get-NextChapter {
     param([string]$ChaptersDir)
 
-    # 从 outline.md 获取总章节数
-    $maxChapters = 500  # 默认最大值
+    # Получение общего количества глав из outline.md
+    $maxChapters = 500  # Значение по умолчанию
     $outlineFile = "$storyDir/outline.md"
 
     if (Test-Path $outlineFile) {
@@ -70,7 +70,7 @@ function Get-NextChapter {
         }
     }
 
-    # 遍历所有可能的章节查找第一个未写的
+    # Перебор всех возможных глав для поиска первой ненаписанной
     for ($i = 1; $i -le $maxChapters; $i++) {
         $volume = Get-Volume -ChapterNum $i
         $chapterNumFormatted = "{0:D3}" -f $i
@@ -80,13 +80,13 @@ function Get-NextChapter {
             return $i
         }
     }
-    return $maxChapters + 1  # 所有章节都已写完
+    return $maxChapters + 1  # Все главы написаны
 }
 
 $storyDir = Get-LatestStory
 
 if (!$storyDir) {
-    Write-Host "错误：没有找到故事项目"
+    Write-Host "Ошибка: Проект истории не найден"
     exit 1
 }
 
@@ -95,10 +95,10 @@ $outlineFile = "$storyDir/outline.md"
 $storyFile = "$storyDir/story.md"
 $styleFile = "$MEMORY_DIR/writing-constitution.md"
 
-# 检查必要文件
+# Проверка наличия необходимых файлов
 if (!(Test-Path $outlineFile)) {
-    Write-Host "错误：没有找到章节规划"
-    Write-Host "请先使用 /outline 命令创建章节规划"
+    Write-Host "Ошибка: План глав не найден"
+    Write-Host "Пожалуйста, сначала создайте план глав с помощью команды /outline"
     exit 1
 }
 
@@ -107,22 +107,22 @@ $volume = Get-Volume -ChapterNum $nextChapter
 $chapterNumFormatted = "{0:D3}" -f $nextChapter
 $volumeDir = "$chaptersDir/$volume"
 
-# 创建卷册目录（如果不存在）
+# Создание директории тома (если не существует)
 if (!(Test-Path $volumeDir)) {
     New-Item -ItemType Directory -Path $volumeDir | Out-Null
 }
 
 $chapterFile = "$volumeDir/chapter-$chapterNumFormatted.md"
 
-Write-Host "故事目录: $storyDir"
-Write-Host "章节文件: $chapterFile"
-Write-Host "当前章节: 第 $nextChapter 章 ($volume)"
+Write-Host "Директория истории: $storyDir"
+Write-Host "Файл главы: $chapterFile"
+Write-Host "Текущая глава: Глава $nextChapter ($volume)"
 Write-Host ""
-Write-Host "相关文件："
+Write-Host "Связанные файлы:"
 if (Test-Path $styleFile) {
-    Write-Host "- 创作风格: $styleFile"
+    Write-Host "- Стиль письма: $styleFile"
 }
-Write-Host "- 故事大纲: $storyFile"
-Write-Host "- 章节规划: $outlineFile"
+Write-Host "- План истории: $storyFile"
+Write-Host "- План глав: $outlineFile"
 Write-Host ""
-Write-Host "开始写作第 $nextChapter 章..."
+Write-Host "Начинаем писать главу $nextChapter..."

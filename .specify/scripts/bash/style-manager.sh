@@ -1,49 +1,50 @@
+```sh
 #!/usr/bin/env bash
-# 风格管理器 - 支持初始设定和外部建议整合
+# Менеджер стилей — поддержка первоначальной настройки и интеграции внешних предложений
 
 set -e
 
-# 加载通用函数
+# Загрузка общих функций
 SCRIPT_DIR=$(dirname "$0")
 source "$SCRIPT_DIR/common.sh"
 
-# 获取项目根目录
+# Получение корневого каталога проекта
 PROJECT_ROOT=$(get_project_root)
 MEMORY_DIR="$PROJECT_ROOT/.specify/memory"
 SPEC_DIR="$PROJECT_ROOT/spec"
 KNOWLEDGE_DIR="$SPEC_DIR/knowledge"
 TRACKING_DIR="$SPEC_DIR/tracking"
 
-# 命令模式
+# Режим команды
 MODE=${1:-init}
 shift || true
 
-# 创建必要目录
+# Создание необходимых каталогов
 mkdir -p "$MEMORY_DIR" "$KNOWLEDGE_DIR" "$TRACKING_DIR"
 
-# 函数：初始化风格设定
+# Функция: Инициализация стиля письма
 init_style() {
-    echo "📝 初始化创作风格..."
+    echo "📝 Инициализация стиля письма..."
 
-    # 创建或更新创作准则文件
+    # Создание или обновление файла руководящих принципов письма
     CONSTITUTION_FILE="$MEMORY_DIR/writing-constitution.md"
     TEMPLATE="$PROJECT_ROOT/.specify/templates/writing-constitution-template.md"
 
     ensure_file "$CONSTITUTION_FILE" "$TEMPLATE"
 
-    # 可选：融合个人语料摘要，增强个体表达一致性
+    # Опционально: интеграция резюме личных корпусов для повышения индивидуальной согласованности выражения
     integrate_personal_voice "$CONSTITUTION_FILE"
 
-    # 固定专章：个人表达基线（自动同步）
+    # Фиксированная глава: Базовая линия личного выражения (автоматическая синхронизация)
     sync_personal_baseline "$CONSTITUTION_FILE"
 
-    # 输出结果
+    # Вывод результата
     echo "CONSTITUTION_FILE: $CONSTITUTION_FILE"
     echo "STATUS: ready"
-    echo "✅ 创作风格初始化完成"
+    echo "✅ Инициализация стиля письма завершена"
 }
 
-# 从 personal-voice.md 提取要点并追加到创作准则
+# Извлечение ключевых моментов из personal-voice.md и добавление их в руководящие принципы письма
 integrate_personal_voice() {
     local constitution_file="$1"
     local pv_file="$PROJECT_ROOT/.specify/memory/personal-voice.md"
@@ -51,27 +52,27 @@ integrate_personal_voice() {
     if [ -f "$pv_file" ]; then
         local tmp="/tmp/pv_summary_$$.md"
         echo "" > "$tmp"
-        echo "## 个人语料摘要（自动引用）" >> "$tmp"
-        echo "来源：.specify/memory/personal-voice.md" >> "$tmp"
+        echo "## Резюме личных корпусов (автоматическая ссылка)" >> "$tmp"
+        echo "Источник: .specify/memory/personal-voice.md" >> "$tmp"
         echo "" >> "$tmp"
 
-        # 提取二级标题与紧邻的前2条列表项作为摘要
+        # Извлечение подзаголовков второго уровня и ближайших 2 пунктов списка как резюме
         awk '
             /^## / { if(h>6) exit; h++; if(cnt>0) {print ""}; print $0; lc=0; next }
             /^- / && lc<2 { print $0; lc++; next }
         ' "$pv_file" >> "$tmp"
 
-        # 防止重复追加：检测是否已存在本次摘要（按日期+章节标题近似判断）
-        if ! grep -q "个人语料摘要（自动引用）" "$constitution_file"; then
+        # Предотвращение повторного добавления: проверка наличия текущего резюме (приблизительная оценка по дате + заголовку главы)
+        if ! grep -q "Резюме личных корпусов (автоматическая ссылка)" "$constitution_file"; then
             echo "" >> "$constitution_file"
             cat "$tmp" >> "$constitution_file"
-            echo "    ✅ 已引用个人语料摘要"
+            echo "    ✅ Резюме личных корпусов добавлено"
         fi
         rm -f "$tmp"
     fi
 }
 
-# 用固定专章方式同步 personal-voice 关键点（可重复执行，幂等）
+# Синхронизация ключевых моментов personal-voice с помощью фиксированной главы (можно выполнять повторно, идемпотентно)
 sync_personal_baseline() {
     local constitution_file="$1"
     local pv_file="$PROJECT_ROOT/.specify/memory/personal-voice.md"
@@ -79,11 +80,11 @@ sync_personal_baseline() {
 
     local tmp="/tmp/pv_baseline_$$.md"
     echo "<!-- BEGIN: PERSONAL_BASELINE_AUTO -->" > "$tmp"
-    echo "## 个人表达基线（自动同步）" >> "$tmp"
-    echo "来源：.specify/memory/personal-voice.md（只读镜像，修改请在源文件）" >> "$tmp"
+    echo "## Базовая линия личного выражения (автоматическая синхронизация)" >> "$tmp"
+    echo "Источник: .specify/memory/personal-voice.md (только для чтения, изменения вносите в исходный файл)" >> "$tmp"
     echo "" >> "$tmp"
 
-    # 函数：按标题抓取前N条列表
+    # Функция: получение первых N пунктов списка по заголовку
     fetch_section() {
         local title="$1"; local n="$2"; local label="$3"
         echo "### $label" >> "$tmp"
@@ -96,17 +97,17 @@ sync_personal_baseline() {
         echo "" >> "$tmp"
     }
 
-    fetch_section "口头禅与常用表达" 6 "口头禅与常用表达"
-    fetch_section "固定句式与节奏偏好" 6 "固定句式与节奏偏好"
-    fetch_section "行业/地域词汇（口音、俚语、术语）" 6 "行业/地域词汇"
-    fetch_section "比喻口味与意象库" 8 "比喻与意象"
-    fetch_section "写作忌口与避讳" 6 "写作忌口"
+    fetch_section "口头禅与常用表达" 6 "Разговорные выражения и часто используемые фразы"
+    fetch_section "固定句式与节奏偏好" 6 "Фиксированные предложения и предпочтения в ритме"
+    fetch_section "行业/地域词汇（口音、俚语、术语）" 6 "Отраслевая/региональная лексика (акценты, сленг, термины)"
+    fetch_section "比喻口味与意象库" 8 "Предпочтения в метафорах и библиотека образов"
+    fetch_section "写作忌口与避讳" 6 "Темы, которых следует избегать, и табу в письме"
 
     echo "<!-- END: PERSONAL_BASELINE_AUTO -->" >> "$tmp"
 
-    # 将标记块写入或替换到创作准则
+    # Запись или замена блока маркеров в руководящих принципах письма
     if grep -q "<!-- BEGIN: PERSONAL_BASELINE_AUTO -->" "$constitution_file"; then
-        # 替换现有块
+        # Замена существующего блока
         awk -v RS='' -v ORS='\n\n' -v file="$tmp" '
             BEGIN{while((getline l<file)>0){blk=blk l "\n"}} 
             { gsub(/<!-- BEGIN: PERSONAL_BASELINE_AUTO -->[\s\S]*<!-- END: PERSONAL_BASELINE_AUTO -->/, blk) }1
@@ -117,69 +118,69 @@ sync_personal_baseline() {
     fi
 
     rm -f "$tmp"
-    echo "    ✅ 已同步个人表达基线"
+    echo "    ✅ Базовая линия личного выражения синхронизирована"
 }
 
-# 函数：解析JSON建议
+# Функция: Парсинг JSON-предложений
 parse_json_suggestions() {
     local input="$1"
     local temp_file="/tmp/suggestions_$$.json"
 
-    # 保存输入到临时文件
+    # Сохранение ввода во временный файл
     echo "$input" > "$temp_file"
 
-    # 验证JSON格式
+    # Проверка формата JSON
     if ! python3 -m json.tool "$temp_file" > /dev/null 2>&1; then
-        echo "❌ JSON格式无效"
+        echo "❌ Неверный формат JSON"
         rm -f "$temp_file"
         return 1
     fi
 
-    # 提取关键信息
+    # Извлечение ключевой информации
     local source=$(python3 -c "import json; data=json.load(open('$temp_file')); print(data.get('source', 'Unknown'))")
     local date=$(python3 -c "import json; data=json.load(open('$temp_file')); print(data.get('analysis_date', '$(date +%Y-%m-%d)'))")
 
-    echo "📊 解析来自 $source 的建议 ($date)"
+    echo "📊 Парсинг предложений из $source ($date)"
 
-    # 处理各类建议
+    # Обработка различных предложений
     process_style_suggestions "$temp_file"
     process_character_suggestions "$temp_file"
     process_plot_suggestions "$temp_file"
     process_world_suggestions "$temp_file"
     process_dialogue_suggestions "$temp_file"
 
-    # 清理临时文件
+    # Очистка временного файла
     rm -f "$temp_file"
 }
 
-# 函数：解析Markdown建议
+# Функция: Парсинг Markdown-предложений
 parse_markdown_suggestions() {
     local input="$1"
     local temp_file="/tmp/suggestions_$$.md"
 
     echo "$input" > "$temp_file"
 
-    echo "📊 解析Markdown格式建议..."
+    echo "📊 Парсинг предложений в формате Markdown..."
 
-    # 提取基础信息
+    # Извлечение базовой информации
     local source=$(grep "分析工具：" "$temp_file" | sed 's/.*分析工具：//')
     local date=$(grep "分析日期：" "$temp_file" | sed 's/.*分析日期：//')
 
-    echo "来源：${source:-Unknown}"
-    echo "日期：${date:-$(date +%Y-%m-%d)}"
+    echo "Источник: ${source:-Unknown}"
+    echo "Дата: ${date:-$(date +%Y-%m-%d)}"
 
-    # 处理建议（简化版）
+    # Обработка предложений (упрощенная версия)
     process_markdown_style "$temp_file"
     process_markdown_characters "$temp_file"
 
     rm -f "$temp_file"
 }
 
-# 函数：处理风格建议
+# Функция: Обработка предложений по стилю
 process_style_suggestions() {
     local json_file="$1"
 
-    # 检查是否有风格建议
+    # Проверка наличия предложений по стилю
     local has_style=$(python3 -c "
 import json
 data = json.load(open('$json_file'))
@@ -187,13 +188,13 @@ print('yes' if 'style' in data.get('suggestions', {}) else 'no')
 ")
 
     if [ "$has_style" = "yes" ]; then
-        echo "  📝 处理风格建议..."
+        echo "  📝 Обработка предложений по стилю..."
 
-        # 更新writing-constitution.md
+        # Обновление writing-constitution.md
         local constitution_file="$MEMORY_DIR/writing-constitution.md"
         local temp_update="/tmp/constitution_update_$$.md"
 
-        # 提取风格建议并追加
+        # Извлечение предложений по стилю и добавление их
         python3 -c "
 import json
 data = json.load(open('$json_file'))
@@ -201,23 +202,23 @@ style = data.get('suggestions', {}).get('style', {})
 items = style.get('items', [])
 
 with open('$temp_update', 'w') as f:
-    f.write('\n## 外部建议优化 ($(date +%Y-%m-%d))\n\n')
+    f.write('\n## Оптимизация внешних предложений ($(date +%Y-%m-%d))\n\n')
     for item in items:
-        f.write(f\"### {item.get('type', '未分类')}\n\")
-        f.write(f\"- **问题**：{item.get('current', '')}\n\")
-        f.write(f\"- **建议**：{item.get('suggestion', '')}\n\")
-        f.write(f\"- **预期效果**：{item.get('impact', '')}\n\n\")
+        f.write(f\"### {item.get('type', 'Некатегоризированный')}\n\")
+        f.write(f\"- **Проблема**：{item.get('current', '')}\n\")
+        f.write(f\"- **Предложение**：{item.get('suggestion', '')}\n\")
+        f.write(f\"- **Ожидаемый эффект**：{item.get('impact', '')}\n\n\")
 "
 
         if [ -f "$temp_update" ]; then
             cat "$temp_update" >> "$constitution_file"
             rm -f "$temp_update"
-            echo "    ✅ 已更新创作准则"
+            echo "    ✅ Руководящие принципы письма обновлены"
         fi
     fi
 }
 
-# 函数：处理角色建议
+# Функция: Обработка предложений по персонажам
 process_character_suggestions() {
     local json_file="$1"
 
@@ -228,9 +229,9 @@ print('yes' if 'characters' in data.get('suggestions', {}) else 'no')
 ")
 
     if [ "$has_chars" = "yes" ]; then
-        echo "  👥 处理角色建议..."
+        echo "  👥 Обработка предложений по персонажам..."
 
-        # 更新角色档案
+        # Обновление профилей персонажей
         local profiles_file="$KNOWLEDGE_DIR/character-profiles.md"
         local temp_update="/tmp/profiles_update_$$.md"
 
@@ -241,27 +242,27 @@ chars = data.get('suggestions', {}).get('characters', {})
 items = chars.get('items', [])
 
 with open('$temp_update', 'w') as f:
-    f.write('\n## 角色优化建议 ($(date +%Y-%m-%d))\n\n')
+    f.write('\n## Предложения по улучшению персонажей ($(date +%Y-%m-%d))\n\n')
     for item in items:
-        f.write(f\"### {item.get('character', '未知角色')}\n\")
-        f.write(f\"- **问题**：{item.get('issue', '')}\n\")
-        f.write(f\"- **建议**：{item.get('suggestion', '')}\n\")
-        f.write(f\"- **发展曲线**：{item.get('development_curve', '')}\n\")
+        f.write(f\"### {item.get('character', 'Неизвестный персонаж')}\n\")
+        f.write(f\"- **Проблема**：{item.get('issue', '')}\n\")
+        f.write(f\"- **Предложение**：{item.get('suggestion', '')}\n\")
+        f.write(f\"- **Кривая развития**：{item.get('development_curve', '')}\n\")
         chapters = item.get('chapters_affected', [])
         if chapters:
-            f.write(f\"- **影响章节**：{', '.join(map(str, chapters))}\n\")
+            f.write(f\"- **Затронутые главы**：{', '.join(map(str, chapters))}\n\")
         f.write('\n')
 "
 
         if [ -f "$temp_update" ] && [ -f "$profiles_file" ]; then
             cat "$temp_update" >> "$profiles_file"
             rm -f "$temp_update"
-            echo "    ✅ 已更新角色档案"
+            echo "    ✅ Профили персонажей обновлены"
         fi
     fi
 }
 
-# 函数：处理情节建议
+# Функция: Обработка предложений по сюжету
 process_plot_suggestions() {
     local json_file="$1"
 
@@ -272,25 +273,25 @@ print('yes' if 'plot' in data.get('suggestions', {}) else 'no')
 ")
 
     if [ "$has_plot" = "yes" ]; then
-        echo "  📖 处理情节建议..."
+        echo "  📖 Обработка предложений по сюжету..."
 
-        # 更新情节追踪器
+        # Обновление трекера сюжета
         local plot_file="$TRACKING_DIR/plot-tracker.json"
 
         if [ -f "$plot_file" ]; then
             python3 -c "
 import json
 
-# 读取现有追踪文件
+# Чтение существующего файла отслеживания
 with open('$plot_file', 'r') as f:
     tracker = json.load(f)
 
-# 读取建议
+# Чтение предложений
 data = json.load(open('$json_file'))
 plot = data.get('suggestions', {}).get('plot', {})
 items = plot.get('items', [])
 
-# 添加建议到追踪器
+# Добавление предложений в трекер
 if 'suggestions' not in tracker:
     tracker['suggestions'] = []
 
@@ -304,16 +305,16 @@ for item in items:
         'status': 'pending'
     })
 
-# 保存更新
+# Сохранение обновлений
 with open('$plot_file', 'w') as f:
     json.dump(tracker, f, indent=2, ensure_ascii=False)
 "
-            echo "    ✅ 已更新情节追踪器"
+            echo "    ✅ Трекер сюжета обновлен"
         fi
     fi
 }
 
-# 函数：处理世界观建议
+# Функция: Обработка предложений по мироустройству
 process_world_suggestions() {
     local json_file="$1"
 
@@ -324,9 +325,9 @@ print('yes' if 'worldbuilding' in data.get('suggestions', {}) else 'no')
 ")
 
     if [ "$has_world" = "yes" ]; then
-        echo "  🌍 处理世界观建议..."
+        echo "  🌍 Обработка предложений по мироустройству..."
 
-        # 更新世界观设定
+        # Обновление настроек мироустройства
         local world_file="$KNOWLEDGE_DIR/world-setting.md"
         local temp_update="/tmp/world_update_$$.md"
 
@@ -337,26 +338,26 @@ world = data.get('suggestions', {}).get('worldbuilding', {})
 items = world.get('items', [])
 
 with open('$temp_update', 'w') as f:
-    f.write('\n## 世界观完善建议 ($(date +%Y-%m-%d))\n\n')
+    f.write('\n## Предложения по доработке мироустройства ($(date +%Y-%m-%d))\n\n')
     for item in items:
-        f.write(f\"### {item.get('aspect', '未分类')}\n\")
-        f.write(f\"- **问题**：{item.get('issue', '')}\n\")
-        f.write(f\"- **建议**：{item.get('suggestion', '')}\n\")
+        f.write(f\"### {item.get('aspect', 'Некатегоризированный')}\n\")
+        f.write(f\"- **Проблема**：{item.get('issue', '')}\n\")
+        f.write(f\"- **Предложение**：{item.get('suggestion', '')}\n\")
         chapters = item.get('reference_chapters', [])
         if chapters:
-            f.write(f\"- **参考章节**：{', '.join(map(str, chapters))}\n\")
+            f.write(f\"- **Ссылочные главы**：{', '.join(map(str, chapters))}\n\")
         f.write('\n')
 "
 
         if [ -f "$temp_update" ] && [ -f "$world_file" ]; then
             cat "$temp_update" >> "$world_file"
             rm -f "$temp_update"
-            echo "    ✅ 已更新世界观设定"
+            echo "    ✅ Настройки мироустройства обновлены"
         fi
     fi
 }
 
-# 函数：处理对话建议
+# Функция: Обработка предложений по диалогам
 process_dialogue_suggestions() {
     local json_file="$1"
 
@@ -367,15 +368,16 @@ print('yes' if 'dialogue' in data.get('suggestions', {}) else 'no')
 ")
 
     if [ "$has_dialogue" = "yes" ]; then
-        echo "  💬 处理对话建议..."
+        echo "  💬 Обработка предложений по диалогам..."
 
-        # 创建或更新角色语言规范
+        # Создание или обновление спецификаций голосов персонажей
         local voices_file="$KNOWLEDGE_DIR/character-voices.md"
 
         if [ ! -f "$voices_file" ]; then
-            echo "# 角色语言规范" > "$voices_file"
+            echo "# Спецификации голосов персонажей" > "$voices_file"
             echo "" >> "$voices_file"
-            echo "## 通用原则" >> "$voices_file"
+```
+            echo "## Общие принципы" >> "$voices_file"
             echo "" >> "$voices_file"
         fi
 
@@ -388,17 +390,17 @@ dialogue = data.get('suggestions', {}).get('dialogue', {})
 items = dialogue.get('items', [])
 
 with open('$temp_update', 'w') as f:
-    f.write('\n## 对话优化建议 ($(date +%Y-%m-%d))\n\n')
+    f.write('\n## Предложения по оптимизации диалогов ($(date +%Y-%m-%d))\n\n')
     for item in items:
-        f.write(f\"### {item.get('character', '通用')}\n\")
-        f.write(f\"- **问题**：{item.get('issue', '')}\n\")
-        f.write(f\"- **建议**：{item.get('suggestion', '')}\n\")
+        f.write(f\"### {item.get('character', 'Общее')}\n\")
+        f.write(f\"- **Проблема**：{item.get('issue', '')}\n\")
+        f.write(f\"- **Предложение**：{item.get('suggestion', '')}\n\")
 
         examples = item.get('examples', [])
         alternatives = item.get('alternatives', [])
 
         if examples and alternatives:
-            f.write('- **替换示例**：\n')
+            f.write('- **Примеры замены**：\n')
             for i, ex in enumerate(examples):
                 if i < len(alternatives):
                     f.write(f\"  - {ex} → {alternatives[i]}\n\")
@@ -408,88 +410,88 @@ with open('$temp_update', 'w') as f:
         if [ -f "$temp_update" ]; then
             cat "$temp_update" >> "$voices_file"
             rm -f "$temp_update"
-            echo "    ✅ 已更新对话规范"
+            echo "    ✅ Нормы диалогов обновлены"
         fi
     fi
 }
 
-# 函数：处理Markdown风格建议
+# Функция: обработка предложений по стилю Markdown
 process_markdown_style() {
     local md_file="$1"
 
-    if grep -q "写作风格建议" "$md_file"; then
-        echo "  📝 处理风格建议..."
+    if grep -q "Предложения по стилю письма" "$md_file"; then
+        echo "  📝 Обработка предложений по стилю..."
 
-        # 提取风格部分并追加到constitution
+        # Извлечение раздела стиля и добавление в constitution
         local constitution_file="$MEMORY_DIR/writing-constitution.md"
 
         echo "" >> "$constitution_file"
-        echo "## 外部建议优化 ($(date +%Y-%m-%d))" >> "$constitution_file"
+        echo "## Внешние предложения по оптимизации ($(date +%Y-%m-%d))" >> "$constitution_file"
         echo "" >> "$constitution_file"
 
-        # 提取风格建议部分（简化处理）
-        awk '/## 写作风格建议/,/## [^写]/' "$md_file" | grep -v "^##" >> "$constitution_file"
+        # Извлечение предложений по стилю (упрощенная обработка)
+        awk '/## Предложения по стилю письма/,/## [^П]/' "$md_file" | grep -v "^##" >> "$constitution_file"
 
-        echo "    ✅ 已更新创作准则"
+        echo "    ✅ Творческие принципы обновлены"
     fi
 }
 
-# 函数：处理Markdown角色建议
+# Функция: обработка предложений по персонажам Markdown
 process_markdown_characters() {
     local md_file="$1"
 
-    if grep -q "角色优化建议" "$md_file"; then
-        echo "  👥 处理角色建议..."
+    if grep -q "Предложения по оптимизации персонажей" "$md_file"; then
+        echo "  👥 Обработка предложений по персонажам..."
 
         local profiles_file="$KNOWLEDGE_DIR/character-profiles.md"
 
         if [ -f "$profiles_file" ]; then
             echo "" >> "$profiles_file"
-            echo "## 外部优化建议 ($(date +%Y-%m-%d))" >> "$profiles_file"
+            echo "## Внешние предложения по оптимизации ($(date +%Y-%m-%d))" >> "$profiles_file"
             echo "" >> "$profiles_file"
 
-            # 提取角色建议部分
-            awk '/## 角色优化建议/,/## [^角]/' "$md_file" | grep -v "^##" >> "$profiles_file"
+            # Извлечение предложений по персонажам
+            awk '/## Предложения по оптимизации персонажей/,/## [^П]/' "$md_file" | grep -v "^##" >> "$profiles_file"
 
-            echo "    ✅ 已更新角色档案"
+            echo "    ✅ Профили персонажей обновлены"
         fi
     fi
 }
 
-# 函数：更新改进日志
+# Функция: обновление журнала улучшений
 update_improvement_log() {
     local source="$1"
     local summary="$2"
 
     local log_file="$KNOWLEDGE_DIR/improvement-log.md"
 
-    # 如果文件不存在，创建头部
+    # Если файл не существует, создать заголовок
     if [ ! -f "$log_file" ]; then
         cat > "$log_file" << EOF
-# 改进建议历史
+# История улучшений
 
-记录所有外部AI建议和采纳情况。
+Запись всех внешних предложений ИИ и их принятие.
 
 EOF
     fi
 
-    # 追加新记录
+    # Добавить новую запись
     cat >> "$log_file" << EOF
 
 ## $(date +%Y-%m-%d) - $source
 
-### 建议摘要
+### Краткое содержание предложений
 $summary
 
-### 采纳状态
-- [x] 已自动整合到规范文件
-- [ ] 待人工审核确认
-- [ ] 待实施修订
+### Статус принятия
+- [x] Автоматически интегрировано в файлы норм
+- [ ] Ожидает ручного подтверждения
+- [ ] Требует внесения исправлений
 
-### 影响文件
+### Затронутые файлы
 EOF
 
-    # 列出被修改的文件
+    # Перечислить измененные файлы
     echo "- writing-constitution.md" >> "$log_file"
     [ -f "$KNOWLEDGE_DIR/character-profiles.md" ] && echo "- character-profiles.md" >> "$log_file"
     [ -f "$TRACKING_DIR/plot-tracker.json" ] && echo "- plot-tracker.json" >> "$log_file"
@@ -500,63 +502,63 @@ EOF
     echo "---" >> "$log_file"
 }
 
-# 函数：整合外部建议
+# Функция: интеграция внешних предложений
 refine_style() {
-    echo "🔄 开始整合外部建议..."
+    echo "🔄 Начинается интеграция внешних предложений..."
 
-    # 读取输入（从标准输入或参数）
+    # Чтение ввода (из стандартного ввода или аргумента)
     local input="$*"
     if [ -z "$input" ]; then
-        # 尝试从标准输入读取
+        # Попытка чтения из стандартного ввода
         if [ ! -t 0 ]; then
             input=$(cat)
         else
-            echo "请提供建议内容"
+            echo "Пожалуйста, предоставьте содержание предложений"
             exit 1
         fi
     fi
 
-    # 自动检测格式 - 改进检测逻辑
+    # Автоматическое определение формата - улучшенная логика определения
     if echo "$input" | grep -q '"version"' && echo "$input" | grep -q '"suggestions"'; then
-        echo "检测到JSON格式"
+        echo "Обнаружен формат JSON"
         parse_json_suggestions "$input"
-        update_improvement_log "外部AI" "已处理JSON格式建议"
-    elif echo "$input" | grep -q "# 小说创作建议报告"; then
-        echo "检测到Markdown格式"
+        update_improvement_log "Внешний ИИ" "Предложения в формате JSON обработаны"
+    elif echo "$input" | grep -q "# Отчет с предложениями по созданию романа"; then
+        echo "Обнаружен формат Markdown"
         parse_markdown_suggestions "$input"
-        update_improvement_log "外部AI" "已处理Markdown格式建议"
+        update_improvement_log "Внешний ИИ" "Предложения в формате Markdown обработаны"
     else
-        echo "❌ 无法识别建议格式"
-        echo "请使用标准JSON或Markdown格式"
-        echo "参考：docs/ai-suggestion-prompt-template.md"
+        echo "❌ Не удалось распознать формат предложений"
+        echo "Используйте стандартный формат JSON или Markdown"
+        echo "См.: docs/ai-suggestion-prompt-template.md"
         exit 1
     fi
 
-    # 生成报告
+    # Генерация отчета
     echo ""
-    echo "✅ 建议整合完成"
+    echo "✅ Интеграция предложений завершена"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "📊 整合报告："
-    echo "  - 更新文件：$(find $MEMORY_DIR $KNOWLEDGE_DIR $TRACKING_DIR -type f -mmin -1 2>/dev/null | wc -l) 个"
-    echo "  - 建议来源：外部AI分析"
-    echo "  - 处理时间：$(date +%H:%M:%S)"
+    echo "📊 Отчет об интеграции:"
+    echo "  - Обновленные файлы: $(find $MEMORY_DIR $KNOWLEDGE_DIR $TRACKING_DIR -type f -mmin -1 2>/dev/null | wc -l) шт."
+    echo "  - Источник предложений: Внешний ИИ-анализ"
+    echo "  - Время обработки: $(date +%H:%M:%S)"
     echo ""
-    echo "📋 下一步行动："
-    echo "  1. 查看 improvement-log.md 了解详情"
-    echo "  2. 使用 /write 创作时会应用新规范"
-    echo "  3. 建议对相关章节进行修订"
+    echo "📋 Следующие шаги:"
+    echo "  1. Просмотрите improvement-log.md для получения подробной информации"
+    echo "  2. При использовании /write будут применены новые нормы"
+    echo "  3. Рекомендуется пересмотреть соответствующие главы"
     echo ""
-    echo "详见：$KNOWLEDGE_DIR/improvement-log.md"
+    echo "Подробнее: $KNOWLEDGE_DIR/improvement-log.md"
 }
 
-# 函数：合并多源建议
+# Функция: слияние предложений из нескольких источников
 merge_suggestions() {
-    echo "🔀 合并多源建议..."
-    echo "（功能开发中）"
-    # TODO: 实现多源建议智能合并
+    echo "🔀 Слияние предложений из нескольких источников..."
+    echo "（Функция в разработке）"
+    # TODO: Реализовать интеллектуальное слияние предложений из нескольких источников
 }
 
-# 主逻辑
+# Основная логика
 case "$MODE" in
     init)
         init_style
@@ -568,8 +570,8 @@ case "$MODE" in
         merge_suggestions "$@"
         ;;
     *)
-        echo "❌ 未知模式: $MODE"
-        echo "可用模式: init, refine, merge"
+        echo "❌ Неизвестный режим: $MODE"
+        echo "Доступные режимы: init, refine, merge"
         exit 1
         ;;
 esac

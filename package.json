@@ -1,8 +1,9 @@
+```json
 {
   "name": "novel-writer-cn",
   "version": "0.20.0",
   "type": "module",
-  "description": "AI 驱动的中文小说创作工具 - 基于结构化工作流的智能写作助手",
+  "description": "Инструмент для создания китайских романов на базе ИИ — интеллектуальный помощник по написанию, основанный на структурированном рабочем процессе",
   "keywords": [
     "novel",
     "writer",
@@ -61,3 +62,4 @@
     "url": "https://github.com/wordflowlab/novel-writer/issues"
   }
 }
+```

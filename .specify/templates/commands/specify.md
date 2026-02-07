@@ -1,209 +1,209 @@
 ---
-description: 定义故事规格，明确要创造什么样的作品
+description: Define the story specifications and clarify what kind of work to create.
 scripts:
   sh: .specify/scripts/bash/specify-story.sh --json
   ps: .specify/scripts/powershell/specify-story.ps1 -Json
 ---
 
-用户输入描述了他们想要创作的故事。基于这个描述，创建一个完整的故事规格文档。
+The user input describes the story they want to create. Based on this description, create a complete story specification document.
 
-用户输入：
+User input:
 $ARGUMENTS
 
-## 目标
+## Goal
 
-像产品规格书（PRD）一样定义故事，明确"要创造什么"而非"如何创造"。输出带有 `[需要澄清]` 标记的规格，为后续澄清步骤留出空间。
+Define the story like a Product Requirements Document (PRD), clarifying "what to create" rather than "how to create." Output specifications with the tag `[Needs Clarification]` to leave room for subsequent clarification steps.
 
-## 执行步骤
+## Execution Steps
 
-### 1. 初始化故事规格
+### 1. Initialize Story Specification
 
-运行 `{SCRIPT}` 获取路径信息：
-- 解析 JSON 获取 `STORY_NAME` 和 `SPEC_PATH`
-- 如果是新故事，创建规格文件
-- 如果已存在，准备更新
+Run `{SCRIPT}` to get path information:
+- Parse JSON to get `STORY_NAME` and `SPEC_PATH`
+- If it's a new story, create the specification file
+- If it already exists, prepare for an update
 
-### 2. 检查宪法合规性
+### 2. Check Constitutional Compliance
 
-如果存在 `memory/novel-constitution.md`：
-- 加载宪法原则
-- 确保规格符合宪法价值观
-- 在规格中引用相关原则
+If `memory/novel-constitution.md` exists:
+- Load constitutional principles
+- Ensure the specifications align with constitutional values
+- Reference relevant principles in the specifications
 
-### 3. 创建故事规格文档
+### 3. Create Story Specification Document
 
-使用以下结构创建规格：
+Create the specification using the following structure:
 
 ```markdown
-# 故事规格书
+# Story Specification
 
-## 元数据
-- 故事名称：[名称]
-- 版本：1.0.0
-- 创建日期：[YYYY-MM-DD]
-- 状态：草案
-- 作者：[作者名]
+## Metadata
+- Story Name: [Name]
+- Version: 1.0.0
+- Creation Date: [YYYY-MM-DD]
+- Status: Draft
+- Author: [Author Name]
 
-## 一、故事概要
+## I. Story Synopsis
 
-### 一句话故事（电梯演讲）
-[30字以内描述故事核心]
+### One-Sentence Story (Elevator Pitch)
+[Core story description within 30 characters]
 
-### 故事简介（100-200字）
-[扩展描述，包含主要冲突和结局暗示]
+### Story Introduction (100-200 characters)
+[Expanded description, including main conflict and hints of the ending]
 
-### 核心主题
-- 主题：[如"成长"、"救赎"、"复仇"]
-- 深层含义：[想要表达什么]
-- 情感内核：[希望读者感受到什么]
+### Core Themes
+- Theme: [e.g., "Growth," "Redemption," "Revenge"]
+- Deeper Meaning: [What do you want to convey?]
+- Emotional Core: [What do you want the reader to feel?]
 
-## 二、目标定位
+## II. Target Audience
 
-### 目标读者画像
-- 年龄段：[需要澄清：具体年龄范围]
-- 性别倾向：[需要澄清：男性向/女性向/通用]
-- 阅读层次：[需要澄清：入门/进阶/资深]
-- 类型偏好：[玄幻/都市/历史等]
-- 阅读场景：[碎片时间/深度阅读]
+### Target Reader Persona
+- Age Group: [Needs Clarification: Specific age range]
+- Gender Tendency: [Needs Clarification: Male-oriented/Female-oriented/General]
+- Reading Level: [Needs Clarification: Beginner/Intermediate/Advanced]
+- Genre Preference: [Fantasy/Urban/Historical, etc.]
+- Reading Scenario: [Fragmented time/In-depth reading]
 
-### 市场定位
-- 类型标签：[主标签] + [副标签]
-- 竞品分析：类似[作品1]的[特点] + [作品2]的[特点]
-- 差异化：[需要澄清：核心卖点是什么]
+### Market Positioning
+- Genre Tags: [Main Tag] + [Sub Tag]
+- Competitor Analysis: Similar to [Work 1]'s [Feature] + [Work 2]'s [Feature]
+- Differentiation: [Needs Clarification: What is the core selling point?]
 
-## 三、成功标准
+## III. Success Criteria
 
-### 量化指标
-- 目标字数：[需要澄清：3万/10万/50万]
-- 更新频率：[需要澄清：日更/周更/月更]
-- 完成时间：[预计时长]
-- 商业目标：[如适用]
+### Quantitative Metrics
+- Target Word Count: [Needs Clarification: 30k/100k/500k]
+- Update Frequency: [Needs Clarification: Daily/Weekly/Monthly]
+- Completion Time: [Estimated Duration]
+- Business Goals: [If applicable]
 
-### 质量标准
-- 逻辑一致性：[必须/应该]无明显漏洞
-- 人物丰满度：主角有[X]个层次，配角有[Y]个层次
-- 情节紧凑度：[需要澄清：每章都有冲突/允许过渡章节]
-- 文字水准：[需要澄清：通俗易懂/文学性/专业性]
+### Quality Standards
+- Logical Consistency: Must/Should have no obvious loopholes
+- Character Depth: Protagonist has [X] layers, supporting characters have [Y] layers
+- Plot Pacing: [Needs Clarification: Conflict in every chapter/Allow transitional chapters]
+- Writing Quality: [Needs Clarification: Easy to understand/Literary/Professional]
 
-### 读者反馈指标
-- 目标评分：[如适用]
-- 互动率：[评论/收藏比例]
-- 完读率：[期望的读者完成度]
+### Reader Feedback Metrics
+- Target Rating: [If applicable]
+- Engagement Rate: [Comment/Favorite Ratio]
+- Completion Rate: [Desired reader completion rate]
 
-## 四、核心需求
+## IV. Core Requirements
 
-### 必须包含（P0）
-1. [核心情节元素1]
-2. [核心人物关系]
-3. [核心冲突设定]
-4. [必要的世界观元素]
+### Must-Haves (P0)
+1. [Core Plot Element 1]
+2. [Core Character Relationship]
+3. [Core Conflict Setup]
+4. [Essential World-building Element]
 
-### 应该包含（P1）
-1. [增强体验的元素]
-2. [深化主题的内容]
-3. [丰富人物的支线]
+### Should-Haves (P1)
+1. [Elements to Enhance Experience]
+2. [Content to Deepen Themes]
+3. [Subplots to Enrich Characters]
 
-### 可以包含（P2）
-1. [锦上添花的内容]
-2. [可选的支线]
-3. [额外的彩蛋]
+### Could-Haves (P2)
+1. [Nice-to-have Elements]
+2. [Optional Subplots]
+3. [Bonus Easter Eggs]
 
-## 五、约束条件
+## V. Constraints
 
-### 内容红线
-- 绝对禁止：[如违法内容]
-- 需要避免：[如敏感话题]
-- 谨慎处理：[需要澄清：如何处理情感关系]
+### Content Red Lines
+- Absolutely Prohibited: [e.g., Illegal content]
+- Avoid: [e.g., Sensitive topics]
+- Handle with Care: [Needs Clarification: How to handle relationships?]
 
-### 创作约束
-- 知识限制：[需要澄清：是否需要专业知识]
-- 时间限制：[完成期限]
-- 资源限制：[如需要的参考资料]
+### Creative Constraints
+- Knowledge Limitations: [Needs Clarification: Is specialized knowledge required?]
+- Time Limitations: [Completion Deadline]
+- Resource Limitations: [e.g., Required reference materials]
 
-### 技术约束
-- 发布平台：[需要澄清：网文平台/出版/自媒体]
-- 格式要求：[章节长度等]
-- 更新要求：[固定时间等]
+### Technical Constraints
+- Publishing Platform: [Needs Clarification: Web novel platform/Publication/Self-media]
+- Format Requirements: [Chapter length, etc.]
+- Update Requirements: [Fixed times, etc.]
 
-## 六、风险评估
+## VI. Risk Assessment
 
-### 创作风险
-- 写作难度：[需要澄清：挑战在哪里]
-- 灵感枯竭：[如何应对]
-- 逻辑漏洞：[复杂度评估]
+### Creative Risks
+- Writing Difficulty: [Needs Clarification: Where are the challenges?]
+- Inspiration Burnout: [How to cope?]
+- Logical Loopholes: [Complexity assessment]
 
-### 市场风险
-- 同质化：[如何差异化]
-- 读者接受度：[需要澄清：创新是否过度]
-- 时效性：[题材是否会过时]
+### Market Risks
+- Homogenization: [How to differentiate?]
+- Reader Acceptance: [Needs Clarification: Is the innovation excessive?]
+- Timeliness: [Will the theme become outdated?]
 
-## 七、核心决策点 [需要澄清]
+## VII. Key Decision Points [Needs Clarification]
 
-以下关键决策需要在 `/clarify` 阶段明确：
-1. [决策1：如主角性格是热血还是冷静]
-2. [决策2：如结局是开放还是圆满]
-3. [决策3：如叙事是单线还是多线]
-4. [决策4：如节奏是快速还是缓慢]
-5. [决策5：如风格是轻松还是严肃]
+The following key decisions need to be clarified in the `/clarify` phase:
+1. [Decision 1: e.g., Is the protagonist hot-blooded or calm?]
+2. [Decision 2: e.g., Is the ending open or complete?]
+3. [Decision 3: e.g., Is the narrative single-threaded or multi-threaded?]
+4. [Decision 4: e.g., Is the pacing fast or slow?]
+5. [Decision 5: e.g., Is the style lighthearted or serious?]
 
-## 八、验证清单
+## VIII. Verification Checklist
 
-- [ ] 故事概要清晰明确
-- [ ] 目标读者定义准确
-- [ ] 成功标准可衡量
-- [ ] 核心需求已列出
-- [ ] 约束条件已识别
-- [ ] 风险已评估
-- [ ] 关键决策点已标记
+- [ ] Story synopsis is clear and concise
+- [ ] Target reader is accurately defined
+- [ ] Success criteria are measurable
+- [ ] Core requirements are listed
+- [ ] Constraints are identified
+- [ ] Risks are assessed
+- [ ] Key decision points are marked
 
-## 附录：参考资料
+## Appendix: References
 
-### 灵感来源
-- [来源1]
-- [来源2]
+### Sources of Inspiration
+- [Source 1]
+- [Source 2]
 
-### 参考作品
-- [作品1]：参考其[特点]
-- [作品2]：参考其[特点]
+### Reference Works
+- [Work 1]: Referencing its [Feature]
+- [Work 2]: Referencing its [Feature]
 
-### 补充说明
-[其他需要说明的内容]
+### Additional Notes
+[Anything else that needs to be stated]
 ```
 
-### 4. 标记需要澄清的点
+### 4. Mark Points Needing Clarification
 
-在规格中标记所有需要进一步澄清的决策点：
-- 使用 `[需要澄清：具体问题]` 格式
-- 确保标记 5-10 个关键决策点
-- 这些将在 `/clarify` 步骤中处理
+Mark all decision points in the specification that require further clarification:
+- Use the format `[Needs Clarification: Specific Question]`
+- Ensure 5-10 key decision points are marked
+- These will be handled in the `/clarify` step
 
-### 5. 版本管理
+### 5. Version Management
 
-- 初始版本：1.0.0（草案）
-- 澄清后：1.1.0（澄清版）
-- 计划后：1.2.0（确认版）
-- 执行中：2.0.0（执行版）
+- Initial Version: 1.0.0 (Draft)
+- After Clarification: 1.1.0 (Clarified)
+- After Planning: 1.2.0 (Confirmed)
+- In Progress: 2.0.0 (In Progress)
 
-### 6. 输出和保存
+### 6. Output and Save
 
-- 将规格保存到 `stories/[story-name]/specification.md`
-- 输出创建成功消息
-- 提示下一步：运行 `/clarify` 澄清关键决策
+- Save the specification to `stories/[story-name]/specification.md`
+- Output a success message for creation
+- Prompt for the next step: Run `/clarify` to clarify key decisions
 
-## 注意事项
+## Notes
 
-### 聚焦于 WHAT 而非 HOW
-- ✅ 正确："需要一个让读者恨之入骨的反派"
-- ❌ 错误："反派在第三章出场，使用倒叙手法"
+### Focus on WHAT, Not HOW
+- ✅ Correct: "Need a villain that readers will hate"
+- ❌ Incorrect: "The villain appears in Chapter 3 and uses a flashback technique"
 
-### 保持规格的灵活性
-- 留出澄清空间
-- 不要过早确定细节
-- 标记所有不确定点
+### Maintain Specification Flexibility
+- Leave room for clarification
+- Do not finalize details too early
+- Mark all uncertain points
 
-### 与后续步骤的关系
-- `/clarify` 将处理所有 `[需要澄清]` 标记
-- `/plan` 将基于澄清后的规格制定技术方案
-- `/analyze` 将验证实现是否符合规格
+### Relationship with Subsequent Steps
+- `/clarify` will handle all `[Needs Clarification]` tags
+- `/plan` will create a technical solution based on the clarified specifications
+- `/analyze` will verify if the implementation meets the specifications
 
-记住：**规格定义目标，而非路径。**
+Remember: **Specifications define the destination, not the route.**

@@ -1,3 +1,4 @@
+```sh
 #!/usr/bin/env bash
 # 检查情节发展的一致性和连贯性
 
@@ -365,10 +366,13 @@ main() {
     # 更新检查时间
     if [ -f "$PLOT_TRACKER" ]; then
         TEMP_FILE=$(mktemp)
+```
+```bash
         jq --arg date "$(date -Iseconds)" '.lastUpdated = $date' "$PLOT_TRACKER" > "$TEMP_FILE"
         mv "$TEMP_FILE" "$PLOT_TRACKER"
     fi
 }
 
-# 执行主函数
+# Запуск основной функции
 main
+```

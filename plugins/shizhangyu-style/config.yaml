@@ -1,61 +1,63 @@
+```yaml
 name: shizhangyu-style
 version: 1.0.0
-description: 石章鱼风格创作插件 - 宏大叙事与深邃权谋的史诗级创作
+description: Плагин для создания контента в стиле Шичжанъюй — эпическое повествование и глубокие интриги
 type: style
 author: Novel Writer Community
 commands:
   - id: shizhangyu-style
     file: commands/shizhangyu-style.md
-    description: 激活石章鱼风格创作模式
+    description: Активировать режим создания контента в стиле Шичжанъюй
   - id: shizhangyu-write
     file: commands/shizhangyu-write.md
-    description: 使用石章鱼风格创作史诗内容
+    description: Создавать эпический контент в стиле Шичжанъюй
   - id: shizhangyu-plot
     file: commands/shizhangyu-plot.md
-    description: 设计多层次权谋情节
+    description: Разрабатывать многоуровневые интриги
   - id: shizhangyu-character
     file: commands/shizhangyu-character.md
-    description: 塑造鲜活立体的人物
+    description: Создавать ярких и многогранных персонажей
   - id: shizhangyu-foreshadow
     file: commands/shizhangyu-foreshadow.md
-    description: 管理伏笔布局与回收
+    description: Управлять завязками и их развязкой
 experts:
   - id: shizhangyu-master
     file: experts/shizhangyu-master.md
-    title: 石章鱼风格大师
-    description: 掌握宏大叙事与权谋艺术的创作专家
+    title: Мастер стиля Шичжанъюй
+    description: Эксперт по эпическому повествованию и искусству интриг
 dependencies:
   core: ">=0.5.0"
 features:
-  - epic-narrative      # 史诗叙事系统
-  - intrigue-engine    # 权谋智能引擎
-  - character-system   # 人物个性系统
-  - foreshadow-tracker # 伏笔追踪器
-  - atmosphere-builder # 氛围营造器
-  - mega-chapter       # 超长章节支持(20000字)
+  - epic-narrative      # Система эпического повествования
+  - intrigue-engine    # Интеллектуальный движок интриг
+  - character-system   # Система индивидуальности персонажей
+  - foreshadow-tracker # Трекер завязок
+  - atmosphere-builder # Создатель атмосферы
+  - mega-chapter       # Поддержка сверхдлинных глав (20000 слов)
 installation:
   message: |
-    ✅ 石章鱼风格插件安装成功！
+    ✅ Плагин стиля Шичжанъюй успешно установлен!
 
-    使用说明：
-    1. 使用 /shizhangyu-style 激活石章鱼风格模式
-    2. 使用 /shizhangyu-write 创作史诗级内容
-    3. 使用 /shizhangyu-plot 设计权谋情节
-    4. 使用 /shizhangyu-character 塑造立体人物
-    5. 使用 /shizhangyu-foreshadow 管理伏笔系统
+    Инструкция по использованию:
+    1. Используйте /shizhangyu-style для активации режима стиля Шичжанъюй
+    2. Используйте /shizhangyu-write для создания эпического контента
+    3. Используйте /shizhangyu-plot для разработки интриг
+    4. Используйте /shizhangyu-character для создания многогранных персонажей
+    5. Используйте /shizhangyu-foreshadow для управления системой завязок
 
-    专家模式：
-    - 使用 /expert shizhangyu-master 激活石章鱼风格大师
+    Режим эксперта:
+    - Используйте /expert shizhangyu-master для активации Мастера стиля Шичжанъюй
 
-    核心特征：
-    - 宏大的时代背景与历史洪流
-    - 深邃的权谋博弈与人性挣扎
-    - 鲜活的人物塑造与个性语言
-    - 跌宕的情节设计与意外结局
-    - 20000字超长章节输出能力
+    Основные особенности:
+    - Масштабный исторический фон и течение времени
+    - Глубокие интриги и борьба человеческих страстей
+    - Яркие персонажи и индивидуальная речь
+    - Захватывающий сюжет и неожиданные развязки
+    - Возможность вывода глав объемом более 20000 слов
 
-    ⚠️ 提示：
-    - 本插件专为历史、权谋、史诗类小说优化
-    - 支持单次输出20000字以上章节
-    - 自动维护伏笔追踪表
-    - 建议配合 /track 命令管理复杂剧情线
+    ⚠️ Примечание:
+    - Данный плагин оптимизирован для исторических, политических и эпических романов
+    - Поддерживает вывод глав объемом более 20000 слов за один раз
+    - Автоматически ведет таблицу отслеживания завязок
+    - Рекомендуется использовать совместно с командой /track для управления сложными сюжетными линиями
+```

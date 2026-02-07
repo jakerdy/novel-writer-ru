@@ -1,3 +1,4 @@
+```markdown
 ---
 description: 执行具体的章节写作，AI 辅助创作内容
 scripts:
@@ -124,4 +125,5 @@ scripts:
 ```
 /track --check   # 深度验证所有内容一致性
 /track --fix     # 自动修复发现的简单问题
+```
 ```

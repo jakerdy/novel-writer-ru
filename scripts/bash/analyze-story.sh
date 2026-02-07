@@ -1,40 +1,41 @@
+```sh
 #!/bin/bash
 
-# 故事分析验证脚本
-# 用于 /analyze 命令
+# Скрипт анализа истории
+# Используется для команды /analyze
 
 set -e
 
-# Source common functions
+# Подключение общих функций
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
-# Parse arguments
+# Разбор аргументов
 STORY_NAME="$1"
 ANALYSIS_TYPE="${2:-full}"  # full, compliance, quality, progress
 
-# Get project root
+# Получение корневого каталога проекта
 PROJECT_ROOT=$(get_project_root)
 cd "$PROJECT_ROOT"
 
-# 确定故事路径
+# Определение пути к истории
 if [ -z "$STORY_NAME" ]; then
     STORY_NAME=$(get_active_story)
 fi
 
 STORY_DIR="stories/$STORY_NAME"
 
-# 检查必要文件
+# Проверка необходимых файлов
 check_story_files() {
     local missing_files=()
 
-    # 检查基准文档
-    [ ! -f "memory/constitution.md" ] && missing_files+=("宪法文件")
-    [ ! -f "$STORY_DIR/specification.md" ] && missing_files+=("规格文件")
-    [ ! -f "$STORY_DIR/creative-plan.md" ] && missing_files+=("计划文件")
+    # Проверка эталонных документов
+    [ ! -f "memory/constitution.md" ] && missing_files+=("Конституционный документ")
+    [ ! -f "$STORY_DIR/specification.md" ] && missing_files+=("Файл спецификации")
+    [ ! -f "$STORY_DIR/creative-plan.md" ] && missing_files+=("Файл творческого плана")
 
     if [ ${#missing_files[@]} -gt 0 ]; then
-        echo "⚠️ 缺少以下基准文档："
+        echo "⚠️ Отсутствуют следующие эталонные документы:"
         for file in "${missing_files[@]}"; do
             echo "  - $file"
         done
@@ -44,42 +45,42 @@ check_story_files() {
     return 0
 }
 
-# 统计内容
+# Статистика контента
 analyze_content() {
     local content_dir="$STORY_DIR/content"
     local total_words=0
     local chapter_count=0
 
     if [ -d "$content_dir" ]; then
-        echo "内容统计："
+        echo "Статистика контента:"
         echo ""
         for file in "$content_dir"/*.md; do
             if [ -f "$file" ]; then
                 ((chapter_count++))
-                # 使用准确的中文字数统计
+                # Точный подсчет китайских слов
                 local words=$(count_chinese_words "$file")
                 ((total_words += words))
                 local filename=$(basename "$file")
-                echo "  $filename: $words 字"
+                echo "  $filename: $words слов"
             fi
         done
         echo ""
-        echo "  总字数：$total_words"
-        echo "  章节数：$chapter_count"
+        echo "  Всего слов: $total_words"
+        echo "  Количество глав: $chapter_count"
         if [ $chapter_count -gt 0 ]; then
-            echo "  平均章节长度：$((total_words / chapter_count)) 字"
+            echo "  Средняя длина главы: $((total_words / chapter_count)) слов"
         fi
     else
-        echo "内容统计："
-        echo "  尚未开始写作"
+        echo "Статистика контента:"
+        echo "  Писательство еще не началось"
     fi
 }
 
-# 检查任务完成度
+# Проверка выполнения задач
 check_task_completion() {
     local tasks_file="$STORY_DIR/tasks.md"
     if [ ! -f "$tasks_file" ]; then
-        echo "任务文件不存在"
+        echo "Файл задач отсутствует"
         return
     fi
 
@@ -88,58 +89,58 @@ check_task_completion() {
     local in_progress=$(grep -c "^- \[~\]" "$tasks_file" 2>/dev/null || echo 0)
     local pending=$((total_tasks - completed_tasks - in_progress))
 
-    echo "任务进度："
-    echo "  总任务：$total_tasks"
-    echo "  已完成：$completed_tasks"
-    echo "  进行中：$in_progress"
-    echo "  未开始：$pending"
+    echo "Прогресс выполнения задач:"
+    echo "  Всего задач: $total_tasks"
+    echo "  Выполнено: $completed_tasks"
+    echo "  В процессе: $in_progress"
+    echo "  Ожидается: $pending"
 
     if [ $total_tasks -gt 0 ]; then
         local completion_rate=$((completed_tasks * 100 / total_tasks))
-        echo "  完成率：$completion_rate%"
+        echo "  Процент выполнения: $completion_rate%"
     fi
 }
 
-# 检查规格符合度
+# Проверка соответствия спецификации
 check_specification_compliance() {
     local spec_file="$STORY_DIR/specification.md"
 
-    echo "规格符合度检查："
+    echo "Проверка соответствия спецификации:"
 
-    # 检查P0需求（简化版）
+    # Проверка требований P0 (упрощенная версия)
     local p0_count=$(grep -c "^### 必须包含（P0）" "$spec_file" 2>/dev/null || echo 0)
     if [ $p0_count -gt 0 ]; then
-        echo "  P0需求：检测到，需人工验证"
+        echo "  Требования P0: обнаружены, требуется ручная проверка"
     fi
 
-    # 检查是否还有[需要澄清]标记
+    # Проверка наличия маркеров [需要澄清]
     local unclear=$(grep -c "\[需要澄清\]" "$spec_file" 2>/dev/null || echo 0)
     if [ $unclear -gt 0 ]; then
-        echo "  ⚠️ 仍有 $unclear 处需要澄清"
+        echo "  ⚠️ Осталось $unclear пунктов, требующих уточнения"
     else
-        echo "  ✅ 所有决策已澄清"
+        echo "  ✅ Все решения уточнены"
     fi
 }
 
-# 主分析流程
+# Основной процесс анализа
 main() {
-    echo "故事分析报告"
+    echo "Отчет об анализе истории"
     echo "============"
-    echo "故事：$STORY_NAME"
-    echo "分析时间：$(date '+%Y-%m-%d %H:%M:%S')"
+    echo "История: $STORY_NAME"
+    echo "Время анализа: $(date '+%Y-%m-%d %H:%M:%S')"
     echo ""
 
-    # 检查基准文档
+    # Проверка эталонных документов
     if ! check_story_files; then
         echo ""
-        echo "❌ 无法进行完整分析，请先完成基准文档"
+        echo "❌ Полный анализ невозможен, пожалуйста, сначала завершите эталонные документы"
         exit 1
     fi
 
-    echo "✅ 基准文档完整"
+    echo "✅ Эталонные документы в полном объеме"
     echo ""
 
-    # 根据分析类型执行
+    # Выполнение в зависимости от типа анализа
     case "$ANALYSIS_TYPE" in
         full)
             analyze_content
@@ -158,13 +159,14 @@ main() {
             check_specification_compliance
             ;;
         *)
-            echo "未知的分析类型：$ANALYSIS_TYPE"
+            echo "Неизвестный тип анализа: $ANALYSIS_TYPE"
             exit 1
             ;;
     esac
 
     echo ""
-    echo "分析完成。详细报告已保存到：$STORY_DIR/analysis-report.md"
+    echo "Анализ завершен. Подробный отчет сохранен в: $STORY_DIR/analysis-report.md"
 }
 
 main
+```

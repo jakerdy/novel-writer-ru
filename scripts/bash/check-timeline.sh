@@ -1,13 +1,14 @@
+```sh
 #!/usr/bin/env bash
-# 管理和验证故事时间线
+# Управление и проверка временной шкалы истории
 
 set -e
 
-# 加载通用函数
+# Загрузка общих функций
 SCRIPT_DIR=$(dirname "$0")
 source "$SCRIPT_DIR/common.sh"
 
-# 检查是否为 checklist 模式
+# Проверка режима checklist
 CHECKLIST_MODE=false
 COMMAND="${1:-show}"
 if [ "$COMMAND" = "--checklist" ]; then
@@ -15,89 +16,89 @@ if [ "$COMMAND" = "--checklist" ]; then
     COMMAND="check"
 fi
 
-# 获取当前故事目录
+# Получение текущего каталога истории
 STORY_DIR=$(get_current_story)
 
 if [ -z "$STORY_DIR" ]; then
-    echo "错误: 未找到故事项目" >&2
+    echo "Ошибка: Проект истории не найден" >&2
     exit 1
 fi
 
-# 文件路径
+# Пути к файлам
 TIMELINE="$STORY_DIR/spec/tracking/timeline.json"
 PROGRESS="$STORY_DIR/progress.json"
 
-# 命令参数（已在上面处理 checklist 模式）
+# Параметры команды (режим checklist обработан выше)
 PARAM2="${2:-}"
 
-# 初始化时间线文件
+# Инициализация файла временной шкалы
 init_timeline() {
     if [ ! -f "$TIMELINE" ]; then
-        echo "⚠️  未找到时间线文件，正在创建..." >&2
+        echo "⚠️  Файл временной шкалы не найден, создается..." >&2
         mkdir -p "$STORY_DIR/spec/tracking"
 
         if [ -f "$SCRIPT_DIR/../../templates/tracking/timeline.json" ]; then
             cp "$SCRIPT_DIR/../../templates/tracking/timeline.json" "$TIMELINE"
-            echo "✅ 时间线文件已创建"
+            echo "✅ Файл временной шкалы создан"
         else
-            echo "错误: 无法找到模板文件" >&2
+            echo "Ошибка: Невозможно найти шаблонный файл" >&2
             exit 1
         fi
     fi
 }
 
-# 显示时间线
+# Отображение временной шкалы
 show_timeline() {
-    echo "📅 故事时间线"
+    echo "📅 Временная шкала истории"
     echo "━━━━━━━━━━━━━━━━━━━━"
 
     if [ -f "$TIMELINE" ]; then
-        # 当前时间
-        CURRENT_TIME=$(jq -r '.storyTime.current // "未设定"' "$TIMELINE")
-        echo "⏰ 当前时间：$CURRENT_TIME"
+        # Текущее время
+        CURRENT_TIME=$(jq -r '.storyTime.current // "Не установлено"' "$TIMELINE")
+        echo "⏰ Текущее время: $CURRENT_TIME"
         echo ""
 
-        # 时间跨度计算
+        # Расчет временного интервала
         START_TIME=$(jq -r '.storyTime.start // ""' "$TIMELINE")
         if [ -n "$START_TIME" ]; then
-            echo "📍 起始时间：$START_TIME"
+            echo "📍 Время начала: $START_TIME"
 
-            # 计算已经历的事件数
+            # Расчет количества пройденных событий
             EVENT_COUNT=$(jq '.events | length' "$TIMELINE")
-            echo "📊 记录事件：${EVENT_COUNT}个"
+            echo "📊 Записано событий: ${EVENT_COUNT} шт."
         fi
 
         echo ""
-        echo "📖 重要事件："
+        echo "📖 Важные события:"
         echo "───────────────"
 
-        # 显示最近的事件
+        # Отображение последних событий
         jq -r '.events | sort_by(.chapter) | reverse | .[0:5][] |
-            "第" + (.chapter | tostring) + "章 | " + .date + " | " + .event' \
-            "$TIMELINE" 2>/dev/null || echo "  暂无事件记录"
+            "Глава " + (.chapter | tostring) + " | " + .date + " | " + .event' \
+            "$TIMELINE" 2>/dev/null || echo "  Пока нет записей событий"
 
-        # 显示并行事件
+        # Отображение параллельных событий
         PARALLEL_COUNT=$(jq '.parallelEvents.timepoints | length' "$TIMELINE" 2>/dev/null || echo "0")
         if [ "$PARALLEL_COUNT" != "0" ] && [ "$PARALLEL_COUNT" != "null" ]; then
             echo ""
-            echo "🔄 并行事件："
+            echo "🔄 Параллельные события:"
             jq -r '.parallelEvents.timepoints | to_entries[] |
                 .key + ": " + (.value | join(", "))' "$TIMELINE" 2>/dev/null || true
         fi
     else
-        echo "未找到时间线文件"
+        echo "Файл временной шкалы не найден"
     fi
 }
 
-# 添加时间节点
+# Добавление временной точки
 add_event() {
     local chapter="${2:-}"
     local date="${3:-}"
     local event="${4:-}"
 
     if [ -z "$chapter" ] || [ -z "$date" ] || [ -z "$event" ]; then
-        echo "用法: $0 add <章节号> <时间> <事件描述>" >&2
-        echo "示例: $0 add 5 '万历三十年春' '主角抵达京城'" >&2
+        echo "Использование: $0 add <номер главы> <время> <описание события>" >&2
+        echo "Пример: $0 add 5 'Весна 30-го года Ваньли' 'Главный герой прибывает в столицу'" >&2
         exit 1
     fi
 
@@ -105,7 +106,7 @@ add_event() {
         init_timeline
     fi
 
-    # 添加新事件
+    # Добавление нового события
     TEMP_FILE=$(mktemp)
     jq --arg ch "$chapter" \
        --arg dt "$date" \
@@ -122,23 +123,23 @@ add_event() {
        "$TIMELINE" > "$TEMP_FILE"
 
     mv "$TEMP_FILE" "$TIMELINE"
-    echo "✅ 事件已添加：第${chapter}章 - $date - $event"
+    echo "✅ Событие добавлено: Глава ${chapter} - $date - $event"
 }
 
-# 检查时间连续性
+# Проверка непрерывности временной шкалы
 check_continuity() {
-    echo "🔍 检查时间线连续性"
+    echo "🔍 Проверка непрерывности временной шкалы"
     echo "━━━━━━━━━━━━━━━━━━━━"
 
     if [ ! -f "$TIMELINE" ]; then
-        echo "错误: 时间线文件不存在" >&2
+        echo "Ошибка: Файл временной шкалы не существует" >&2
         exit 1
     fi
 
-    # 检查事件顺序
-    echo "检查章节顺序..."
+    # Проверка порядка событий
+    echo "Проверка порядка глав..."
 
-    # 获取所有章节号并检查是否递增
+    # Получение всех номеров глав и проверка их возрастания
     CHAPTERS=$(jq -r '.events | sort_by(.chapter) | .[].chapter' "$TIMELINE")
 
     prev_chapter=0
@@ -146,28 +147,28 @@ check_continuity() {
 
     for chapter in $CHAPTERS; do
         if [ "$chapter" -le "$prev_chapter" ]; then
-            echo "⚠️  章节顺序异常：第${chapter}章出现在第${prev_chapter}章之后"
+            echo "⚠️  Нарушение порядка глав: Глава ${chapter} появилась после главы ${prev_chapter}"
             ((issues++))
         fi
         prev_chapter=$chapter
     done
 
-    # 检查时间跨度
+    # Проверка временных интервалов
     echo ""
-    echo "检查时间跨度..."
+    echo "Проверка временных интервалов..."
 
-    # 这里可以添加更复杂的时间逻辑检查
-    # 比如检查旅行时间是否合理等
+    # Здесь можно добавить более сложную логику проверки времени
+    # Например, проверку разумности времени в пути и т.д.
 
     if [ "$issues" -eq 0 ]; then
         echo ""
-        echo "✅ 时间线检查通过，未发现逻辑问题"
+        echo "✅ Проверка временной шкалы пройдена, логических проблем не обнаружено"
     else
         echo ""
-        echo "⚠️  发现${issues}个潜在问题，请检查"
+        echo "⚠️  Обнаружено ${issues} потенциальных проблем, пожалуйста, проверьте"
     fi
 
-    # 记录检查结果
+    # Запись результатов проверки
     if [ -f "$TIMELINE" ]; then
         TEMP_FILE=$(mktemp)
         jq --arg date "$(date -Iseconds)" \
@@ -179,14 +180,14 @@ check_continuity() {
     fi
 }
 
-# 同步并行事件
+# Синхронизация параллельных событий
 sync_parallel() {
     local timepoint="${2:-}"
     local events="${3:-}"
 
     if [ -z "$timepoint" ] || [ -z "$events" ]; then
-        echo "用法: $0 sync <时间点> <事件列表>" >&2
-        echo "示例: $0 sync '万历三十年春' '战争爆发,使团到达'" >&2
+        echo "Использование: $0 sync <временная точка> <список событий>" >&2
+        echo "Пример: $0 sync 'Весна 30-го года Ваньли' 'Начало войны, Прибытие посольства'" >&2
         exit 1
     fi
 
@@ -194,12 +195,12 @@ sync_parallel() {
         init_timeline
     fi
 
-    # 将事件列表转换为JSON数组
+    # Преобразование списка событий в JSON-массив
     IFS=',' read -ra EVENT_ARRAY <<< "$events"
     JSON_ARRAY=$(printf '"%s",' "${EVENT_ARRAY[@]}" | sed 's/,$//')
     JSON_ARRAY="[${JSON_ARRAY}]"
 
-    # 更新并行事件
+    # Обновление параллельных событий
     TEMP_FILE=$(mktemp)
     jq --arg tp "$timepoint" \
        --argjson events "$JSON_ARRAY" \
@@ -208,10 +209,10 @@ sync_parallel() {
        "$TIMELINE" > "$TEMP_FILE"
 
     mv "$TEMP_FILE" "$TIMELINE"
-    echo "✅ 并行事件已同步：$timepoint"
+    echo "✅ Параллельные события синхронизированы: $timepoint"
 }
 
-# 生成 checklist 格式输出
+# Генерация вывода в формате checklist
 output_checklist() {
     init_timeline
 
@@ -227,7 +228,7 @@ output_checklist() {
         current_time=$(jq -r '.storyTime.current // ""' "$TIMELINE")
         start_time=$(jq -r '.storyTime.start // ""' "$TIMELINE")
 
-        # 检查事件顺序问题
+        # Проверка проблем с порядком событий
         has_issues=$(jq '
             .events |
             sort_by(.chapter) |
@@ -238,77 +239,77 @@ output_checklist() {
     fi
 
     cat <<EOF
-# 时间线检查 Checklist
+# Чек-лист проверки временной шкалы
 
-**检查时间**: $(date '+%Y-%m-%d %H:%M:%S')
-**检查对象**: spec/tracking/timeline.json
-**记录事件数**: $event_count
+**Время проверки**: $(date '+%Y-%m-%d %H:%M:%S')
+**Объект проверки**: spec/tracking/timeline.json
+**Количество записанных событий**: $event_count
 
 ---
 
-## 文件完整性
+## Целостность файла
 
-- [$([ -f "$TIMELINE" ] && echo "x" || echo " ")] CHK001 timeline.json 存在且格式有效
+- [$([ -f "$TIMELINE" ] && echo "x" || echo " ")] CHK001 Файл timeline.json существует и имеет корректный формат
 
-## 时间设定
+## Настройка времени
 
-- [$([ -n "$start_time" ] && echo "x" || echo " ")] CHK002 故事起始时间已设定（$start_time）
-- [$([ -n "$current_time" ] && echo "x" || echo " ")] CHK003 当前故事时间已更新（$current_time）
+- [$([ -n "$start_time" ] && echo "x" || echo " ")] CHK002 Установлено время начала истории ($start_time)
+- [$([ -n "$current_time" ] && echo "x" || echo " ")] CHK003 Текущее время истории обновлено ($current_time)
 
-## 事件记录
+## Запись событий
 
-- [$([ $event_count -gt 0 ] && echo "x" || echo " ")] CHK004 时间事件已记录（$event_count 个）
-- [$([ $has_issues -eq 0 ] && echo "x" || echo "!")] CHK005 时间事件按章节有序排列$([ $has_issues -gt 0 ] && echo "（⚠️ 发现 $has_issues 个乱序）" || echo "")
+- [$([ $event_count -gt 0 ] && echo "x" || echo " ")] CHK004 События временной шкалы записаны ($event_count шт.)
+- [$([ $has_issues -eq 0 ] && echo "x" || echo "!")] CHK005 События временной шкалы упорядочены по главам$([ $has_issues -gt 0 ] && echo " (⚠️ обнаружено $has_issues нарушений порядка)" || echo "")
 
-## 并行事件
+## Параллельные события
 
 EOF
 
     if [ "$parallel_count" -gt 0 ]; then
-        echo "- [x] CHK006 并行事件时间点已记录（$parallel_count 个）"
+        echo "- [x] CHK006 Временные точки параллельных событий записаны ($parallel_count шт.)"
     else
-        echo "- [ ] CHK006 并行事件时间点已记录（无记录）"
+        echo "- [ ] CHK006 Временные точки параллельных событий записаны (записей нет)"
     fi
 
     cat <<EOF
 
 ---
 
-## 后续行动
+## Дальнейшие действия
 
 EOF
 
     local has_actions=false
 
     if [ $event_count -eq 0 ]; then
-        echo "- [ ] 开始记录时间事件"
+        echo "- [ ] Начать запись событий временной шкалы"
         has_actions=true
     fi
 
     if [ -z "$current_time" ]; then
-        echo "- [ ] 设置当前故事时间"
+        echo "- [ ] Установить текущее время истории"
         has_actions=true
     fi
 
     if [ $has_issues -gt 0 ]; then
-        echo "- [ ] 修复 $has_issues 个事件顺序问题"
+        echo "- [ ] Исправить $has_issues нарушений порядка событий"
         has_actions=true
     fi
 
     if [ "$has_actions" = false ]; then
-        echo "*时间线记录完整，无需特别行动*"
+        echo "*Запись временной шкалы полная, особых действий не требуется*"
     fi
 
     cat <<EOF
 
 ---
 
-**检查工具**: check-timeline.sh
-**版本**: 1.1 (支持 checklist 输出)
+**Инструмент проверки**: check-timeline.sh
+**Версия**: 1.1 (поддержка вывода checklist)
 EOF
 }
 
-# 主函数
+# Основная функция
 main() {
     if [ "$CHECKLIST_MODE" = true ]; then
         output_checklist
@@ -331,16 +332,17 @@ main() {
             sync_parallel "$@"
             ;;
         *)
-            echo "用法: $0 [show|add|check|sync] [参数...]" >&2
-            echo "命令:" >&2
-            echo "  show  - 显示时间线" >&2
-            echo "  add   - 添加时间节点" >&2
-            echo "  check - 检查连续性" >&2
-            echo "  sync  - 同步并行事件" >&2
+            echo "Использование: $0 [show|add|check|sync] [параметры...]" >&2
+            echo "Команды:" >&2
+            echo "  show  - Показать временную шкалу" >&2
+            echo "  add   - Добавить временную точку" >&2
+            echo "  check - Проверить непрерывность" >&2
+            echo "  sync  - Синхронизировать параллельные события" >&2
             exit 1
             ;;
     esac
 }
 
-# 执行主函数
+# Выполнение основной функции
 main "$@"
+```

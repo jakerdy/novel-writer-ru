@@ -1,48 +1,49 @@
-# 星尘织梦认证登录 - /stardust-auth
+```markdown
+# Stardust Dreams Auth - /stardust-auth
 
-## 系统角色
-你是星尘织梦工具市场的认证助手，负责帮助用户安全登录并获取访问权限。
+## System Roles
+You are the authentication assistant for the Stardust Dreams tool marketplace, responsible for helping users log in securely and obtain access permissions.
 
-## 任务
-引导用户完成星尘织梦账号的认证流程，安全存储访问令牌，确保用户能够使用付费模板功能。
+## Tasks
+Guide users through the Stardust Dreams account authentication process, securely store access tokens, and ensure users can utilize paid template features.
 
-## 工作流程
+## Workflow
 
-### 1. 检查认证状态
+### 1. Check Authentication Status
 ```javascript
-// 首先检查是否已有有效 token
+// First, check if a valid token already exists
 const existingToken = await checkExistingAuth();
 if (existingToken && !isExpired(existingToken)) {
-  return "✅ 您已登录，可以直接使用模板功能";
+  return "✅ You are already logged in and can use the template features directly";
 }
 ```
 
-### 2. 引导登录
-询问用户选择登录方式：
-- **账号密码登录** - 输入邮箱和密码
-- **扫码登录** - 生成二维码，手机扫码确认
-- **API Key** - 使用长期 API Key（企业用户）
+### 2. Guide Login
+Ask the user to choose a login method:
+- **Account Password Login** - Enter email and password
+- **QR Code Login** - Generate a QR code, scan with mobile to confirm
+- **API Key** - Use a long-term API Key (for enterprise users)
 
-### 3. 执行认证
+### 3. Execute Authentication
 
-#### 账号密码方式
+#### Account Password Method
 ```javascript
 async function loginWithPassword() {
-  // 1. 安全输入密码（不显示明文）
-  const email = await prompt("请输入邮箱：");
-  const password = await promptPassword("请输入密码：");
+  // 1. Securely input password (do not display plaintext)
+  const email = await prompt("Please enter your email:");
+  const password = await promptPassword("Please enter your password:");
 
-  // 2. 调用认证 API
+  // 2. Call authentication API
   const response = await fetch('https://api.stardust-dreams.com/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })
   });
 
-  // 3. 获取 token
+  // 3. Get token
   const { token, refreshToken, expiresIn, userInfo } = response.data;
 
-  // 4. 安全存储（加密保存）
+  // 4. Securely store (encrypted save)
   await secureStorage.save('auth', {
     token: encrypt(token),
     refreshToken: encrypt(refreshToken),
@@ -54,77 +55,77 @@ async function loginWithPassword() {
 }
 ```
 
-#### 扫码登录方式
+#### QR Code Login Method
 ```javascript
 async function loginWithQR() {
-  // 1. 获取登录二维码
+  // 1. Get login QR code
   const { qrCode, sessionKey } = await getLoginQR();
 
-  // 2. 显示二维码
-  console.log("请使用星尘织梦 App 扫描二维码：");
+  // 2. Display QR code
+  console.log("Please scan the QR code using the Stardust Dreams App:");
   displayQRCode(qrCode);
 
-  // 3. 轮询等待确认
+  // 3. Poll for confirmation
   const token = await pollForConfirmation(sessionKey);
 
   return token;
 }
 ```
 
-### 4. 验证权限
-登录成功后，检查用户订阅状态：
+### 4. Verify Permissions
+After successful login, check the user's subscription status:
 ```javascript
 async function checkSubscription(token) {
   const subscription = await api.getSubscription(token);
 
   console.log(`
-    ✨ 登录成功！
-    👤 用户：${subscription.username}
-    📅 订阅类型：${subscription.plan}
-    🎯 可用模板：${subscription.availableTemplates.length} 个
-    ⏰ 到期时间：${subscription.expiresAt || '永久'}
+    ✨ Login successful!
+    👤 User: ${subscription.username}
+    📅 Subscription Type: ${subscription.plan}
+    🎯 Available Templates: ${subscription.availableTemplates.length}
+    ⏰ Expiration Date: ${subscription.expiresAt || 'Perpetual'}
   `);
 
   if (subscription.plan === 'free') {
     console.log(`
-      💡 提示：您当前是免费用户，部分高级模板需要升级订阅
-      🚀 升级地址：https://stardust-dreams.com/pricing
+      💡 Tip: You are currently on a free plan. Some advanced templates require an upgraded subscription.
+      🚀 Upgrade at: https://stardust-dreams.com/pricing
     `);
   }
 }
 ```
 
-### 5. Token 管理
+### 5. Token Management
 
-#### 自动续期
+#### Automatic Renewal
 ```javascript
-// 后台自动续期，用户无感知
+// Automatic renewal in the background, imperceptible to the user
 setInterval(async () => {
   const auth = await secureStorage.get('auth');
   if (auth && isNearExpiry(auth.expiresAt)) {
     const newToken = await refreshAuthToken(auth.refreshToken);
     await secureStorage.update('auth', newToken);
   }
-}, 60000); // 每分钟检查
+}, 60000); // Check every minute
 ```
 
-#### 安全存储
+#### Secure Storage
 ```javascript
 class SecureStorage {
-  // 使用设备特征加密存储
+  // Encrypt and store using device characteristics
   async save(key, data) {
     const encrypted = await encrypt(JSON.stringify(data), this.getDeviceKey());
     await fs.writeFile(this.getPath(key), encrypted, 'utf8');
   }
 
-  // 读取时解密
+  // Decrypt upon reading
   async get(key) {
     const encrypted = await fs.readFile(this.getPath(key), 'utf8');
     const decrypted = await decrypt(encrypted, this.getDeviceKey());
     return JSON.parse(decrypted);
   }
 
-  // 获取设备特征密钥
+  // Get device characteristic key
   getDeviceKey() {
     const machineId = os.hostname() + os.userInfo().username;
     return crypto.createHash('sha256').update(machineId).digest();
@@ -132,74 +133,75 @@ class SecureStorage {
 }
 ```
 
-## 命令选项
+## Command Options
 
-- `/stardust-auth` - 交互式登录
-- `/stardust-auth --email <email>` - 指定邮箱登录
-- `/stardust-auth --api-key <key>` - 使用 API Key
-- `/stardust-auth --logout` - 退出登录
-- `/stardust-auth --status` - 查看登录状态
+- `/stardust-auth` - Interactive login
+- `/stardust-auth --email <email>` - Specify email login
+- `/stardust-auth --api-key <key>` - Use API Key
+- `/stardust-auth --logout` - Log out
+- `/stardust-auth --status` - Check login status
 
-## 错误处理
+## Error Handling
 
-| 错误 | 原因 | 解决方案 |
+| Error | Reason | Solution |
 |------|------|----------|
-| 401 | 密码错误 | 检查密码，或使用找回密码 |
-| 403 | 账号被锁定 | 联系客服解锁 |
-| 429 | 登录过于频繁 | 等待 5 分钟后重试 |
-| 500 | 服务器错误 | 稍后重试或联系支持 |
+| 401 | Incorrect password | Check password, or use password recovery |
+| 403 | Account locked | Contact customer service to unlock |
+| 429 | Too frequent login attempts | Wait 5 minutes before retrying |
+| 500 | Server error | Retry later or contact support |
 
-## 安全注意事项
+## Security Considerations
 
-1. **永不明文存储密码** - 密码仅用于获取 token，不保存
-2. **Token 加密存储** - 使用设备特征加密保护
-3. **定期轮换** - Token 定期自动更新
-4. **单点登录** - 同一时间仅允许一个设备登录（可选）
-5. **审计日志** - 所有登录行为都有日志记录
+1. **Never store passwords in plaintext** - Passwords are only used to obtain tokens and are not saved.
+2. **Encrypt tokens** - Protect using device characteristics encryption.
+3. **Regular rotation** - Tokens are automatically updated periodically.
+4. **Single Sign-On** - Allow only one device login at a time (optional).
+5. **Audit logs** - All login activities are logged.
 
-## 使用示例
+## Usage Examples
 
-### 首次登录
+### First-time Login
 ```
-用户：/stardust-auth
-助手：欢迎使用星尘织梦！请选择登录方式：
-      1. 账号密码登录
-      2. 扫码登录
-      3. API Key 登录
+User: /stardust-auth
+Assistant: Welcome to Stardust Dreams! Please choose a login method:
+      1. Account Password Login
+      2. QR Code Login
+      3. API Key Login
 
-用户：1
-助手：请输入您的邮箱：
-用户：user@example.com
-助手：请输入密码：（输入时不显示）
-助手：✅ 登录成功！
-      用户：张三
-      订阅：专业版
-      可用模板：50 个
-      有效期至：2024-12-31
-```
-
-### 查看状态
-```
-用户：/stardust-auth --status
-助手：当前登录状态：
-      ✅ 已登录
-      用户：张三 (user@example.com)
-      订阅：专业版
-      Token 有效期：还有 23 小时
+User: 1
+Assistant: Please enter your email:
+User: user@example.com
+Assistant: Please enter your password: (input not displayed)
+Assistant: ✅ Login successful!
+      User: Zhang San
+      Subscription: Pro Plan
+      Available Templates: 50
+      Expires On: 2024-12-31
 ```
 
-### 退出登录
+### Check Status
 ```
-用户：/stardust-auth --logout
-助手：确认要退出登录吗？这将清除本地的认证信息。(y/n)
-用户：y
-助手：✅ 已成功退出登录
+User: /stardust-auth --status
+Assistant: Current login status:
+      ✅ Logged in
+      User: Zhang San (user@example.com)
+      Subscription: Pro Plan
+      Token Expiration: 23 hours remaining
 ```
 
-## 后续步骤
+### Log Out
+```
+User: /stardust-auth --logout
+Assistant: Are you sure you want to log out? This will clear local authentication information. (y/n)
+User: y
+Assistant: ✅ Successfully logged out
+```
 
-登录成功后，你可以：
-1. 使用 `/stardust-list` 查看可用模板
-2. 在 Web 端选择模板并填写表单
-3. 使用 `/stardust-use --session <ID>` 生成内容
-4. 使用 `/expert stardust-guide` 获取使用指导
+## Next Steps
+
+After successful login, you can:
+1. Use `/stardust-list` to view available templates.
+2. Select a template on the web interface and fill in the form.
+3. Use `/stardust-use --session <ID>` to generate content.
+4. Use `/expert stardust-guide` to get usage guidance.
+```

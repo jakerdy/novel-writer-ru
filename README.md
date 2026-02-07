@@ -1,309 +1,311 @@
-# Novel Writer - AI 驱动的中文小说创作工具
+```markdown
+# Novel Writer — ИИ-инструмент для создания китайских романов на основе спецификаций
 
 [![npm version](https://badge.fury.io/js/novel-writer-cn.svg)](https://www.npmjs.com/package/novel-writer-cn)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> 🚀 基于规格驱动开发（SDD）的 AI 智能小说创作助手
+> 🚀 AI-помощник для создания романов на основе разработки, управляемой спецификациями (SDD)
 >
-> 在 Claude、Cursor、Gemini 等 AI 助手中直接使用斜杠命令，系统化创作高质量小说
+> Используйте команды через слэш непосредственно в AI-помощниках, таких как Claude, Cursor, Gemini, для систематического создания высококачественных романов.
 
-## ✨ 核心特性
+## ✨ Основные возможности
 
-- 📚 **斜杠命令** - 在 Claude、Gemini、Codex、Cursor、Windsurf、Roo Code 等 AI 助手中直接使用
-- 🎯 **七步方法论** - 基于规格驱动开发（SDD）的系统化创作流程
-- 🤖 **智能辅助** - AI 理解上下文，提供针对性创作建议
-- 📝 **中文优化** - 专为中文小说创作设计，支持字数统计、多线索管理
-- 🔄 **跨平台** - 支持 13 个 AI 工具，Windows/Mac/Linux 全平台
-- 🔌 **插件系统** - 可扩展功能，如真实人声、翻译、风格模仿等
-- ✅ **质量保障** - 情节追踪、时间线管理、角色一致性验证
+- 📚 **Команды через слэш** — Используйте непосредственно в AI-помощниках, таких как Claude, Gemini, Codex, Cursor, Windsurf, Roo Code и других.
+- 🎯 **Методология семи шагов** — Систематизированный процесс создания на основе разработки, управляемой спецификациями (SDD).
+- 🤖 **Интеллектуальная помощь** — AI понимает контекст и предоставляет целенаправленные рекомендации по созданию контента.
+- 📝 **Оптимизация для китайского языка** — Специально разработан для создания китайских романов, поддерживает подсчет слов, управление несколькими сюжетными линиями.
+- 🔄 **Кроссплатформенность** — Поддерживает 13 AI-инструментов, работает на всех платформах: Windows/Mac/Linux.
+- 🔌 **Система плагинов** — Расширяемые функции, такие как озвучка, перевод, имитация стиля и т. д.
+- ✅ **Гарантия качества** — Отслеживание сюжета, управление временной шкалой, проверка согласованности персонажей.
 
-> 📖 **详细特性说明**：查看 [CHANGELOG.md](CHANGELOG.md) 了解各版本的完整更新
+> 📖 **Подробное описание возможностей**：См. [CHANGELOG.md](CHANGELOG.md) для полного списка обновлений по версиям.
 
-## 🚀 快速开始
+## 🚀 Быстрый старт
 
-### 1. 安装
+### 1. Установка
 
 ```bash
 npm install -g novel-writer-cn
 ```
 
-### 2. 初始化项目
+### 2. Инициализация проекта
 
 ```bash
-# 基本用法
+# Базовое использование
 novel init my-novel
 
-# 推荐：预装真实人声插件
+# Рекомендуется: предварительная установка плагина озвучки
 novel init my-novel --plugins authentic-voice
 
-# 指定 AI 平台
+# Указание AI-платформы
 novel init my-novel --ai claude    # Claude Code
 novel init my-novel --ai gemini    # Gemini CLI
 novel init my-novel --ai codex     # Codex CLI
 novel init my-novel --ai cursor    # Cursor
 ```
 
-### 3. 开始创作
+### 3. Начните творить
 
-在 AI 助手中使用斜杠命令：
+Используйте команды через слэш в вашем AI-помощнике:
 
 ```
-/novel.constitution    # Claude Code 格式
-/novel:constitution    # Gemini CLI 格式
-/novel-constitution    # Codex CLI 格式
-/constitution          # 其他平台格式
+/novel.constitution    # Формат Claude Code
+/novel:constitution    # Формат Gemini CLI
+/novel-constitution    # Формат Codex CLI
+/constitution          # Формат для других платформ
 ```
 
-**七步方法论流程**：
+**Процесс методологии семи шагов**：
 1. `/constitution` → 2. `/specify` → 3. `/clarify` →
 4. `/plan` → 5. `/tasks` → 6. `/write` → 7. `/analyze`
 
-> 📚 **详细安装说明**：[docs/installation.md](docs/installation.md)
-> 📖 **完整工作流程**：[docs/workflow.md](docs/workflow.md)
-> 🎯 **AI 平台命令对照**：[docs/ai-platform-commands.md](docs/ai-platform-commands.md) ⭐ **必读**
+> 📚 **Подробные инструкции по установке**：[docs/installation.md](docs/installation.md)
+> 📖 **Полный рабочий процесс**：[docs/workflow.md](docs/workflow.md)
+> 🎯 **Соответствие команд AI-платформам**：[docs/ai-platform-commands.md](docs/ai-platform-commands.md) ⭐ **Обязательно к прочтению**
 
-## 📦 升级现有项目
+## 📦 Обновление существующего проекта
 
 ```bash
-# 升级到最新版本
+# Обновление до последней версии
 npm install -g novel-writer-cn@latest
 cd my-novel
 novel upgrade
 
-# 或指定 AI 平台
+# Или с указанием AI-платформы
 novel upgrade --ai claude
 ```
 
-> 📚 **完整升级指南**：[docs/upgrade-guide.md](docs/upgrade-guide.md) - 包含版本兼容性、迁移说明、回滚方法
+> 📚 **Полное руководство по обновлению**：[docs/upgrade-guide.md](docs/upgrade-guide.md) — включает информацию о совместимости версий, инструкции по миграции и методы отката.
 
-## 📚 斜杠命令
+## 📚 Команды через слэш
 
-### 命名空间说明
+### Описание пространств имен команд
 
-| AI 平台 | 命令格式 | 示例 |
+| AI-платформа | Формат команды | Пример |
 |---------|----------|------|
-| **Claude Code** | `/novel.命令名` | `/novel.write` |
-| **Gemini CLI** | `/novel:命令名` | `/novel:write` |
-| **Codex CLI** | `/novel-命令名` | `/novel-write` |
-| **其他平台** | `/命令名` | `/write` |
+| **Claude Code** | `/novel.имя_команды` | `/novel.write` |
+| **Gemini CLI** | `/novel:имя_команды` | `/novel:write` |
+| **Codex CLI** | `/novel-имя_команды` | `/novel-write` |
+| **Другие платформы** | `/имя_команды` | `/write` |
 
-> 💡 下表使用通用格式，实际使用时请根据您的 AI 平台添加相应前缀
-> 📖 **详细命令对照**：[docs/ai-platform-commands.md](docs/ai-platform-commands.md)
+> 💡 В таблице ниже используется общий формат. При фактическом использовании добавьте соответствующий префикс для вашей AI-платформы.
+> 📖 **Подробное соответствие команд**：[docs/ai-platform-commands.md](docs/ai-platform-commands.md)
 
-### 七步方法论
+### Методология семи шагов
 
-| 命令 | 描述 | 何时使用 |
+| Команда | Описание | Когда использовать |
 |------|------|----------|
-| `/constitution` | 创作宪法 | 项目开始，定义核心创作原则 |
-| `/specify` | 故事规格 | 像 PRD 一样定义故事需求 |
-| `/clarify` | 澄清决策 | 通过 5 个问题明确模糊点 |
-| `/plan` | 创作计划 | 制定章节结构和技术方案 |
-| `/tasks` | 任务分解 | 生成可执行的任务清单 |
-| `/write` | 章节写作 | 基于任务清单进行创作 |
-| `/analyze` | 综合验证 | 智能双模式：框架分析/内容分析 |
+| `/constitution` | Создание «конституции» проекта | В начале проекта, для определения основных принципов создания. |
+| `/specify` | Спецификация истории | Определение требований к истории, подобно PRD. |
+| `/clarify` | Уточнение решений | Прояснение неясных моментов с помощью 5 вопросов. |
+| `/plan` | Создание плана | Разработка структуры глав и технического плана. |
+| `/tasks` | Декомпозиция задач | Создание списка выполнимых задач. |
+| `/write` | Написание глав | Создание контента на основе списка задач. |
+| `/analyze` | Комплексная проверка | Интеллектуальный двойной режим: анализ структуры / анализ контента. |
 
-### 追踪与验证
+### Отслеживание и проверка
 
-| 命令 | 描述 | 何时使用 |
+| Команда | Описание | Когда использовать |
 |------|------|----------|
-| `/track-init` | 初始化追踪 | 首次使用（只需一次） |
-| `/checklist` | 质量检查清单 ⭐ | 规格验证（写作前）+ 内容扫描（写作后） |
-| `/track` | 综合追踪 | 每完成一章后 |
-| `/plot-check` | 情节检查 | 每 5-10 章定期检查 |
-| `/timeline` | 时间线管理 | 重要事件后 |
-| `/relations` | 关系追踪 | 角色关系变化时 |
-| `/world-check` | 世界观检查 | 新设定出现后 |
+| `/track-init` | Инициализация отслеживания | При первом использовании (только один раз). |
+| `/checklist` | Контрольный список качества ⭐ | Проверка спецификаций (перед написанием) + сканирование контента (после написания). |
+| `/track` | Комплексное отслеживание | После завершения каждой главы. |
+| `/plot-check` | Проверка сюжета | Регулярная проверка каждые 5-10 глав. |
+| `/timeline` | Управление временной шкалой | После важных событий. |
+| `/relations` | Отслеживание отношений | При изменении отношений между персонажами. |
+| `/world-check` | Проверка мира | После появления новых элементов сеттинга. |
 
-> 📖 **详细命令说明**：[docs/commands.md](docs/commands.md) - 包含每个命令的详细用法、参数和最佳实践
+> 📖 **Подробное описание команд**：[docs/commands.md](docs/commands.md) — включает подробное использование, параметры и лучшие практики для каждой команды.
 
 <details>
-<summary>📁 项目结构（点击展开）</summary>
+<summary>📁 Структура проекта (нажмите, чтобы развернуть)</summary>
 
 ```
 my-novel/
-├── .specify/          # Spec Kit 配置
-│   ├── memory/        # 创作记忆（constitution.md等）
-│   └── scripts/       # 支持脚本
-├── .claude/           # Claude 命令（或 .cursor/.gemini 等）
-│   └── commands/      # 斜杠命令文件
-├── spec/              # 小说规格数据
-│   ├── tracking/      # 追踪数据（plot-tracker.json等）
-│   └── knowledge/     # 知识库（world-setting.md等）
-├── stories/           # 故事内容
-│   └── 001-故事名/
-│       ├── specification.md    # 故事规格
-│       ├── creative-plan.md    # 创作计划
-│       ├── tasks.md            # 任务清单
-│       └── content/            # 章节内容
-└── scripts/           # 支持脚本
+├── .specify/          # Конфигурация Spec Kit
+│   ├── memory/        # Память для создания (constitution.md и т. д.)
+│   └── scripts/       # Вспомогательные скрипты
+├── .claude/           # Команды Claude (или .cursor/.gemini и т. д.)
+│   └── commands/      # Файлы команд через слэш
+├── spec/              # Данные спецификаций романа
+│   ├── tracking/      # Данные отслеживания (plot-tracker.json и т. д.)
+│   └── knowledge/     # База знаний (world-setting.md и т. д.)
+├── stories/           # Содержание романа
+│   └── 001-Название_истории/
+│       ├── specification.md    # Спецификация истории
+│       ├── creative-plan.md    # План создания
+│       ├── tasks.md            # Список задач
+│       └── content/            # Содержание глав
+└── scripts/           # Вспомогательные скрипты
     ├── bash/          # Unix/Linux/Mac
     └── powershell/    # Windows
 ```
 
 </details>
 
-## 🤖 支持的 AI 助手
+## 🤖 Поддерживаемые AI-помощники
 
-| AI 工具 | 说明 | 状态 |
+| AI-инструмент | Описание | Статус |
 |---------|------|------|
-| **Claude Code** | Anthropic 的 AI 助手 | ✅ 推荐 |
-| **Cursor** | AI 代码编辑器 | ✅ 完整支持 |
-| **Gemini CLI** | Google 的 AI 助手 | ✅ TOML 格式 |
-| **Windsurf** | Codeium 的 AI 编辑器 | ✅ 完整支持 |
-| **Roo Code** | AI 编程助手 | ✅ 完整支持 |
-| **GitHub Copilot** | GitHub 的 AI 编程助手 | ✅ 完整支持 |
-| **Qwen Code** | 阿里通义千问代码助手 | ✅ TOML 格式 |
-| **OpenCode** | 开源 AI 编程工具 | ✅ 完整支持 |
-| **Codex CLI** | AI 编程助手 | ✅ 完整支持 |
-| **Kilo Code** | AI 编程工具 | ✅ 完整支持 |
-| **Auggie CLI** | AI 开发助手 | ✅ 完整支持 |
-| **CodeBuddy** | AI 编程伙伴 | ✅ 完整支持 |
-| **Amazon Q Developer** | AWS 的 AI 开发助手 | ✅ 完整支持 |
+| **Claude Code** | AI-помощник от Anthropic | ✅ Рекомендуется |
+| **Cursor** | AI-редактор кода | ✅ Полная поддержка |
+| **Gemini CLI** | AI-помощник от Google | ✅ Формат TOML |
+| **Windsurf** | AI-редактор от Codeium | ✅ Полная поддержка |
+| **Roo Code** | AI-помощник для программирования | ✅ Полная поддержка |
+| **GitHub Copilot** | AI-помощник для программирования от GitHub | ✅ Полная поддержка |
+| **Qwen Code** | AI-помощник для кода от Alibaba Tongyi Qianwen | ✅ Формат TOML |
+| **OpenCode** | Инструмент для AI-программирования с открытым исходным кодом | ✅ Полная поддержка |
+| **Codex CLI** | AI-помощник для программирования | ✅ Полная поддержка |
+| **Kilo Code** | Инструмент для AI-программирования | ✅ Полная поддержка |
+| **Auggie CLI** | AI-помощник для разработки | ✅ Полная поддержка |
+| **CodeBuddy** | AI-помощник для программирования | ✅ Полная поддержка |
+| **Amazon Q Developer** | AI-помощник для разработки от AWS | ✅ Полная поддержка |
 
-> 💡 使用 `novel init --all` 可以同时为所有 AI 工具生成配置
+> 💡 Используйте `novel init --all`, чтобы одновременно сгенерировать конфигурацию для всех AI-инструментов.
 
-## 🛠️ CLI 命令
+## 🛠️ Команды CLI
 
 <details>
-<summary>详细选项（点击展开）</summary>
+<summary>Подробные параметры (нажмите, чтобы развернуть)</summary>
 
 ### `novel init [name]`
 
 ```bash
-novel init my-novel [选项]
+novel init my-novel [опции]
 ```
 
-**常用选项**：
-- `--here` - 在当前目录初始化
-- `--ai <type>` - 选择 AI 平台（claude/gemini/cursor等）
-- `--with-experts` - 包含专家模式
-- `--plugins <names>` - 预装插件（逗号分隔）
-- `--all` - 生成所有 AI 平台配置
+**Часто используемые опции**：
+- `--here` — Инициализировать в текущем каталоге.
+- `--ai <type>` — Выбрать AI-платформу (claude/gemini/cursor и т. д.).
+- `--with-experts` — Включить режим эксперта.
+- `--plugins <names>` — Предварительно установить плагины (разделенные запятыми).
+- `--all` — Сгенерировать конфигурацию для всех AI-платформ.
 
 ### `novel plugins`
 
 ```bash
-novel plugins list                # 列出已安装插件
-novel plugins add <name>          # 安装插件
-novel plugins remove <name>       # 移除插件
+novel plugins list                # Показать установленные плагины
+novel plugins add <name>          # Установить плагин
+novel plugins remove <name>       # Удалить плагин
 ```
 
 ### `novel upgrade`
 
 ```bash
-novel upgrade [--ai <type>]       # 升级项目到最新版本
+novel upgrade [--ai <type>]       # Обновить проект до последней версии
 ```
 
 ### `novel check`
 
 ```bash
-novel check                       # 检查项目配置和状态
+novel check                       # Проверить конфигурацию и состояние проекта
 ```
 
 </details>
 
-## 📖 文档索引
+## 📖 Индекс документации
 
-### 核心文档
-- **[命令详解](docs/commands.md)** - 所有斜杠命令的详细用法、参数和最佳实践
-- **[工作流程](docs/workflow.md)** - 完整的创作流程说明
-- **[写作方法](docs/writing-methods.md)** - 6种经典写作方法详解
-- **[最佳实践](docs/best-practices.md)** - 实战经验和高级技巧
+### Основная документация
+- **[Подробное описание команд](docs/commands.md)** — Подробное использование, параметры и лучшие практики для всех команд через слэш.
+- **[Рабочий процесс](docs/workflow.md)** — Полное описание процесса создания.
+- **[Методы письма](docs/writing-methods.md)** — Подробное описание 6 классических методов письма.
+- **[Лучшие практики](docs/best-practices.md)** — Практический опыт и продвинутые приемы.
 
-### 进阶文档
-- **[实战指南](docs/writing/practical-guide.md)** - 基于真实案例的 SDD 应用
-- **[升级指南](docs/upgrade-guide.md)** - 版本升级说明和迁移指南
-- **[安装指南](docs/installation.md)** - 详细安装步骤
-- **[字数统计](docs/word-count-guide.md)** - 中文字数统计最佳实践
+### Расширенная документация
+- **[Практическое руководство](docs/writing/practical-guide.md)** — Применение SDD на реальных примерах.
+- **[Руководство по обновлению](docs/upgrade-guide.md)** — Инструкции по обновлению версий и миграции.
+- **[Руководство по установке](docs/installation.md)** — Подробные шаги установки.
+- **[Подсчет слов](docs/word-count-guide.md)** — Лучшие практики подсчета слов на китайском языке.
 
-### 插件与扩展
-- **真实人声插件** - `novel plugins add authentic-voice`
-  - 编辑 `.specify/memory/personal-voice.md` 配置个人语料
-  - 使用 `/authentic-voice` 创作，`/authenticity-audit` 自查
-- **翻译插件** - `novel plugins add translate`
-- **风格模仿插件** - 路遥、王钰等作家风格
+### Плагины и расширения
+- **Плагин озвучки** — `novel plugins add authentic-voice`
+  - Отредактируйте `.specify/memory/personal-voice.md` для настройки личных данных.
+  - Используйте `/authentic-voice` для создания, `/authenticity-audit` для самопроверки.
+- **Плагин перевода** — `novel plugins add translate`
+- **Плагин имитации стиля** — Стиль писателей, таких как Лу Яо, Ван Юй и др.
 
-> 💡 使用 `novel plugins list` 查看所有可用插件
+> 💡 Используйте `novel plugins list`, чтобы увидеть все доступные плагины.
 
-## 📈 版本历史
+## 📈 История версий
 
-查看完整的更新日志：**[CHANGELOG.md](CHANGELOG.md)**
+Полный журнал обновлений: **[CHANGELOG.md](CHANGELOG.md)**
 
-**最新版本亮点**：
-- v0.15.0 - 多平台命令格式优化
-- v0.14.2 - 中文字数统计修复
-- v0.12.2 - Claude Code 增强层
-- v0.12.0 - 多线索管理系统
-- v0.10.0 - 七步方法论体系
+**Основные моменты последних версий**：
+- v0.15.0 — Оптимизация форматов команд для нескольких платформ.
+- v0.14.2 — Исправление подсчета слов на китайском языке.
+- v0.12.2 — Улучшенный слой для Claude Code.
+- v0.12.0 — Система управления несколькими сюжетными линиями.
+- v0.10.0 — Система методологии семи шагов.
 
-## 🤝 贡献
+## 🤝 Вклад
 
-欢迎提交 Issue 和 Pull Request！
+Приглашаем к отправке Issues и Pull Requests!
 
-项目地址：[https://github.com/wordflowlab/novel-writer](https://github.com/wordflowlab/novel-writer)
+Адрес проекта: [https://github.com/wordflowlab/novel-writer](https://github.com/wordflowlab/novel-writer)
 
-## 📄 许可证
+## 📄 Лицензия
 
 MIT License
 
-## 🌐 项目矩阵
+## 🌐 Матрица проектов
 
-WordFlowLab 围绕 AI 辅助小说创作展开多维度探索，采用不同方法论和技术栈的开源项目组合：
+WordFlowLab проводит многомерные исследования в области создания романов с помощью ИИ, используя комбинацию проектов с открытым исходным кодом, основанных на различных методологиях и технологических стеках:
 
-### 方法论探索系列
+### Серия исследований методологий
 
-| 项目 | 方法论 | 技术特点 | 适用场景 |
+| Проект | Методология | Технические особенности | Сценарии использования |
 |------|--------|----------|----------|
-| **[Novel-Writer](https://github.com/wordflowlab/novel-writer)** ⭐ | Spec-Kit | 寄生斜杠命令，七步方法论 | 适合多平台用户，跨 13 个 AI 工具 |
-| **[Article-Writer](https://github.com/wordflowlab/article-writer)** 🆕 | Spec-Kit | 九步写作流程，工作区管理 | 公众号/自媒体文章创作，降低 AI 味 |
-| **[Novel-Writer-OpenSpec](https://github.com/wordflowlab/novel-writer-openspec)** | OpenSpec | 寄生斜杠命令，规格分离管理（specs/ + changes/） | 适合需要 OpenSpec 规格化管理 |
-| **[Novel-Writer-Skills](https://github.com/wordflowlab/novel-writer-skills)** | Spec-Kit + Agent Skills | 寄生斜杠命令，支持 Claude Code Agent Skills | 专为 Claude Code 优化 |
+| **[Novel-Writer](https://github.com/wordflowlab/novel-writer)** ⭐ | Spec-Kit | Использует команды через слэш, методология семи шагов | Подходит для пользователей разных платформ, работает с 13 AI-инструментами |
+| **[Article-Writer](https://github.com/wordflowlab/article-writer)** 🆕 | Spec-Kit | Девятишаговый процесс письма, управление рабочей областью | Создание статей для WeChat/самостоятельных медиа, снижение «AI-оттенка» |
+| **[Novel-Writer-OpenSpec](https://github.com/wordflowlab/novel-writer-openspec)** | OpenSpec | Использует команды через слэш, раздельное управление спецификациями (specs/ + changes/) | Подходит для тех, кому требуется стандартизированное управление OpenSpec |
+| **[Novel-Writer-Skills](https://github.com/wordflowlab/novel-writer-skills)** | Spec-Kit + Agent Skills | Использует команды через слэш, поддержка Claude Code Agent Skills | Специально оптимизирован для Claude Code |
 
-### 工具实现系列
+### Серия реализаций инструментов
 
-| 项目 | 类型 | 技术基础 | 说明 |
+| Проект | Тип | Техническая основа | Описание |
 |------|------|----------|------|
-| **[WriteFlow](https://github.com/wordflowlab/writeflow)** | CLI 工具 | 模仿 Claude Code 架构 | 独立 CLI，为技术型作家设计 |
-| **[NovelWeave](https://github.com/wordflowlab/novelweave)** | VSCode 扩展 | Fork: Cline → Roo Code → Kilo Code → NovelWeave | 可视化小说编辑器，星尘织梦 |
+| **[WriteFlow](https://github.com/wordflowlab/writeflow)** | CLI-инструмент | Архитектура, имитирующая Claude Code | Автономный CLI, разработанный для писателей-технарей |
+| **[NovelWeave](https://github.com/wordflowlab/novelweave)** | Расширение VSCode | Форк: Cline → Roo Code → Kilo Code → NovelWeave | Визуальный редактор романов, «Сплетая звезды в мечты» |
 
-### 技术演进路径
+### Путь технической эволюции
 
 ```
-Spec-Kit 方法论分支:
-  Novel-Writer (主线) ──┬─→ Novel-Writer-Skills (Claude Code 专版)
-                       └─→ WriteFlow (CLI 独立版)
+Ветвь методологии Spec-Kit:
+  Novel-Writer (основная линия) ──┬─→ Novel-Writer-Skills (специальная версия для Claude Code)
+                                 └─→ WriteFlow (автономная версия CLI)
 
-OpenSpec 方法论分支:
-  Novel-Writer-OpenSpec (探索版)
+Ветвь методологии OpenSpec:
+  Novel-Writer-OpenSpec (исследовательская версия)
 
-VSCode 扩展分支:
-  Cline → Roo Code → Kilo Code → NovelWeave (小说定制版)
+Ветвь расширений VSCode:
+  Cline → Roo Code → Kilo Code → NovelWeave (специальная версия для романов)
 ```
 
-### 选择建议
+### Советы по выбору
 
-根据您的经验背景选择合适的工具：
+Выберите подходящий инструмент в зависимости от вашего опыта:
 
-| 用户类型 | 推荐项目 | 理由 |
+| Тип пользователя | Рекомендуемый проект | Причина |
 |---------|---------|------|
-| 🌟 **新手入门** | [NovelWeave](https://github.com/wordflowlab/novelweave) | 可视化编辑器，VSCode 扩展，最易上手 |
-| 💻 **有编程基础<br>无小说经验** | [Novel-Writer](https://github.com/wordflowlab/novel-writer) <br> [Novel-Writer-Skills](https://github.com/wordflowlab/novel-writer-skills) | 七步方法论引导创作流程<br>Skills 版适合 Claude Code 用户 |
-| 📚 **有编程基础<br>有小说经验** | [Novel-Writer-OpenSpec](https://github.com/wordflowlab/novel-writer-openspec) | OpenSpec 规格化管理<br>适合系统化创作和团队协作 |
-| 🚀 **技术探索者<br>可贡献 PR** | [WriteFlow](https://github.com/wordflowlab/writeflow) | CLI 工具开发探索<br>欢迎贡献代码和想法 |
+| 🌟 **Новичок** | [NovelWeave](https://github.com/wordflowlab/novelweave) | Визуальный редактор, расширение VSCode, самый простой в освоении |
+| 💻 **С опытом программирования<br>Без опыта в написании романов** | [Novel-Writer](https://github.com/wordflowlab/novel-writer) <br> [Novel-Writer-Skills](https://github.com/wordflowlab/novel-writer-skills) | Методология семи шагов направляет процесс создания.<br>Версия Skills подходит для пользователей Claude Code. |
+| 📚 **С опытом программирования<br>С опытом в написании романов** | [Novel-Writer-OpenSpec](https://github.com/wordflowlab/novel-writer-openspec) | Стандартизированное управление спецификациями OpenSpec.<br>Подходит для систематического создания и командной работы. |
+| 🚀 **Технический исследователь<br>Готов к вкладу в PR** | [WriteFlow](https://github.com/wordflowlab/writeflow) | Исследование разработки CLI-инструментов.<br>Приглашаем к внесению кода и идей. |
 
-**快速决策**：
-- **完全新手** → NovelWeave（可视化最友好）
-- **用 Claude Code** → Novel-Writer-Skills（深度集成 Agent Skills）
-- **跨多个 AI 工具** → Novel-Writer（支持 13 个平台）
-- **追求规格化** → Novel-Writer-OpenSpec（OpenSpec 方法论）
-- **喜欢命令行** → WriteFlow（纯 CLI 体验）
+**Быстрое решение**：
+- **Полный новичок** → NovelWeave (самый удобный визуальный интерфейс)
+- **Используете Claude Code** → Novel-Writer-Skills (глубокая интеграция с Agent Skills)
+- **Используете несколько AI-инструментов** → Novel-Writer (поддержка 13 платформ)
+- **Стремитесь к стандартизации** → Novel-Writer-OpenSpec (методология OpenSpec)
+- **Предпочитаете командную строку** → WriteFlow (чистый опыт CLI)
 
-> 💡 **多矩阵、多方法论组合开源**：探索 AI 写作的不同可能性，欢迎根据需求选择合适的工具！
+> 💡 **Множественные матрицы, комбинация методологий с открытым исходным кодом**：Исследуйте различные возможности AI-письма, выбирайте подходящий инструмент в соответствии с вашими потребностями!
 
-## 🙏 致谢
+## 🙏 Благодарности
 
-本项目基于 [Spec Kit](https://github.com/sublayerapp/spec-kit) 架构设计，特此感谢！
+Этот проект разработан на основе архитектуры [Spec Kit](https://github.com/sublayerapp/spec-kit). Выражаем особую благодарность!
 
 ---
 
-**Novel Writer** - 让 AI 成为你的创作伙伴！ ✨📚
+**Novel Writer** — Пусть AI станет вашим партнером в творчестве! ✨📚
+```

@@ -1,42 +1,43 @@
-# 故事分析验证脚本
-# 用于 /analyze 命令
+```xml
+# Скрипт проверки анализа истории
+# Используется для команды /analyze
 
 param(
     [string]$StoryName,
     [string]$AnalysisType = "full"  # full, compliance, quality, progress
 )
 
-# 导入通用函数
+# Импорт общих функций
 . "$PSScriptRoot\common.ps1"
 
-# 获取项目根目录
+# Получение корневого каталога проекта
 $ProjectRoot = Get-ProjectRoot
 Set-Location $ProjectRoot
 
-# 确定故事路径
+# Определение пути к истории
 if ([string]::IsNullOrEmpty($StoryName)) {
     $StoryName = Get-ActiveStory
 }
 
 $StoryDir = "stories\$StoryName"
 
-# 检查必要文件
+# Проверка необходимых файлов
 function Test-StoryFiles {
     $missingFiles = @()
 
-    # 检查基准文档
+    # Проверка базовых документов
     if (-not (Test-Path "memory\constitution.md")) {
-        $missingFiles += "宪法文件"
+        $missingFiles += "Файл конституции"
     }
     if (-not (Test-Path "$StoryDir\specification.md")) {
-        $missingFiles += "规格文件"
+        $missingFiles += "Файл спецификации"
     }
     if (-not (Test-Path "$StoryDir\creative-plan.md")) {
-        $missingFiles += "计划文件"
+        $missingFiles += "Файл плана"
     }
 
     if ($missingFiles.Count -gt 0) {
-        Write-Host "⚠️ 缺少以下基准文档：" -ForegroundColor Yellow
+        Write-Host "⚠️ Отсутствуют следующие базовые документы:" -ForegroundColor Yellow
         foreach ($file in $missingFiles) {
             Write-Host "  - $file"
         }
@@ -46,7 +47,7 @@ function Test-StoryFiles {
     return $true
 }
 
-# 统计内容
+# Статистика контента
 function Get-ContentAnalysis {
     $contentDir = "$StoryDir\content"
     $totalWords = 0
@@ -57,29 +58,29 @@ function Get-ContentAnalysis {
 
         foreach ($file in $mdFiles) {
             $chapterCount++
-            # 简单的字数统计（中文按字符算）
+            # Простая статистика слов (для китайского языка считается по символам)
             $content = Get-Content $file.FullName -Raw
             $words = ($content -replace '\s', '').Length
             $totalWords += $words
         }
     }
 
-    Write-Host "内容统计："
-    Write-Host "  总字数：$totalWords"
-    Write-Host "  章节数：$chapterCount"
+    Write-Host "Статистика контента:"
+    Write-Host "  Общее количество слов: $totalWords"
+    Write-Host "  Количество глав: $chapterCount"
 
     if ($chapterCount -gt 0) {
         $avgLength = [math]::Round($totalWords / $chapterCount)
-        Write-Host "  平均章节长度：$avgLength"
+        Write-Host "  Средняя длина главы: $avgLength"
     }
 }
 
-# 检查任务完成度
+# Проверка выполнения задач
 function Test-TaskCompletion {
     $tasksFile = "$StoryDir\tasks.md"
 
     if (-not (Test-Path $tasksFile)) {
-        Write-Host "任务文件不存在"
+        Write-Host "Файл задач отсутствует"
         return
     }
 
@@ -89,61 +90,61 @@ function Test-TaskCompletion {
     $inProgress = ([regex]::Matches($content, '^- \[~\]', [System.Text.RegularExpressions.RegexOptions]::Multiline)).Count
     $pending = $totalTasks - $completedTasks - $inProgress
 
-    Write-Host "任务进度："
-    Write-Host "  总任务：$totalTasks"
-    Write-Host "  已完成：$completedTasks"
-    Write-Host "  进行中：$inProgress"
-    Write-Host "  未开始：$pending"
+    Write-Host "Прогресс выполнения задач:"
+    Write-Host "  Всего задач: $totalTasks"
+    Write-Host "  Выполнено: $completedTasks"
+    Write-Host "  В процессе: $inProgress"
+    Write-Host "  Ожидают: $pending"
 
     if ($totalTasks -gt 0) {
         $completionRate = [math]::Round(($completedTasks * 100) / $totalTasks)
-        Write-Host "  完成率：$completionRate%"
+        Write-Host "  Процент выполнения: $completionRate%"
     }
 }
 
-# 检查规格符合度
+# Проверка соответствия спецификации
 function Test-SpecificationCompliance {
     $specFile = "$StoryDir\specification.md"
 
-    Write-Host "规格符合度检查："
+    Write-Host "Проверка соответствия спецификации:"
 
     if (Test-Path $specFile) {
         $content = Get-Content $specFile -Raw
 
-        # 检查P0需求（简化版）
+        # Проверка требований P0 (упрощенная версия)
         if ($content -match "### 必须包含（P0）") {
-            Write-Host "  P0需求：检测到，需人工验证"
+            Write-Host "  Требования P0: обнаружены, требуется ручная проверка"
         }
 
-        # 检查是否还有[需要澄清]标记
+        # Проверка наличия маркеров [需要澄清] (требуется уточнение)
         $unclearCount = ([regex]::Matches($content, '\[需要澄清\]')).Count
         if ($unclearCount -gt 0) {
-            Write-Host "  ⚠️ 仍有 $unclearCount 处需要澄清" -ForegroundColor Yellow
+            Write-Host "  ⚠️ Осталось $unclearCount пунктов, требующих уточнения" -ForegroundColor Yellow
         }
         else {
-            Write-Host "  ✅ 所有决策已澄清" -ForegroundColor Green
+            Write-Host "  ✅ Все решения уточнены" -ForegroundColor Green
         }
     }
 }
 
-# 主分析流程
-Write-Host "故事分析报告"
+# Основной процесс анализа
+Write-Host "Отчет об анализе истории"
 Write-Host "============"
-Write-Host "故事：$StoryName"
-Write-Host "分析时间：$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+Write-Host "История: $StoryName"
+Write-Host "Время анализа: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
 Write-Host ""
 
-# 检查基准文档
+# Проверка базовых документов
 if (-not (Test-StoryFiles)) {
     Write-Host ""
-    Write-Host "❌ 无法进行完整分析，请先完成基准文档" -ForegroundColor Red
+    Write-Host "❌ Невозможно выполнить полный анализ, пожалуйста, сначала завершите базовые документы" -ForegroundColor Red
     exit 1
 }
 
-Write-Host "✅ 基准文档完整" -ForegroundColor Green
+Write-Host "✅ Базовые документы полные" -ForegroundColor Green
 Write-Host ""
 
-# 根据分析类型执行
+# Выполнение в зависимости от типа анализа
 switch ($AnalysisType) {
     "full" {
         Get-ContentAnalysis
@@ -162,10 +163,11 @@ switch ($AnalysisType) {
         Test-SpecificationCompliance
     }
     default {
-        Write-Host "未知的分析类型：$AnalysisType" -ForegroundColor Red
+        Write-Host "Неизвестный тип анализа: $AnalysisType" -ForegroundColor Red
         exit 1
     }
 }
 
 Write-Host ""
-Write-Host "分析完成。详细报告已保存到：$StoryDir\analysis-report.md"
+Write-Host "Анализ завершен. Подробный отчет сохранен в: $StoryDir\analysis-report.md"
+```

@@ -1,90 +1,90 @@
 /**
- * 模板引擎
- * 负责将用户参数填充到 Prompt 模板中
- * 支持变量替换、条件渲染和循环等功能
+ * Шаблонный движок
+ * Отвечает за заполнение пользовательскими параметрами шаблонов Prompt
+ * Поддерживает замену переменных, условный рендеринг и циклы и т. д.
  */
 
 export class TemplateEngine {
   constructor() {
-    // 支持的模板语法
+    // Поддерживаемый синтаксис шаблонов
     this.syntax = {
-      variable: /\{\{([^}]+)\}\}/g,           // {{variable}}
-      condition: /\{\{#if\s+([^}]+)\}\}([\s\S]*?)\{\{\/if\}\}/g,  // {{#if condition}}...{{/if}}
-      unless: /\{\{#unless\s+([^}]+)\}\}([\s\S]*?)\{\{\/unless\}\}/g,  // {{#unless condition}}...{{/unless}}
-      each: /\{\{#each\s+([^}]+)\}\}([\s\S]*?)\{\{\/each\}\}/g,   // {{#each items}}...{{/each}}
-      with: /\{\{#with\s+([^}]+)\}\}([\s\S]*?)\{\{\/with\}\}/g,   // {{#with object}}...{{/with}}
+      variable: /\{\{([^}]+)\}\}/g,           // {{переменная}}
+      condition: /\{\{#if\s+([^}]+)\}\}([\s\S]*?)\{\{\/if\}\}/g,  // {{#if условие}}...{{/if}}
+      unless: /\{\{#unless\s+([^}]+)\}\}([\s\S]*?)\{\{\/unless\}\}/g,  // {{#unless условие}}...{{/unless}}
+      each: /\{\{#each\s+([^}]+)\}\}([\s\S]*?)\{\{\/each\}\}/g,   // {{#each элементы}}...{{/each}}
+      with: /\{\{#with\s+([^}]+)\}\}([\s\S]*?)\{\{\/with\}\}/g,   // {{#with объект}}...{{/with}}
     };
   }
 
   /**
-   * 填充模板
-   * @param {string} template - Prompt 模板
-   * @param {object} parameters - 用户参数
-   * @returns {string} 填充后的 Prompt
+   * Заполнение шаблона
+   * @param {string} template - Шаблон Prompt
+   * @param {object} parameters - Пользовательские параметры
+   * @returns {string} Заполненный Prompt
    */
   fill(template, parameters) {
     if (!template || typeof template !== 'string') {
-      throw new Error('模板无效');
+      throw new Error('Недействительный шаблон');
     }
 
     if (!parameters || typeof parameters !== 'object') {
-      throw new Error('参数无效');
+      throw new Error('Недействительные параметры');
     }
 
     let result = template;
 
     try {
-      // 1. 处理条件块
+      // 1. Обработка условных блоков
       result = this.processConditions(result, parameters);
 
-      // 2. 处理循环块
+      // 2. Обработка циклических блоков
       result = this.processLoops(result, parameters);
 
-      // 3. 处理 with 块
+      // 3. Обработка блоков with
       result = this.processWithBlocks(result, parameters);
 
-      // 4. 处理变量替换（放在最后）
+      // 4. Обработка замены переменных (помещается в конце)
       result = this.processVariables(result, parameters);
 
-      // 5. 清理未使用的占位符
+      // 5. Очистка неиспользуемых заполнителей
       result = this.cleanupTemplate(result);
 
       return result;
     } catch (error) {
-      throw new Error(`模板填充失败: ${error.message}`);
+      throw new Error(`Ошибка заполнения шаблона: ${error.message}`);
     }
   }
 
   /**
-   * 处理变量替换
+   * Обработка замены переменных
    */
   processVariables(template, parameters) {
     return template.replace(this.syntax.variable, (match, path) => {
       const trimmedPath = path.trim();
 
-      // 支持嵌套属性访问 (如 user.name)
+      // Поддержка доступа к вложенным свойствам (например, user.name)
       const value = this.getValueByPath(parameters, trimmedPath);
 
-      // 处理不同类型的值
+      // Обработка значений разных типов
       if (value === undefined || value === null) {
-        return ''; // 未定义的变量替换为空
+        return ''; // Неопределенная переменная заменяется пустой строкой
       }
 
       if (typeof value === 'object') {
-        // 对象转为 JSON 字符串
+        // Объекты преобразуются в JSON-строку
         return JSON.stringify(value, null, 2);
       }
 
-      // 其他类型转为字符串
+      // Другие типы преобразуются в строку
       return String(value);
     });
   }
 
   /**
-   * 处理条件渲染
+   * Обработка условного рендеринга
    */
   processConditions(template, parameters) {
-    // 处理 {{#if condition}}
+    // Обработка {{#if условие}}
     template = template.replace(this.syntax.condition, (match, condition, content) => {
       const trimmedCondition = condition.trim();
       const conditionValue = this.evaluateCondition(trimmedCondition, parameters);
@@ -92,7 +92,7 @@ export class TemplateEngine {
       return conditionValue ? content : '';
     });
 
-    // 处理 {{#unless condition}}
+    // Обработка {{#unless условие}}
     template = template.replace(this.syntax.unless, (match, condition, content) => {
       const trimmedCondition = condition.trim();
       const conditionValue = this.evaluateCondition(trimmedCondition, parameters);
@@ -104,7 +104,7 @@ export class TemplateEngine {
   }
 
   /**
-   * 处理循环
+   * Обработка циклов
    */
   processLoops(template, parameters) {
     return template.replace(this.syntax.each, (match, arrayPath, content) => {
@@ -112,12 +112,12 @@ export class TemplateEngine {
       const array = this.getValueByPath(parameters, trimmedPath);
 
       if (!Array.isArray(array)) {
-        return ''; // 非数组返回空
+        return ''; // Возвращается пустая строка, если это не массив
       }
 
-      // 为每个元素渲染内容
+      // Рендеринг контента для каждого элемента
       return array.map((item, index) => {
-        // 创建循环上下文
+        // Создание контекста цикла
         const loopContext = {
           ...parameters,
           '@item': item,
@@ -126,21 +126,21 @@ export class TemplateEngine {
           '@last': index === array.length - 1
         };
 
-        // 在循环内容中替换变量
+        // Замена переменных внутри контента цикла
         return content.replace(this.syntax.variable, (m, path) => {
           const p = path.trim();
 
-          // 特殊变量
+          // Специальные переменные
           if (p.startsWith('@')) {
             return loopContext[p] !== undefined ? String(loopContext[p]) : '';
           }
 
-          // 支持 this 关键字
+          // Поддержка ключевого слова this
           if (p === 'this' || p === '.') {
             return String(item);
           }
 
-          // 常规属性访问
+          // Обычный доступ к свойствам
           return this.getValueByPath(loopContext, p);
         });
       }).join('');
@@ -148,7 +148,7 @@ export class TemplateEngine {
   }
 
   /**
-   * 处理 with 块
+   * Обработка блока with
    */
   processWithBlocks(template, parameters) {
     return template.replace(this.syntax.with, (match, objectPath, content) => {
@@ -156,25 +156,25 @@ export class TemplateEngine {
       const object = this.getValueByPath(parameters, trimmedPath);
 
       if (!object || typeof object !== 'object') {
-        return ''; // 非对象返回空
+        return ''; // Возвращается пустая строка, если это не объект
       }
 
-      // 创建新的上下文
+      // Создание нового контекста
       const withContext = {
         ...parameters,
         ...object
       };
 
-      // 在 with 块内填充变量
+      // Заполнение переменных внутри блока with
       return this.processVariables(content, withContext);
     });
   }
 
   /**
-   * 评估条件表达式
+   * Оценка условного выражения
    */
   evaluateCondition(condition, parameters) {
-    // 支持的操作符
+    // Поддерживаемые операторы
     const operators = {
       '==': (a, b) => a == b,
       '===': (a, b) => a === b,
@@ -188,14 +188,14 @@ export class TemplateEngine {
       '||': (a, b) => a || b
     };
 
-    // 简单条件（仅变量名）
+    // Простое условие (только имя переменной)
     if (!condition.match(/[=!<>&|]/)) {
       const value = this.getValueByPath(parameters, condition);
       return this.isTruthy(value);
     }
 
-    // 复杂条件（包含操作符）
-    // 这里简化处理，实际可能需要更复杂的表达式解析
+    // Сложное условие (включает операторы)
+    // Здесь упрощенная обработка, в реальности может потребоваться более сложный парсинг выражений
     for (const [op, fn] of Object.entries(operators)) {
       if (condition.includes(op)) {
         const parts = condition.split(op).map(p => p.trim());
@@ -207,12 +207,12 @@ export class TemplateEngine {
       }
     }
 
-    // 默认返回 false
+    // По умолчанию возвращается false
     return false;
   }
 
   /**
-   * 判断值是否为真
+   * Проверка истинности значения
    */
   isTruthy(value) {
     if (value === undefined || value === null) {
@@ -243,15 +243,15 @@ export class TemplateEngine {
   }
 
   /**
-   * 通过路径获取值
-   * 支持嵌套属性访问，如 'user.profile.name'
+   * Получение значения по пути
+   * Поддерживает доступ к вложенным свойствам, например 'user.profile.name'
    */
   getValueByPath(object, path) {
     if (!object || !path) {
       return undefined;
     }
 
-    // 处理字面量
+    // Обработка литералов
     if (path.startsWith('"') && path.endsWith('"')) {
       return path.slice(1, -1);
     }
@@ -260,16 +260,16 @@ export class TemplateEngine {
       return path.slice(1, -1);
     }
 
-    // 数字字面量
+    // Числовые литералы
     if (/^\d+$/.test(path)) {
       return parseInt(path, 10);
     }
 
-    // 布尔字面量
+    // Булевы литералы
     if (path === 'true') return true;
     if (path === 'false') return false;
 
-    // 属性路径
+    // Путь к свойству
     const parts = path.split('.');
     let current = object;
 
@@ -278,7 +278,7 @@ export class TemplateEngine {
         return undefined;
       }
 
-      // 支持数组索引
+      // Поддержка индексов массива
       const arrayMatch = part.match(/^(\w+)\[(\d+)\]$/);
       if (arrayMatch) {
         current = current[arrayMatch[1]];
@@ -296,41 +296,41 @@ export class TemplateEngine {
   }
 
   /**
-   * 清理未使用的模板标记
+   * Очистка неиспользуемых тегов шаблона
    */
   cleanupTemplate(template) {
-    // 移除未匹配的变量占位符
+    // Удаление несовпавших заполнителей переменных
     template = template.replace(/\{\{[^}]*\}\}/g, '');
 
-    // 移除多余的空行
+    // Удаление лишних пустых строк
     template = template.replace(/\n\s*\n\s*\n/g, '\n\n');
 
-    // 去除尾部空白
+    // Удаление конечных пробелов
     template = template.trimEnd();
 
     return template;
   }
 
   /**
-   * 验证模板语法
-   * 在填充前检查模板是否有语法错误
+   * Проверка синтаксиса шаблона
+   * Проверка шаблона на наличие синтаксических ошибок перед заполнением
    */
   validateTemplate(template) {
     const errors = [];
 
-    // 检查未闭合的标签
+    // Проверка незакрытых тегов
     const openTags = template.match(/\{\{#(if|unless|each|with)[^}]*\}\}/g) || [];
     const closeTags = template.match(/\{\{\/(if|unless|each|with)\}\}/g) || [];
 
     if (openTags.length !== closeTags.length) {
-      errors.push('模板包含未闭合的标签');
+      errors.push('Шаблон содержит незакрытые теги');
     }
 
-    // 检查变量格式
+    // Проверка формата переменных
     const variables = template.match(this.syntax.variable) || [];
     for (const variable of variables) {
       if (variable.includes('{{{{')) {
-        errors.push(`无效的变量格式: ${variable}`);
+        errors.push(`Недействительный формат переменной: ${variable}`);
       }
     }
 
@@ -338,8 +338,8 @@ export class TemplateEngine {
   }
 
   /**
-   * 预处理参数
-   * 添加一些有用的内置变量
+   * Предварительная обработка параметров
+   * Добавление некоторых полезных встроенных переменных
    */
   preprocessParameters(parameters) {
     return {
@@ -352,5 +352,5 @@ export class TemplateEngine {
   }
 }
 
-// 导出单例
+// Экспорт одиночного экземпляра
 export const templateEngine = new TemplateEngine();

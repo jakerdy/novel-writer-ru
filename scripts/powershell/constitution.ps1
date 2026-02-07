@@ -1,77 +1,78 @@
-# 小说创作宪法管理脚本
-# 用于 /constitution 命令
+```powershell
+# Конституция управления сценариями романа
+# Используется для команды /constitution
 
 param(
     [string]$Command = "check"
 )
 
-# 导入通用函数
+# Импорт общих функций
 . "$PSScriptRoot\common.ps1"
 
-# 获取项目根目录
+# Получение корневого каталога проекта
 $ProjectRoot = Get-ProjectRoot
 Set-Location $ProjectRoot
 
-# 定义文件路径
+# Определение пути к файлу
 $ConstitutionFile = "memory\constitution.md"
 
 switch ($Command) {
     "check" {
-        # 检查宪法文件是否存在
+        # Проверка существования файла конституции
         if (Test-Path $ConstitutionFile) {
-            Write-Host "✅ 宪法文件已存在：$ConstitutionFile" -ForegroundColor Green
+            Write-Host "✅ Файл конституции существует: $ConstitutionFile" -ForegroundColor Green
 
-            # 提取版本信息
+            # Извлечение информации о версии
             $content = Get-Content $ConstitutionFile -Raw
-            if ($content -match "- 版本：(.+)") {
+            if ($content -match "- Версия：(.+)") {
                 $version = $matches[1].Trim()
             } else {
-                $version = "未知"
+                $version = "Неизвестно"
             }
 
-            if ($content -match "- 最后修订：(.+)") {
+            if ($content -match "- Последнее изменение：(.+)") {
                 $updated = $matches[1].Trim()
             } else {
-                $updated = "未知"
+                $updated = "Неизвестно"
             }
 
-            Write-Host "  版本：$version"
-            Write-Host "  最后修订：$updated"
+            Write-Host "  Версия：$version"
+            Write-Host "  Последнее изменение：$updated"
             exit 0
         }
         else {
-            Write-Host "❌ 尚未创建宪法文件" -ForegroundColor Red
-            Write-Host "  建议：运行 /constitution 创建创作宪法"
+            Write-Host "❌ Файл конституции ещё не создан" -ForegroundColor Red
+            Write-Host "  Рекомендация: выполните /constitution для создания конституции творчества"
             exit 1
         }
     }
 
     "init" {
-        # 初始化宪法文件
+        # Инициализация файла конституции
         $dir = Split-Path $ConstitutionFile -Parent
         if (-not (Test-Path $dir)) {
             New-Item -ItemType Directory -Path $dir -Force | Out-Null
         }
 
         if (Test-Path $ConstitutionFile) {
-            Write-Host "宪法文件已存在，准备更新"
+            Write-Host "Файл конституции существует, подготовка к обновлению"
         }
         else {
-            Write-Host "准备创建新的宪法文件"
+            Write-Host "Подготовка к созданию нового файла конституции"
         }
     }
 
     "validate" {
-        # 验证宪法文件格式
+        # Проверка формата файла конституции
         if (-not (Test-Path $ConstitutionFile)) {
-            Write-Host "错误：宪法文件不存在" -ForegroundColor Red
+            Write-Host "Ошибка: файл конституции не существует" -ForegroundColor Red
             exit 1
         }
 
-        Write-Host "验证宪法文件..."
+        Write-Host "Проверка файла конституции..."
 
-        # 检查必要章节
-        $requiredSections = @("核心价值观", "质量标准", "创作风格", "内容规范", "读者契约")
+        # Проверка необходимых разделов
+        $requiredSections = @("Основные ценности", "Стандарты качества", "Стиль письма", "Нормы содержания", "Договор с читателем")
         $content = Get-Content $ConstitutionFile -Raw
         $missingSections = @()
 
@@ -82,61 +83,62 @@ switch ($Command) {
         }
 
         if ($missingSections.Count -gt 0) {
-            Write-Host "⚠️ 缺少以下章节：" -ForegroundColor Yellow
+            Write-Host "⚠️ Отсутствуют следующие разделы:" -ForegroundColor Yellow
             foreach ($section in $missingSections) {
                 Write-Host "  - $section"
             }
         }
         else {
-            Write-Host "✅ 所有必要章节都存在" -ForegroundColor Green
+            Write-Host "✅ Все необходимые разделы присутствуют" -ForegroundColor Green
         }
 
-        # 检查版本信息
-        if ($content -match "^- 版本：") {
-            Write-Host "✅ 版本信息完整" -ForegroundColor Green
+        # Проверка информации о версии
+        if ($content -match "^- Версия：") {
+            Write-Host "✅ Информация о версии полная" -ForegroundColor Green
         }
         else {
-            Write-Host "⚠️ 缺少版本信息" -ForegroundColor Yellow
+            Write-Host "⚠️ Отсутствует информация о версии" -ForegroundColor Yellow
         }
     }
 
     "export" {
-        # 导出宪法摘要
+        # Экспорт резюме конституции
         if (-not (Test-Path $ConstitutionFile)) {
-            Write-Host "错误：宪法文件不存在" -ForegroundColor Red
+            Write-Host "Ошибка: файл конституции не существует" -ForegroundColor Red
             exit 1
         }
 
-        Write-Host "# 创作宪法摘要"
+        Write-Host "# Резюме конституции творчества"
         Write-Host ""
 
         $content = Get-Content $ConstitutionFile -Raw
 
-        # 提取核心原则
-        Write-Host "## 核心原则"
-        if ($content -match "### 原则[\s\S]*?\*\*声明\*\*：(.+)") {
+        # Извлечение основных принципов
+        Write-Host "## Основные принципы"
+        if ($content -match "### Принципы[\s\S]*?\*\*Заявление\*\*：(.+)") {
             Write-Host $matches[1]
         }
         else {
-            Write-Host "（未找到原则声明）"
+            Write-Host "（Заявление о принципах не найдено）"
         }
 
         Write-Host ""
-        Write-Host "## 质量底线"
-        if ($content -match "### 标准[\s\S]*?\*\*要求\*\*：(.+)") {
+        Write-Host "## Минимальные стандарты качества"
+        if ($content -match "### Стандарты[\s\S]*?\*\*Требования\*\*：(.+)") {
             Write-Host $matches[1]
         }
         else {
-            Write-Host "（未找到质量标准）"
+            Write-Host "（Стандарты качества не найдены）"
         }
 
         Write-Host ""
-        Write-Host "详细内容请查看：$ConstitutionFile"
+        Write-Host "Подробное содержание см. по адресу: $ConstitutionFile"
     }
 
     default {
-        Write-Host "未知命令：$Command" -ForegroundColor Red
-        Write-Host "支持的命令：check, init, validate, export"
+        Write-Host "Неизвестная команда: $Command" -ForegroundColor Red
+        Write-Host "Поддерживаемые команды: check, init, validate, export"
         exit 1
     }
 }
+```

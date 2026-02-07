@@ -1,5 +1,6 @@
+```powershell
 #!/usr/bin/env pwsh
-# 公用函数（PowerShell）
+# Общие функции (PowerShell)
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -13,7 +14,7 @@ function Get-ProjectRoot {
     if (-not $parent -or $parent -eq $current) { break }
     $current = $parent
   }
-  throw "未找到项目根目录（缺少 .specify/config.json）"
+  throw "Корневой каталог проекта не найден (отсутствует .specify/config.json)"
 }
 
 function Get-CurrentStoryDir {
@@ -24,4 +25,4 @@ function Get-CurrentStoryDir {
   if ($dirs.Count -gt 0) { return $dirs[0].FullName }
   return $null
 }
-
+```

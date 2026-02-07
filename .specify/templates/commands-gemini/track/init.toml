@@ -1,76 +1,77 @@
-description = "初始化进度追踪系统，创建追踪文件"
+```toml
+description = "Инициализация системы отслеживания прогресса, создание файлов отслеживания"
 
 prompt = """
-初始化进度追踪系统，设置追踪文件。
+Инициализация системы отслеживания прогресса, настройка файлов отслеживания.
 
-用户要求：{{args}}
+Запрос пользователя: {{args}}
 
-## 执行步骤
+## Шаги выполнения
 
-### 1. 创建追踪目录
-确保目录存在：
+### 1. Создание каталога отслеживания
+Убедитесь, что каталог существует:
 ```bash
 mkdir -p spec/tracking
 ```
 
-### 2. 初始化追踪文件
-使用 run_shell_command 执行：.specify/scripts/bash/init-tracking.sh
+### 2. Инициализация файла отслеживания
+Используйте run_shell_command для выполнения: .specify/scripts/bash/init-tracking.sh
 
-### 3. 创建角色状态文件
-使用 write_file 创建 spec/tracking/character-state.json：
+### 3. Создание файла состояния персонажа
+Используйте write_file для создания spec/tracking/character-state.json:
 ```json
 {
   "characters": {
     "protagonist": {
-      "name": "主角名",
-      "currentState": "初始状态",
+      "name": "Имя главного героя",
+      "currentState": "Начальное состояние",
       "developmentStage": 1,
       "keyChanges": [],
       "relationships": {}
     }
   },
-  "lastUpdated": "日期"
+  "lastUpdated": "Дата"
 }
 ```
 
-### 4. 创建情节追踪文件
-创建 spec/tracking/plot-tracker.json：
+### 4. Создание файла отслеживания сюжета
+Создайте spec/tracking/plot-tracker.json:
 ```json
 {
   "mainPlot": {
-    "currentStage": "开端",
+    "currentStage": "Начало",
     "progress": 0,
     "keyEvents": [],
     "conflicts": []
   },
   "subPlots": {},
-  "lastUpdated": "日期"
+  "lastUpdated": "Дата"
 }
 ```
 
-### 5. 创建关系追踪文件
-创建 spec/tracking/relationships.json：
+### 5. Создание файла отслеживания отношений
+Создайте spec/tracking/relationships.json:
 ```json
 {
   "relationships": [],
   "changes": [],
-  "lastUpdated": "日期"
+  "lastUpdated": "Дата"
 }
 ```
 
-### 6. 创建时间线文件
-创建 spec/tracking/timeline.json：
+### 6. Создание файла временной шкалы
+Создайте spec/tracking/timeline.json:
 ```json
 {
   "timeline": [],
-  "storyStartDate": "故事开始日期",
-  "currentDate": "当前故事日期",
-  "lastUpdated": "日期"
+  "storyStartDate": "Дата начала истории",
+  "currentDate": "Текущая дата истории",
+  "lastUpdated": "Дата"
 }
 ```
 
-### 7. 创建验证规则
-创建 spec/tracking/validation-rules.json：
+### 7. Создание правил валидации
+Создайте spec/tracking/validation-rules.json:
 ```json
 {
   "rules": {
@@ -87,32 +88,33 @@ mkdir -p spec/tracking
 }
 ```
 
-### 8. 初始化进度统计
-创建初始进度报告：
+### 8. Инициализация статистики прогресса
+Создайте первоначальный отчет о прогрессе:
 ```
-📊 追踪系统初始化完成！
+📊 Система отслеживания инициализирована!
 
-已创建文件：
-✅ character-state.json - 角色状态
-✅ plot-tracker.json - 情节进度
-✅ relationships.json - 关系网络
-✅ timeline.json - 时间线
-✅ validation-rules.json - 验证规则
+Созданные файлы:
+✅ character-state.json - Состояние персонажей
+✅ plot-tracker.json - Прогресс сюжета
+✅ relationships.json - Сеть отношений
+✅ timeline.json - Временная шкала
+✅ validation-rules.json - Правила валидации
 
-设置目标：
-- 每日目标：1,500字
-- 每周目标：10,000字
-- 章节字数：2,000-4,000字
+Установленные цели:
+- Ежедневная цель: 1500 слов
+- Еженедельная цель: 10000 слов
+- Объем главы: 2000-4000 слов
 
-下一步：
-1. 使用 /track 查看进度
-2. 写作时自动更新追踪
-3. 定期运行检查脚本
+Следующие шаги:
+1. Используйте /track для просмотра прогресса
+2. Автоматическое обновление отслеживания во время письма
+3. Регулярно запускайте скрипты проверки
 ```
 
-## 注意事项
-- 初始化只需运行一次
-- 可以自定义目标参数
-- 追踪文件会自动更新
-- 定期备份追踪数据
+## Примечания
+- Инициализация выполняется только один раз
+- Параметры целей можно настроить
+- Файлы отслеживания обновляются автоматически
+- Регулярно делайте резервные копии данных отслеживания
 """
+```

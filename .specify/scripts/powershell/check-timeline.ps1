@@ -1,5 +1,6 @@
+```powershell
 #!/usr/bin/env pwsh
-# 时间线管理与检查（PowerShell）
+# Управление и проверка временной шкалы (PowerShell)
 
 param(
   [ValidateSet('show','add','check','sync')]
@@ -15,49 +16,49 @@ $ErrorActionPreference = 'Stop'
 
 $root = Get-ProjectRoot
 $storyDir = Get-CurrentStoryDir
-if (-not $storyDir) { throw "未找到故事项目（stories/*）" }
+if (-not $storyDir) { throw "Проект истории (stories/*) не найден" }
 
 $timelinePath = Join-Path $storyDir "spec/tracking/timeline.json"
 if (-not (Test-Path $timelinePath)) { $timelinePath = Join-Path $root "spec/tracking/timeline.json" }
 
 function Init-Timeline {
   if (-not (Test-Path $timelinePath)) {
-    Write-Host "⚠️  未找到时间线文件，正在创建..."
+    Write-Host "⚠️  Файл временной шкалы не найден, создаётся..."
     $tpl = Join-Path $root "templates/tracking/timeline.json"
-    if (-not (Test-Path $tpl)) { throw "无法找到模板文件" }
+    if (-not (Test-Path $tpl)) { throw "Невозможно найти файл шаблона" }
     New-Item -ItemType Directory -Path (Split-Path $timelinePath -Parent) -Force | Out-Null
     Copy-Item $tpl $timelinePath -Force
-    Write-Host "✅ 时间线文件已创建"
+    Write-Host "✅ Файл временной шкалы создан"
   }
 }
 
 function Show-Timeline {
-  Write-Host "📅 故事时间线"
+  Write-Host "📅 Временная шкала истории"
   Write-Host "━━━━━━━━━━━━━━━━━━━━"
-  if (-not (Test-Path $timelinePath)) { Write-Host "未找到时间线文件"; return }
+  if (-not (Test-Path $timelinePath)) { Write-Host "Файл временной шкалы не найден"; return }
   $j = Get-Content -LiteralPath $timelinePath -Raw -Encoding UTF8 | ConvertFrom-Json
   $cur = $j.storyTime.current
-  if (-not $cur) { $cur = '未设定' }
-  Write-Host "⏰ 当前时间：$cur"
+  if (-not $cur) { $cur = 'Не установлено' }
+  Write-Host "⏰ Текущее время: $cur"
   Write-Host ""
   $events = @($j.events)
   if ($events.Count -gt 0) {
-    Write-Host "📖 重要事件："
+    Write-Host "📖 Важные события:"
     Write-Host "───────────────"
     $events | Sort-Object chapter -Descending | Select-Object -First 5 | ForEach-Object {
-      Write-Host ("第{0}章 | {1} | {2}" -f $_.chapter, $_.date, $_.event)
+      Write-Host ("Глава {0} | {1} | {2}" -f $_.chapter, $_.date, $_.event)
     }
   }
   $p = $j.parallelEvents.timepoints
   if ($p) {
     Write-Host ""
-    Write-Host "🔄 并行事件："
+    Write-Host "🔄 Параллельные события:"
     $p.PSObject.Properties | ForEach-Object { Write-Host ("{0}: {1}" -f $_.Name, (@($_.Value) -join ', ')) }
   }
 }
 
 function Add-Event([int]$chapter, [string]$date, [string]$event) {
-  if (-not $chapter -or -not $date -or -not $event) { throw "用法: check-timeline.ps1 add <章节号> <时间> <事件描述>" }
+  if (-not $chapter -or -not $date -or -not $event) { throw "Использование: check-timeline.ps1 add <номер главы> <время> <описание события>" }
   Init-Timeline
   $j = Get-Content -LiteralPath $timelinePath -Raw -Encoding UTF8 | ConvertFrom-Json
   if (-not $j.events) { $j | Add-Member -NotePropertyName events -NotePropertyValue @() }
@@ -65,26 +66,26 @@ function Add-Event([int]$chapter, [string]$date, [string]$event) {
   $j.events = @($j.events | Sort-Object chapter)
   $j.lastUpdated = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
   $j | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $timelinePath -Encoding UTF8
-  Write-Host "✅ 事件已添加：第${chapter}章 - $date - $event"
+  Write-Host "✅ Событие добавлено: Глава ${chapter} - $date - $event"
 }
 
 function Check-Continuity {
-  Write-Host "🔍 检查时间线连续性"
+  Write-Host "🔍 Проверка непрерывности временной шкалы"
   Write-Host "━━━━━━━━━━━━━━━━━━━━"
-  if (-not (Test-Path $timelinePath)) { throw "时间线文件不存在" }
+  if (-not (Test-Path $timelinePath)) { throw "Файл временной шкалы не существует" }
   $j = Get-Content -LiteralPath $timelinePath -Raw -Encoding UTF8 | ConvertFrom-Json
   $chapters = @($j.events | Sort-Object chapter | ForEach-Object { $_.chapter })
   $issues = 0
   $prev = -1
   foreach ($c in $chapters) {
     if ($prev -ge 0 -and $c -le $prev) {
-      Write-Host "⚠️  章节顺序异常：第$c 章出现在第$prev 章之后"
+      Write-Host "⚠️  Неправильный порядок глав: Глава $c появилась после главы $prev"
       $issues++
     }
     $prev = $c
   }
-  if ($issues -eq 0) { Write-Host "`n✅ 时间线检查通过，未发现逻辑问题" }
-  else { Write-Host "`n⚠️  发现${issues}个潜在问题，请检查" }
+  if ($issues -eq 0) { Write-Host "`n✅ Проверка временной шкалы пройдена, логических проблем не обнаружено" }
+  else { Write-Host "`n⚠️  Обнаружено ${issues} потенциальных проблем, пожалуйста, проверьте" }
   $j.lastChecked = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
   if (-not $j.anomalies) { $j | Add-Member anomalies (@{}) }
   $j.anomalies.lastCheckIssues = $issues
@@ -92,7 +93,7 @@ function Check-Continuity {
 }
 
 function Sync-Parallel([string]$timepoint, [string]$eventsCsv) {
-  if (-not $timepoint -or -not $eventsCsv) { throw "用法: check-timeline.ps1 sync <时间点> <事件列表,逗号分隔>" }
+  if (-not $timepoint -or -not $eventsCsv) { throw "Использование: check-timeline.ps1 sync <временная точка> <список событий, разделённых запятыми>" }
   Init-Timeline
   $j = Get-Content -LiteralPath $timelinePath -Raw -Encoding UTF8 | ConvertFrom-Json
   if (-not $j.parallelEvents) { $j | Add-Member -NotePropertyName parallelEvents -NotePropertyValue @{ timepoints=@{} } }
@@ -100,7 +101,7 @@ function Sync-Parallel([string]$timepoint, [string]$eventsCsv) {
   $j.parallelEvents.timepoints[$timepoint] = $events
   $j.lastUpdated = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
   $j | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $timelinePath -Encoding UTF8
-  Write-Host "✅ 并行事件已同步：$timepoint"
+  Write-Host "✅ Параллельные события синхронизированы: $timepoint"
 }
 
 switch ($Command) {
@@ -109,4 +110,4 @@ switch ($Command) {
   'check' { Check-Continuity }
   'sync'  { Sync-Parallel -timepoint $Param1 -eventsCsv $Param2 }
 }
-
+```

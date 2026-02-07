@@ -1,31 +1,33 @@
+```bash
 #!/usr/bin/env bash
-# 设置章节大纲
+# Настройка структуры глав
 
 set -e
 
-# 加载通用函数
+# Загрузка общих функций
 SCRIPT_DIR=$(dirname "$0")
 source "$SCRIPT_DIR/common.sh"
 
-# 获取当前故事目录
+# Получение текущей директории истории
 STORY_DIR=$(get_current_story)
 
 if [ -z "$STORY_DIR" ]; then
-    echo "错误: 未找到故事项目，请先使用 /story 命令创建故事" >&2
+    echo "Ошибка: Проект истории не найден. Пожалуйста, сначала создайте историю с помощью команды /story" >&2
     exit 1
 fi
 
-# 创建大纲文件
+# Создание файла структуры глав
 OUTLINE_FILE="$STORY_DIR/outline.md"
 PROJECT_ROOT=$(get_project_root)
 TEMPLATE="$PROJECT_ROOT/.specify/templates/outline-template.md"
 
 ensure_file "$OUTLINE_FILE" "$TEMPLATE"
 
-# 创建章节目录结构
+# Создание структуры директорий для глав
 mkdir -p "$STORY_DIR/chapters/volume-1"
 
-# 输出结果
+# Вывод результата
 echo "OUTLINE_FILE: $OUTLINE_FILE"
 echo "STORY_DIR: $STORY_DIR"
 echo "STATUS: ready"
+```

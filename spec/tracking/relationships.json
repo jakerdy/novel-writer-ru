@@ -1,9 +1,10 @@
+```json
 {
-  "novel": "[小说名称]",
+  "novel": "[Название романа]",
   "lastUpdated": "",
 
   "characters": {
-    "[主角名]": {
+    "[Имя главного героя]": {
       "relationships": {
         "allies": [],
         "enemies": [],
@@ -15,9 +16,9 @@
       },
       "dynamicRelations": [
         {
-          "character": "[角色名]",
-          "initial": "陌生人",
-          "current": "朋友",
+          "character": "[Имя персонажа]",
+          "initial": "Незнакомец",
+          "current": "Друг",
           "trajectory": "positive",
           "keyEvents": []
         }
@@ -26,7 +27,7 @@
   },
 
   "factions": {
-    "[派系名]": {
+    "[Название фракции]": {
       "description": "",
       "leader": "",
       "members": [],
@@ -38,7 +39,7 @@
   },
 
   "relationshipMatrix": {
-    "说明": "角色间关系的快速查询矩阵",
+    "说明": "Матрица для быстрого поиска отношений между персонажами",
     "matrix": {}
   },
 
@@ -55,7 +56,7 @@
         {
           "type": "new",
           "characters": ["A", "B"],
-          "relation": "初次相遇",
+          "relation": "Первая встреча",
           "impact": "low"
         }
       ]
@@ -63,8 +64,9 @@
   ],
 
   "predictions": {
-    "说明": "基于当前关系预测的发展",
+    "说明": "Прогнозы развития отношений на основе текущей ситуации",
     "likely": [],
     "possible": []
   }
 }
+```

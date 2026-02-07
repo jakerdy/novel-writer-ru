@@ -1,5 +1,6 @@
+```powershell
 #!/usr/bin/env pwsh
-# 创建新故事项目
+# Создание нового проекта истории
 
 param(
     [string]$Json = ""
@@ -7,15 +8,15 @@ param(
 
 $STORIES_DIR = "stories"
 
-# 创建故事目录
+# Создание каталога историй
 if (!(Test-Path $STORIES_DIR)) {
     New-Item -ItemType Directory -Path $STORIES_DIR | Out-Null
 }
 
-# 解析 JSON 参数
+# Парсинг JSON параметров
 $storyData = @{
-    name = "未命名故事"
-    genre = "通用"
+    name = "Безымянная история"
+    genre = "Общий"
     description = ""
 }
 
@@ -26,11 +27,11 @@ if ($Json) {
         if ($parsed.genre) { $storyData.genre = $parsed.genre }
         if ($parsed.description) { $storyData.description = $parsed.description }
     } catch {
-        Write-Host "警告：无法解析 JSON 参数，使用默认值"
+        Write-Host "Предупреждение: Не удалось разобрать JSON параметры, используются значения по умолчанию"
     }
 }
 
-# 获取下一个编号
+# Получение следующего номера
 function Get-NextNumber {
     param([string]$Dir, [string]$Prefix)
 
@@ -44,20 +45,20 @@ function Get-NextNumber {
     return $maxNum + 1
 }
 
-# 创建编号目录（参考 spec-kit 方式）
+# Создание каталога с номером (по аналогии со spec-kit)
 $storyNum = Get-NextNumber -Dir $STORIES_DIR -Prefix "story"
 $storyNumFormatted = "{0:D3}" -f $storyNum
 
-# 生成安全的目录名（只保留英文单词）
+# Генерация безопасного имени каталога (только английские слова)
 $safeName = $storyData.name.ToLower() -replace '[^a-z0-9]', '-' -replace '-+', '-' -replace '^-|-$', ''
 
-# 提取前3个词
+# Извлечение первых 3 слов
 if ($safeName) {
     $words = $safeName -split '-' | Where-Object { $_ -ne '' } | Select-Object -First 3
     $safeName = $words -join '-'
 }
 
-# 如果为空（比如纯中文），使用默认名称
+# Если имя пустое (например, только китайские иероглифы), используется имя по умолчанию
 if (-not $safeName) {
     $safeName = "story"
 }
@@ -71,7 +72,7 @@ New-Item -ItemType Directory -Path "$storyPath/characters" | Out-Null
 New-Item -ItemType Directory -Path "$storyPath/worldbuilding" | Out-Null
 New-Item -ItemType Directory -Path "$storyPath/notes" | Out-Null
 
-# 输出 JSON 结果
+# Вывод JSON результата
 $result = @{
     STORY_NAME = $storyData.name
     STORY_FILE = "$storyPath/story.md"
@@ -79,3 +80,4 @@ $result = @{
 } | ConvertTo-Json -Compress
 
 Write-Host $result
+```

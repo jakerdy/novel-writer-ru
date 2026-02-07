@@ -1,6 +1,7 @@
+```javascript
 /**
- * 星尘织梦 API 客户端
- * 负责与服务端 API 通信，获取加密的 Prompt 和会话数据
+ * Клиент API Stardust Dreams
+ * Отвечает за взаимодействие с API сервера для получения зашифрованных Prompt и данных сеанса
  */
 
 import fetch from 'node-fetch';
@@ -14,16 +15,16 @@ export class StardustAPIClient {
   }
 
   /**
-   * 设置 API Key
+   * Установить API Key
    */
   setApiKey(apiKey) {
     this.apiKey = apiKey;
   }
 
   /**
-   * 获取会话信息
-   * @param {string} sessionId - 会话 ID
-   * @returns {Object} 会话数据
+   * Получить информацию о сеансе
+   * @param {string} sessionId - ID сеанса
+   * @returns {Object} Данные сеанса
    */
   async getSession(sessionId) {
     const response = await this.request('/api/trpc/form.getSession', {
@@ -34,16 +35,16 @@ export class StardustAPIClient {
     });
 
     if (!response?.result?.data?.success) {
-      throw new Error(`会话 ${sessionId} 不存在或已过期`);
+      throw new Error(`Сеанс ${sessionId} не существует или истек`);
     }
 
     return response.result.data.data;
   }
 
   /**
-   * 获取加密的 Prompt（核心功能）
-   * @param {string} sessionId - 会话 ID
-   * @returns {Object} 包含加密 Prompt 和解密密钥的对象
+   * Получить зашифрованный Prompt (основная функция)
+   * @param {string} sessionId - ID сеанса
+   * @returns {Object} Объект, содержащий зашифрованный Prompt и ключ для расшифровки
    */
   async getEncryptedPrompt(sessionId) {
     const response = await this.request('/api/trpc/form.getPrompt', {
@@ -57,12 +58,12 @@ export class StardustAPIClient {
     });
 
     if (!response?.result?.data?.success) {
-      throw new Error(`无法获取会话 ${sessionId} 的加密 Prompt`);
+      throw new Error(`Не удалось получить зашифрованный Prompt для сеанса ${sessionId}`);
     }
 
     const data = response.result.data.data;
 
-    // 返回标准格式的加密数据
+    // Возвращаем зашифрованные данные в стандартном формате
     return {
       sessionId: data.sessionId,
       formId: data.formId,
@@ -78,7 +79,7 @@ export class StardustAPIClient {
 
 
   /**
-   * 发送 API 请求
+   * Отправить запрос к API
    */
   async request(endpoint, options = {}) {
     const url = endpoint.startsWith('http') ? endpoint : `${this.baseUrl}${endpoint}`;
@@ -100,10 +101,10 @@ export class StardustAPIClient {
       const response = await fetch(url, fetchOptions);
       const data = await response.json();
 
-      // 处理速率限制
+      // Обработка ограничения скорости запросов
       if (response.status === 429) {
         const retryAfter = response.headers.get('Retry-After');
-        throw new Error(`请求过于频繁，请 ${retryAfter || '60'} 秒后重试`);
+        throw new Error(`Слишком частые запросы, повторите попытку через ${retryAfter || '60'} секунд`);
       }
 
       return data;
@@ -111,10 +112,11 @@ export class StardustAPIClient {
       if (error instanceof Error) {
         throw error;
       }
-      throw new Error(`网络请求失败: ${error}`);
+      throw new Error(`Сетевой запрос не удался: ${error}`);
     }
   }
 }
 
-// 导出单例
+// Экспорт синглтона
 export const apiClient = new StardustAPIClient();
+```

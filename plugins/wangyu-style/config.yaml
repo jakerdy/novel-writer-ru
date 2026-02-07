@@ -1,56 +1,58 @@
+```yaml
 name: wangyu-style
 version: 1.0.0
-description: 忘语风格创作插件 - 深度模拟《凡人修仙传》作者风格
+description: Плагин для творчества в стиле Ван Ю — глубокое моделирование стиля автора «Путь бессмертного»
 type: style
 author: Novel Writer Community
 commands:
   - id: wangyu-style
     file: commands/wangyu-style.md
-    description: 设定并激活忘语风格创作模式
+    description: Установка и активация режима творчества в стиле Ван Ю
   - id: wangyu-write
     file: commands/wangyu-write.md
-    description: 使用忘语风格创作章节
+    description: Создание глав в стиле Ван Ю
   - id: wangyu-analyze
     file: commands/wangyu-analyze.md
-    description: 分析现有文本是否符合忘语风格
+    description: Анализ соответствия существующего текста стилю Ван Ю
   - id: wangyu-enhance
     file: commands/wangyu-enhance.md
-    description: 将普通文本转换为忘语风格
+    description: Преобразование обычного текста в стиль Ван Ю
 experts:
   - id: wangyu-master
     file: experts/wangyu-master.md
-    title: 忘语风格大师
-    description: 深度掌握忘语创作精髓的仙侠小说专家
+    title: Мастер стиля Ван Ю
+    description: Эксперт в жанре сянься, глубоко постигший суть творчества Ван Ю
 dependencies:
   core: ">=0.5.0"
 features:
-  - style-templates      # 风格模板系统
-  - auto-detection      # 自动检测适用场景
-  - consistency-check   # 风格一致性检查
-  - smart-conversion    # 智能风格转换
-  - resource-system     # 资源稀缺性系统
-  - power-hierarchy     # 力量体系管理
-  - suspense-tracking   # 悬念伏笔追踪
+  - style-templates      # Система шаблонов стиля
+  - auto-detection      # Автоматическое определение применимых сценариев
+  - consistency-check   # Проверка соответствия стиля
+  - smart-conversion    # Интеллектуальное преобразование стиля
+  - resource-system     # Система дефицита ресурсов
+  - power-hierarchy     # Управление системой силы
+  - suspense-tracking   # Отслеживание интриг и зацепок
 installation:
   message: |
-    ✅ 忘语风格插件安装成功！
+    ✅ Плагин «Стиль Ван Ю» успешно установлен!
 
-    使用说明：
-    1. 使用 /wangyu-style 激活忘语风格模式
-    2. 使用 /wangyu-write 创作符合忘语风格的内容
-    3. 使用 /wangyu-analyze 分析文本风格
-    4. 使用 /wangyu-enhance 强化忘语风格特征
+    Инструкции по использованию:
+    1. Используйте /wangyu-style для активации режима стиля Ван Ю
+    2. Используйте /wangyu-write для создания контента в стиле Ван Ю
+    3. Используйте /wangyu-analyze для анализа стиля текста
+    4. Используйте /wangyu-enhance для усиления характерных черт стиля Ван Ю
 
-    专家模式：
-    - 使用 /expert wangyu-master 激活忘语风格大师
+    Режим эксперта:
+    - Используйте /expert wangyu-master для активации Мастера стиля Ван Ю
 
-    核心特征：
-    - 冷静客观的叙事风格
-    - 严谨的修仙世界观
-    - 谨慎务实的主角塑造
-    - 环环相扣的悬念设计
+    Основные особенности:
+    - Спокойный и объективный стиль повествования
+    - Строгая мировоззренческая система культивации
+    - Осторожное и прагматичное создание главного героя
+    - Захватывающий дизайн интриг с последовательными завязками
 
-    ⚠️ 提示：
-    - 本插件专为仙侠、玄幻类小说优化
-    - 建议配合 /track 命令追踪伏笔和悬念
-    - 可与其他写作方法（如英雄之旅）结合使用
+    ⚠️ Примечание:
+    - Этот плагин оптимизирован для романов в жанрах сянься и фэнтези
+    - Рекомендуется использовать совместно с командой /track для отслеживания зацепок и интриг
+    - Может использоваться в сочетании с другими методами письма (например, «Путешествие героя»)
+```

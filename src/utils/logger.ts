@@ -1,3 +1,4 @@
+```typescript
 import chalk from 'chalk'
 
 export const logger = {
@@ -23,3 +24,4 @@ export const logger = {
     }
   }
 }
+```

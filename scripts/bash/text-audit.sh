@@ -1,5 +1,6 @@
+```json
 #!/usr/bin/env bash
-# 文本人味自查（离线）：连接词/空话密度、句长统计、抽象词密度
+# Самостоятельная проверка текста на «человечность» (офлайн): плотность связующих слов/пустых фраз, статистика длины предложений, плотность абстрактных слов
 
 set -e
 
@@ -10,11 +11,11 @@ PROJECT_ROOT=$(get_project_root)
 
 FILE_PATH="$1"
 if [ -z "$FILE_PATH" ] || [ ! -f "$FILE_PATH" ]; then
-  echo "用法: scripts/bash/text-audit.sh <file>"
+  echo "Использование: scripts/bash/text-audit.sh <файл>"
   exit 1
 fi
 
-# 选择配置：优先项目 spec/knowledge，其次 .specify/templates/knowledge
+# Выбор конфигурации: приоритет spec/knowledge проекта, затем .specify/templates/knowledge
 CFG_PROJECT="$PROJECT_ROOT/spec/knowledge/audit-config.json"
 CFG_TEMPLATE="$PROJECT_ROOT/.specify/templates/knowledge/audit-config.json"
 if [ -f "$CFG_PROJECT" ]; then
@@ -102,43 +103,43 @@ def ratio(count):
   return (count / max(1,total_chars)) * 1000
 
 print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-print("📊 离线文本人味自查报告")
-print(f"文件: {os.path.basename(path)}  字符数: {total_chars}")
+print("📊 Отчёт самопроверки текста на «человечность» (офлайн)")
+print(f"Файл: {os.path.basename(path)}  Количество символов: {total_chars}")
 print("")
-print("连接词密度（每千字出现次数）")
+print("Плотность связующих слов (количество на тысячу символов)")
 total_conn = sum(connectors.values())
-print(f"  总计: {total_conn}  | 比率: {ratio(total_conn):.2f}")
+print(f"  Всего: {total_conn}  | Отношение: {ratio(total_conn):.2f}")
 for k,v in sorted(connectors.items(), key=lambda x: -x[1])[:10]:
   if v>0: print(f"  - {k}: {v}")
 
 print("")
-print("空话/套话计数")
+print("Количество пустых/шаблонных фраз")
 total_emp = sum(empties.values())
-print(f"  总计: {total_emp}  | 比率: {ratio(total_emp):.2f}")
+print(f"  Всего: {total_emp}  | Отношение: {ratio(total_emp):.2f}")
 for k,v in sorted(empties.items(), key=lambda x: -x[1])[:10]:
   if v>0: print(f"  - {k}: {v}")
 
 print("")
-print("句长统计")
-print(f"  句子数: {len(lens)}  | 平均: {avg:.1f}  | 标准差: {std:.1f}")
-print(f"  连续短句最大: {mx_run_short} (阈值 {cfg['sentence_length']['max_run_short']})")
-print(f"  连续长句最大: {mx_run_long} (阈值 {cfg['sentence_length']['max_run_long']})")
+print("Статистика длины предложений")
+print(f"  Количество предложений: {len(lens)}  | Среднее: {avg:.1f}  | Стандартное отклонение: {std:.1f}")
+print(f"  Макс. последовательность коротких предложений: {mx_run_short} (порог {cfg['sentence_length']['max_run_short']})")
+print(f"  Макс. последовательность длинных предложений: {mx_run_long} (порог {cfg['sentence_length']['max_run_long']})")
 
 print("")
-print("抽象过载（示例段，≥2 抽象词）")
+print("Абстрактная перегрузка (примеры фрагментов, ≥2 абстрактных слова)")
 if abstract_top:
   for idx, s in abstract_top:
     snippet = s[:80] + ("…" if len(s)>80 else "")
-    print(f"  - 第{idx+1}句: {snippet}")
+    print(f"  - Предложение №{idx+1}: {snippet}")
 else:
-  print("  无显著抽象过载片段")
+  print("  Нет значительных фрагментов с абстрактной перегрузкой")
 
 print("")
-print("建议")
-print("  - 用具体动作/器物/气味替代空话与抽象名词")
-print("  - 打断长长串句子；合并过多的短句以形成起伏")
-print("  - 复查连接词是否可删除或自然过渡")
-print("  - 写前先列3个生活细节作为锚点")
+print("Рекомендации")
+print("  - Заменяйте пустые фразы и абстрактные существительные конкретными действиями/предметами/запахами")
+print("  - Разбивайте слишком длинные предложения; объединяйте слишком короткие для создания ритмического разнообразия")
+print("  - Проверьте, можно ли удалить связующие слова или заменить их более естественными переходами")
+print("  - Перед написанием составьте список из 3 жизненных деталей в качестве опорных точек")
 print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 PY
-
+```

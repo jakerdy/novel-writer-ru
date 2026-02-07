@@ -1,3 +1,4 @@
+```json
 {
   "tools": {
     "core": [
@@ -39,8 +40,9 @@
   "extensions": {
     "novelWriter": {
       "enabled": true,
-      "description": "AI 驱动的中文小说创作工具",
+      "description": "Инструмент для создания китайских романов на базе ИИ",
       "commands": ".gemini/commands"
     }
   }
 }
+```

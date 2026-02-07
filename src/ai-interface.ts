@@ -1,3 +1,4 @@
+```typescript
 /**
  * AI 接口层
  * 为 AI 助手提供简化的功能调用接口
@@ -388,3 +389,4 @@ export class AIInterface {
  * 导出单例实例供 AI 直接使用
  */
 export const aiInterface = new AIInterface();
+```

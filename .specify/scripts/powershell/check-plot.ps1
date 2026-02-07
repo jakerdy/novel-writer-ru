@@ -1,5 +1,6 @@
+```powershell
 #!/usr/bin/env pwsh
-# 检查情节发展的一致性和连贯性（PowerShell）
+# Проверка согласованности и связности развития сюжета (PowerShell)
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -8,7 +9,7 @@ $ErrorActionPreference = 'Stop'
 
 $root = Get-ProjectRoot
 $storyDir = Get-CurrentStoryDir
-if (-not $storyDir) { throw "未找到故事项目（stories/*）" }
+if (-not $storyDir) { throw "Проект истории (stories/*) не найден" }
 
 $plotPath = Join-Path $storyDir "spec/tracking/plot-tracker.json"
 if (-not (Test-Path $plotPath)) { $plotPath = Join-Path $root "spec/tracking/plot-tracker.json" }
@@ -17,13 +18,13 @@ $progressPath = Join-Path $storyDir "progress.json"
 
 function Ensure-PlotTracker {
   if (-not (Test-Path $plotPath)) {
-    Write-Host "⚠️  未找到情节追踪文件，正在创建..."
+    Write-Host "⚠️  Файл отслеживания сюжета не найден, создается..."
     $tpl = Join-Path $root "templates/tracking/plot-tracker.json"
-    if (-not (Test-Path $tpl)) { throw "无法找到模板文件" }
+    if (-not (Test-Path $tpl)) { throw "Невозможно найти файл шаблона" }
     New-Item -ItemType Directory -Path (Split-Path $plotPath -Parent) -Force | Out-Null
     Copy-Item $tpl $plotPath -Force
   }
-  if (-not (Test-Path $outlinePath)) { throw "未找到章节大纲 outline.md，请先使用 /outline" }
+  if (-not (Test-Path $outlinePath)) { throw "Структура главы outline.md не найдена, используйте /outline" }
 }
 
 function Get-CurrentProgress {
@@ -39,27 +40,27 @@ function Get-CurrentProgress {
 }
 
 function Analyze-PlotAlignment {
-  Write-Host "📊 情节发展检查报告"
+  Write-Host "📊 Отчет о проверке развития сюжета"
   Write-Host "━━━━━━━━━━━━━━━━━━━━"
   $cur = Get-CurrentProgress
-  Write-Host "📍 当前进度：第$($cur.chapter)章（第$($cur.volume)卷）"
+  Write-Host "📍 Текущий прогресс: Глава $($cur.chapter) (Том $($cur.volume))"
 
   if (Test-Path $plotPath) {
     $j = Get-Content -LiteralPath $plotPath -Raw -Encoding UTF8 | ConvertFrom-Json
     $main = $j.plotlines.main
     $mainPlot = $main.currentNode
     $status = $main.status
-    Write-Host "📖 主线进度：$mainPlot [$status]"
+    Write-Host "📖 Прогресс основной линии: $mainPlot [$status]"
 
     $completed = @($main.completedNodes)
     Write-Host ""
-    Write-Host "✅ 已完成节点：$($completed.Count)个"
+    Write-Host "✅ Завершенные узлы: $($completed.Count) шт."
     $completed | ForEach-Object { Write-Host "  • $_" }
 
     $upcoming = @($main.upcomingNodes)
     if ($upcoming.Count -gt 0) {
       Write-Host ""
-      Write-Host "→ 接下来的节点："
+      Write-Host "→ Следующие узлы:"
       $upcoming | Select-Object -First 3 | ForEach-Object { Write-Host "  • $_" }
     }
     return @{ cur = $cur; json = $j }
@@ -68,7 +69,7 @@ function Analyze-PlotAlignment {
 
 function Check-Foreshadowing($state) {
   Write-Host ""
-  Write-Host "🎯 伏笔追踪"
+  Write-Host "🎯 Отслеживание зацепок"
   Write-Host "───────────"
   $j = $state.json
   $curCh = [int]$state.cur.chapter
@@ -76,49 +77,49 @@ function Check-Foreshadowing($state) {
   $total = $fs.Count
   $active = @($fs | Where-Object { $_.status -eq 'active' }).Count
   $resolved = @($fs | Where-Object { $_.status -eq 'resolved' }).Count
-  Write-Host "统计：总计${total}个，活跃${active}个，已回收${resolved}个"
+  Write-Host "Статистика: Всего ${total} шт., активно ${active} шт., разрешено ${resolved} шт."
 
   if ($active -gt 0) {
     Write-Host ""
-    Write-Host "⚠️ 待处理伏笔："
+    Write-Host "⚠️ Незавершенные зацепки:"
     $fs | Where-Object { $_.status -eq 'active' } | ForEach-Object {
       $ch = $_.planted.chapter
-      Write-Host "  • $($_.content)（第$ch章埋设）"
+      Write-Host "  • $($_.content) (Заложено в главе $ch)"
     }
   }
 
   $overdue = @($fs | Where-Object { $_.status -eq 'active' -and $_.planted.chapter -and ($curCh - [int]$_.planted.chapter) -gt 30 }).Count
-  if ($overdue -gt 0) { Write-Host ""; Write-Host "⚠️ 警告：有${overdue}个伏笔超过30章未处理" }
+  if ($overdue -gt 0) { Write-Host ""; Write-Host "⚠️ Предупреждение: ${overdue} зацепок не обрабатывались более 30 глав" }
 }
 
 function Check-Conflicts($state) {
   Write-Host ""
-  Write-Host "⚔️ 冲突追踪"
+  Write-Host "⚔️ Отслеживание конфликтов"
   Write-Host "───────────"
   $active = @($state.json.conflicts.active)
   $count = $active.Count
   if ($count -gt 0) {
-    Write-Host "当前活跃冲突：${count}个"
+    Write-Host "Активных конфликтов: ${count} шт."
     $active | ForEach-Object { Write-Host ("  • " + $_.name + " [" + $_.intensity + "]") }
-  } else { Write-Host "暂无活跃冲突" }
+  } else { Write-Host "Активных конфликтов нет" }
 }
 
 function Generate-Suggestions($state) {
   Write-Host ""
-  Write-Host "💡 建议"
+  Write-Host "💡 Предложения"
   Write-Host "───────"
   $ch = [int]$state.cur.chapter
-  if ($ch -lt 10) { Write-Host "• 前10章是关键，确保有足够的钩子吸引读者" }
-  elseif ($ch -lt 30) { Write-Host "• 接近第一个小高潮，检查冲突是否足够激烈" }
-  elseif (($ch % 60) -gt 50) { Write-Host "• 接近卷尾，准备高潮和悬念设置" }
+  if ($ch -lt 10) { Write-Host "• Первые 10 глав — ключевые, убедитесь, что есть достаточно крючков для привлечения читателя" }
+  elseif ($ch -lt 30) { Write-Host "• Приближается первый кульминационный момент, проверьте, достаточно ли напряжены конфликты" }
+  elseif (($ch % 60) -gt 50) { Write-Host "• Приближается конец тома, подготовьте кульминацию и задел на будущее" }
 
   $activeFo = @($state.json.foreshadowing | Where-Object { $_.status -eq 'active' }).Count
-  if ($activeFo -gt 5) { Write-Host "• 活跃伏笔较多，考虑在接下来几章回收部分" }
+  if ($activeFo -gt 5) { Write-Host "• Много активных зацепок, рассмотрите возможность разрешения некоторых в ближайших главах" }
   $activeConf = @($state.json.conflicts.active).Count
-  if ($activeConf -eq 0 -and $ch -gt 5) { Write-Host "• 当前无活跃冲突，考虑引入新的矛盾点" }
+  if ($activeConf -eq 0 -and $ch -gt 5) { Write-Host "• Текущих конфликтов нет, рассмотрите возможность введения новых точек напряжения" }
 }
 
-Write-Host "🔍 开始检查情节一致性..."
+Write-Host "🔍 Начинается проверка согласованности сюжета..."
 Write-Host ""
 Ensure-PlotTracker
 $st = Analyze-PlotAlignment
@@ -128,12 +129,12 @@ Generate-Suggestions $st
 
 Write-Host ""
 Write-Host "━━━━━━━━━━━━━━━━━━━━"
-Write-Host "✅ 检查完成"
+Write-Host "✅ Проверка завершена"
 
-# 更新时间戳
+# Обновление временной метки
 if (Test-Path $plotPath) {
   $json = Get-Content -LiteralPath $plotPath -Raw -Encoding UTF8 | ConvertFrom-Json
   $json.lastUpdated = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
   $json | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $plotPath -Encoding UTF8
 }
-
+```

@@ -1,6 +1,7 @@
+```javascript
 /**
- * Prompt 管理器
- * 核心安全组件：负责从服务端获取加密的 Prompt，在内存中解密使用，确保不持久化
+ * Менеджер промптов
+ * Основной компонент безопасности: отвечает за получение зашифрованных промптов с сервера, их расшифровку в памяти и обеспечение отсутствия их сохранения
  */
 
 import { apiClient } from './api-client.js';
@@ -12,16 +13,16 @@ export class PromptManager {
     this.decryptor = new Decryptor();
     this.templateEngine = new TemplateEngine();
 
-    // 不使用持久化缓存，仅内存临时存储
+    // Не используется кэширование с сохранением, только временное хранение в памяти
     this.memoryCache = new Map();
 
-    // 设置内存清理定时器
+    // Запуск таймера очистки памяти
     this.startMemoryCleaner();
   }
 
   /**
-   * 使用 Prompt 模板生成内容
-   * 整个过程确保 Prompt 仅在内存中，用完即清理
+   * Генерация контента с использованием шаблона промпта
+   * Весь процесс обеспечивает, что промпт находится только в памяти и очищается после использования
    */
   async usePrompt(sessionId, apiKey = null) {
     let decryptedPrompt = null;
@@ -29,30 +30,30 @@ export class PromptManager {
     let encryptedData = null;
 
     try {
-      // 设置 API Key（如果提供）
+      // Установка API Key (если предоставлен)
       if (apiKey) {
         apiClient.setApiKey(apiKey);
       }
 
-      // 步骤 1: 获取会话信息
-      console.log('📋 获取会话信息...');
+      // Шаг 1: Получение информации о сессии
+      console.log('📋 Получение информации о сессии...');
       const session = await apiClient.getSession(sessionId);
 
       if (!session) {
-        throw new Error('会话不存在或已过期');
+        throw new Error('Сессия не существует или истекла');
       }
 
-      // 检查会话是否过期
+      // Проверка истечения срока действия сессии
       if (new Date(session.expiresAt) < new Date()) {
-        throw new Error('会话已过期，请在 Web 端重新生成');
+        throw new Error('Сессия истекла, пожалуйста, сгенерируйте новую в веб-интерфейсе');
       }
 
-      // 步骤 2: 获取加密的 Prompt
-      console.log('🔐 获取加密模板...');
+      // Шаг 2: Получение зашифрованного промпта
+      console.log('🔐 Получение зашифрованного шаблона...');
       encryptedData = await apiClient.getEncryptedPrompt(sessionId);
 
-      // 步骤 3: 内存中解密
-      console.log('🔓 解密模板中...');
+      // Шаг 3: Расшифровка в памяти
+      console.log('🔓 Расшифровка шаблона...');
       decryptedPrompt = await this.decryptInMemory(
         {
           encrypted: encryptedData.encryptedPrompt,
@@ -62,18 +63,18 @@ export class PromptManager {
         encryptedData.sessionKey
       );
 
-      // 步骤 4: 填充参数
-      console.log('📝 填充参数中...');
+      // Шаг 4: Заполнение параметров
+      console.log('📝 Заполнение параметров...');
       filledPrompt = this.templateEngine.fill(
         decryptedPrompt,
         encryptedData.parameters
       );
 
-      // 步骤 5: 记录使用（不含敏感内容）
+      // Шаг 5: Запись использования (без конфиденциального содержимого)
       const startTime = Date.now();
 
-      // 步骤 6: 返回填充后的 Prompt（供 AI 使用）
-      // 注意：这里返回后，调用方应立即使用并清理
+      // Шаг 6: Возврат заполненного промпта (для использования ИИ)
+      // Примечание: после возврата вызывающий код должен немедленно использовать и очистить его
       return {
         prompt: filledPrompt,
         metadata: {
@@ -85,12 +86,12 @@ export class PromptManager {
       };
 
     } finally {
-      // 步骤 7: 强制清理内存中的敏感数据
+      // Шаг 7: Принудительная очистка конфиденциальных данных из памяти
       this.clearSensitiveData(decryptedPrompt);
       this.clearSensitiveData(filledPrompt);
       this.clearSensitiveData(encryptedData);
 
-      // 触发垃圾回收（如果可用）
+      // Запуск сборщика мусора (если доступен)
       if (global.gc) {
         global.gc();
       }
@@ -98,49 +99,49 @@ export class PromptManager {
   }
 
   /**
-   * 在内存中解密 Prompt
-   * 不写入任何文件或日志
+   * Расшифровка промпта в памяти
+   * Не записывает в файлы или логи
    */
   async decryptInMemory(encryptedPrompt, sessionKey) {
-    // 使用临时变量，确保不持久化
+    // Использование временных переменных для обеспечения отсутствия сохранения
     let decrypted = null;
 
     try {
-      // 检查内存限制
+      // Проверка ограничений памяти
       this.checkMemoryUsage();
 
-      // 执行解密
+      // Выполнение расшифровки
       decrypted = await this.decryptor.decrypt(encryptedPrompt, sessionKey);
 
-      // 验证解密结果
+      // Проверка результата расшифровки
       if (!decrypted || typeof decrypted !== 'string') {
-        throw new Error('解密失败：无效的结果');
+        throw new Error('Ошибка расшифровки: неверный результат');
       }
 
-      // 立即返回，不存储
+      // Немедленный возврат, без сохранения
       return decrypted;
 
     } catch (error) {
-      // 错误处理时也要清理
+      // Очистка при ошибке также необходима
       this.clearSensitiveData(decrypted);
-      throw new Error(`解密失败: ${error.message}`);
+      throw new Error(`Ошибка расшифровки: ${error.message}`);
     }
   }
 
   /**
-   * 清理敏感数据
-   * JavaScript 无法真正覆写内存，但可以尽快释放引用
+   * Очистка конфиденциальных данных
+   * JavaScript не может по-настоящему перезаписать память, но может как можно скорее освободить ссылки
    */
   clearSensitiveData(data) {
     if (!data) return;
 
     try {
       if (typeof data === 'string') {
-        // 对于字符串，创建新的空字符串并释放原引用
+        // Для строк: создание новой пустой строки и освобождение старой ссылки
         data = '';
         data = null;
       } else if (typeof data === 'object') {
-        // 对于对象，清理所有属性
+        // Для объектов: очистка всех свойств
         Object.keys(data).forEach(key => {
           if (typeof data[key] === 'string') {
             data[key] = '';
@@ -151,26 +152,26 @@ export class PromptManager {
         data = null;
       }
     } catch (e) {
-      // 忽略清理错误
+      // Игнорирование ошибок очистки
     }
   }
 
   /**
-   * 检查内存使用情况
-   * 防止内存泄漏
+   * Проверка использования памяти
+   * Предотвращение утечек памяти
    */
   checkMemoryUsage() {
     const usage = process.memoryUsage();
     const heapUsedMB = usage.heapUsed / 1024 / 1024;
 
-    // 如果堆内存超过 100MB，发出警告
+    // Если использование кучи превышает 100 МБ, выдать предупреждение
     if (heapUsedMB > 100) {
-      console.warn(`⚠️ 内存使用较高: ${heapUsedMB.toFixed(2)} MB`);
+      console.warn(`⚠️ Высокое использование памяти: ${heapUsedMB.toFixed(2)} МБ`);
 
-      // 清理内存缓存
+      // Очистка кэша памяти
       this.clearMemoryCache();
 
-      // 强制垃圾回收
+      // Принудительный сбор мусора
       if (global.gc) {
         global.gc();
       }
@@ -178,10 +179,10 @@ export class PromptManager {
   }
 
   /**
-   * 清理内存缓存
+   * Очистка кэша памяти
    */
   clearMemoryCache() {
-    // 清理所有缓存项
+    // Очистка всех элементов кэша
     for (const [key, value] of this.memoryCache) {
       this.clearSensitiveData(value);
     }
@@ -189,15 +190,15 @@ export class PromptManager {
   }
 
   /**
-   * 启动内存清理定时器
-   * 定期清理未使用的内存
+   * Запуск таймера очистки памяти
+   * Периодическая очистка неиспользуемой памяти
    */
   startMemoryCleaner() {
-    // 每分钟检查一次
+    // Проверка каждую минуту
     setInterval(() => {
       const now = Date.now();
 
-      // 清理超过 5 分钟的缓存
+      // Очистка кэша, которому более 5 минут
       for (const [key, value] of this.memoryCache) {
         if (value.timestamp && now - value.timestamp > 5 * 60 * 1000) {
           this.clearSensitiveData(value);
@@ -205,42 +206,42 @@ export class PromptManager {
         }
       }
 
-      // 检查内存使用
+      // Проверка использования памяти
       this.checkMemoryUsage();
     }, 60 * 1000);
   }
 
   /**
-   * 验证会话权限
-   * 确保用户只能访问自己的会话
+   * Проверка доступа к сессии
+   * Гарантия того, что пользователь может получить доступ только к своим сессиям
    */
   async validateAccess(sessionId, userId) {
-    // 这里可以添加额外的权限验证逻辑
+    // Здесь можно добавить дополнительную логику проверки разрешений
     const session = await apiClient.getSession(sessionId);
 
     if (!session) {
-      throw new Error('会话不存在');
+      throw new Error('Сессия не существует');
     }
 
-    // 验证会话所有者
+    // Проверка владельца сессии
     if (session.userId && session.userId !== userId) {
-      throw new Error('无权访问此会话');
+      throw new Error('Нет доступа к этой сессии');
     }
 
     return true;
   }
 
   /**
-   * 获取 Prompt 元数据（不含实际内容）
-   * 用于显示模板信息
+   * Получение метаданных промпта (без фактического содержимого)
+   * Для отображения информации о шаблоне
    */
   async getPromptMetadata(templateId) {
-    // 只返回元数据，不返回实际 Prompt
+    // Возвращаются только метаданные, фактическое содержимое промпта не возвращается
     const templates = await apiClient.getTemplates();
     const template = templates.find(t => t.id === templateId);
 
     if (!template) {
-      throw new Error('模板不存在');
+      throw new Error('Шаблон не существует');
     }
 
     return {
@@ -249,13 +250,13 @@ export class PromptManager {
       description: template.description,
       category: template.category,
       parameters: template.parameters,
-      // 不包含实际的 Prompt 内容
+      // фактическое содержимое промпта не включено
     };
   }
 
   /**
-   * 预检查
-   * 在实际使用前检查各项条件
+   * Предварительная проверка
+   * Проверка всех условий перед фактическим использованием
    */
   async preCheck(sessionId) {
     const checks = {
@@ -266,19 +267,19 @@ export class PromptManager {
     };
 
     try {
-      // 检查会话
+      // Проверка сессии
       const session = await apiClient.getSession(sessionId);
       checks.session = !!session && new Date(session.expiresAt) > new Date();
 
-      // 检查认证
+      // Проверка аутентификации
       checks.auth = !!apiClient.token;
 
-      // 检查内存
+      // Проверка памяти
       const usage = process.memoryUsage();
-      checks.memory = usage.heapUsed < 200 * 1024 * 1024; // < 200MB
+      checks.memory = usage.heapUsed < 200 * 1024 * 1024; // < 200 МБ
 
-      // 检查网络
-      checks.network = true; // 已经通过获取会话验证
+      // Проверка сети
+      checks.network = true; // Уже проверено при получении сессии
 
       return checks;
     } catch (error) {
@@ -287,26 +288,26 @@ export class PromptManager {
   }
 
   /**
-   * 安全执行
-   * 包装执行过程，确保安全和清理
+   * Безопасное выполнение
+   * Обертка процесса выполнения для обеспечения безопасности и очистки
    */
   async safeExecute(fn) {
     const sensitiveData = [];
 
     try {
-      // 注册清理函数
+      // Регистрация функции очистки
       const registerForCleanup = (data) => {
         sensitiveData.push(data);
         return data;
       };
 
-      // 执行函数
+      // Выполнение функции
       const result = await fn(registerForCleanup);
 
       return result;
 
     } finally {
-      // 无论成功或失败，都清理敏感数据
+      // Очистка конфиденциальных данных независимо от успеха или неудачи
       for (const data of sensitiveData) {
         this.clearSensitiveData(data);
       }
@@ -315,5 +316,6 @@ export class PromptManager {
   }
 }
 
-// 导出单例
+// Экспорт синглтона
 export const promptManager = new PromptManager();
+```

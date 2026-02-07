@@ -1,5 +1,6 @@
+```powershell
 #!/usr/bin/env pwsh
-# 风格管理器（PowerShell）- 参考 Bash 版完整实现
+# Менеджер стилей (PowerShell) — полная реализация, основанная на версии Bash
 
 param(
   [string]$Mode = "init"
@@ -9,7 +10,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 function Get-ProjectRoot {
-  # 从当前目录向上查找包含 .specify/config.json 的目录
+  # Ищет корневой каталог проекта, содержащий .specify/config.json, поднимаясь от текущего каталога
   $current = (Get-Location).Path
   while ($true) {
     $cfg = Join-Path $current ".specify/config.json"
@@ -18,7 +19,7 @@ function Get-ProjectRoot {
     if (-not $parent -or $parent -eq $current) { break }
     $current = $parent
   }
-  throw "未找到小说项目根目录（缺少 .specify/config.json）"
+  throw "Не удалось найти корневой каталог проекта (отсутствует .specify/config.json)"
 }
 
 function Ensure-Dir($path) {
@@ -52,11 +53,11 @@ function Integrate-PersonalVoice([string]$constitutionFile) {
   $lines = Get-Content -LiteralPath $pvFile -Encoding UTF8
   $out = @()
   $out += ""
-  $out += "## 个人语料摘要（自动引用）"
-  $out += "来源：.specify/memory/personal-voice.md"
+  $out += "## Сводка личных материалов (автоматическая ссылка)"
+  $out += "Источник: .specify/memory/personal-voice.md"
   $out += ""
 
-  # 模拟 Bash 版：取若干个 H2 的前2条列表项
+  # Имитация версии Bash: берём первые 2 элемента из нескольких заголовков H2
   $countSections = 0
   $take = 2
   $inSection = $false
@@ -81,9 +82,9 @@ function Integrate-PersonalVoice([string]$constitutionFile) {
   }
 
   $constText = if (Test-Path $constitutionFile) { Get-Content -LiteralPath $constitutionFile -Raw -Encoding UTF8 } else { "" }
-  if ($constText -notmatch '个人语料摘要（自动引用）') {
+  if ($constText -notmatch 'Сводка личных материалов (автоматическая ссылка)') {
     Add-Content -LiteralPath $constitutionFile -Value ($out -join "`n") -Encoding UTF8
-    Write-Host "    ✅ 已引用个人语料摘要"
+    Write-Host "    ✅ Сводка личных материалов импортирована"
   }
 }
 
@@ -92,11 +93,11 @@ function Sync-PersonalBaseline([string]$constitutionFile) {
   if (-not (Test-Path $pvFile)) { return }
 
   $sections = @(
-    @{ title='口头禅与常用表达'; label='口头禅与常用表达'; take=6 },
-    @{ title='固定句式与节奏偏好'; label='固定句式与节奏偏好'; take=6 },
-    @{ title='行业/地域词汇（口音、俚语、术语）'; label='行业/地域词汇'; take=6 },
-    @{ title='比喻口味与意象库'; label='比喻与意象'; take=8 },
-    @{ title='写作忌口与避讳'; label='写作忌口'; take=6 }
+    @{ title='Коронные фразы и часто используемые выражения'; label='Коронные фразы и выражения'; take=6 },
+    @{ title='Стандартные фразы и предпочтения в ритме'; label='Стандартные фразы и ритм'; take=6 },
+    @{ title='Отраслевая/региональная лексика (акцент, сленг, терминология)'; label='Отраслевая/региональная лексика'; take=6 },
+    @{ title='Предпочтения в метафорах и библиотека образов'; label='Метафоры и образы'; take=8 },
+    @{ title='Писательские табу и ограничения'; label='Писательские табу'; take=6 }
   )
 
   $lines = Get-Content -LiteralPath $pvFile -Encoding UTF8
@@ -114,8 +115,8 @@ function Sync-PersonalBaseline([string]$constitutionFile) {
 
   $block = @()
   $block += "<!-- BEGIN: PERSONAL_BASELINE_AUTO -->"
-  $block += "## 个人表达基线（自动同步）"
-  $block += "来源：.specify/memory/personal-voice.md（只读镜像，修改请在源文件）"
+  $block += "## Линейка личного стиля (автоматическая синхронизация)"
+  $block += "Источник: .specify/memory/personal-voice.md (только для чтения, редактируйте исходный файл)"
   $block += ""
   foreach ($sec in $sections) {
     $block += "### $($sec.label)"
@@ -133,11 +134,11 @@ function Sync-PersonalBaseline([string]$constitutionFile) {
     $constText += $blockText
   }
   Set-Content -LiteralPath $constitutionFile -Value $constText -Encoding UTF8
-  Write-Host "    ✅ 已同步个人表达基线"
+  Write-Host "    ✅ Линейка личного стиля синхронизирована"
 }
 
 function Init-Style {
-  Write-Host "📝 初始化创作风格..."
+  Write-Host "📝 Инициализация стиля письма..."
   $constitution = Join-Path $MemoryDir "writing-constitution.md"
   $template = Join-Path $ProjectRoot ".specify/templates/writing-constitution-template.md"
   Ensure-File $constitution $template
@@ -145,7 +146,7 @@ function Init-Style {
   Sync-PersonalBaseline $constitution
   Write-Host "CONSTITUTION_FILE: $constitution"
   Write-Host "STATUS: ready"
-  Write-Host "✅ 创作风格初始化完成"
+  Write-Host "✅ Инициализация стиля письма завершена"
 }
 
 function Append-Lines($path, [string[]]$lines) {
@@ -156,53 +157,53 @@ function Append-Lines($path, [string[]]$lines) {
 
 function Process-StyleSuggestions($data) {
   if (-not $data.suggestions -or -not $data.suggestions.style) { return }
-  Write-Host "  📝 处理风格建议..."
+  Write-Host "  📝 Обработка предложений по стилю..."
   $items = $data.suggestions.style.items
   if (-not $items) { return }
   $constitution = Join-Path $MemoryDir "writing-constitution.md"
   $hdr = @()
   $date = (Get-Date -Format 'yyyy-MM-dd')
   $hdr += ""
-  $hdr += "## 外部建议优化 ($date)"
+  $hdr += "## Оптимизация стиля от внешних источников ($date)"
   $hdr += ""
   $body = @()
   foreach ($it in $items) {
-    $body += "### $($it.type ?? '未分类')"
-    $body += "- **问题**：$($it.current)"
-    $body += "- **建议**：$($it.suggestion)"
-    $body += "- **预期效果**：$($it.impact)"
+    $body += "### $($it.type ?? 'Без категории')"
+    $body += "- **Проблема**：$($it.current)"
+    $body += "- **Предложение**：$($it.suggestion)"
+    $body += "- **Ожидаемый эффект**：$($it.impact)"
     $body += ""
   }
   Append-Lines $constitution ($hdr + $body)
-  Write-Host "    ✅ 已更新创作准则"
+  Write-Host "    ✅ Руководство по стилю обновлено"
 }
 
 function Process-CharacterSuggestions($data) {
   if (-not $data.suggestions -or -not $data.suggestions.characters) { return }
-  Write-Host "  👥 处理角色建议..."
+  Write-Host "  👥 Обработка предложений по персонажам..."
   $items = $data.suggestions.characters.items
   if (-not $items) { return }
   $profiles = Join-Path $KnowledgeDir "character-profiles.md"
   if (-not (Test-Path $profiles)) { return }
   $date = (Get-Date -Format 'yyyy-MM-dd')
-  $lines = @("", "## 角色优化建议 ($date)", "")
+  $lines = @("", "## Предложения по оптимизации персонажей ($date)", "")
   foreach ($it in $items) {
-    $lines += "### $($it.character ?? '未知角色')"
-    $lines += "- **问题**：$($it.issue)"
-    $lines += "- **建议**：$($it.suggestion)"
-    $lines += "- **发展曲线**：$($it.development_curve)"
+    $lines += "### $($it.character ?? 'Неизвестный персонаж')"
+    $lines += "- **Проблема**：$($it.issue)"
+    $lines += "- **Предложение**：$($it.suggestion)"
+    $lines += "- **Кривая развития**：$($it.development_curve)"
     if ($it.chapters_affected) {
-      $lines += "- **影响章节**：$((@($it.chapters_affected) -join ', '))"
+      $lines += "- **Затронутые главы**：$((@($it.chapters_affected) -join ', '))"
     }
     $lines += ""
   }
   Append-Lines $profiles $lines
-  Write-Host "    ✅ 已更新角色档案"
+  Write-Host "    ✅ Профили персонажей обновлены"
 }
 
 function Process-PlotSuggestions($data) {
   if (-not $data.suggestions -or -not $data.suggestions.plot) { return }
-  Write-Host "  📖 处理情节建议..."
+  Write-Host "  📖 Обработка предложений по сюжету..."
   $file = Join-Path $TrackingDir "plot-tracker.json"
   if (-not (Test-Path $file)) { return }
   $tracker = Get-Content -LiteralPath $file -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -219,48 +220,48 @@ function Process-PlotSuggestions($data) {
     }
   }
   $tracker | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $file -Encoding UTF8
-  Write-Host "    ✅ 已更新情节追踪器"
+  Write-Host "    ✅ Трекер сюжета обновлен"
 }
 
 function Process-WorldSuggestions($data) {
   if (-not $data.suggestions -or -not $data.suggestions.worldbuilding) { return }
-  Write-Host "  🌍 处理世界观建议..."
+  Write-Host "  🌍 Обработка предложений по мироустройству..."
   $items = $data.suggestions.worldbuilding.items
   if (-not $items) { return }
   $file = Join-Path $KnowledgeDir "world-setting.md"
   if (-not (Test-Path $file)) { return }
   $date = (Get-Date -Format 'yyyy-MM-dd')
-  $lines = @("", "## 世界观完善建议 ($date)", "")
+  $lines = @("", "## Предложения по улучшению мироустройства ($date)", "")
   foreach ($it in $items) {
-    $lines += "### $($it.aspect ?? '未分类')"
-    $lines += "- **问题**：$($it.issue)"
-    $lines += "- **建议**：$($it.suggestion)"
+    $lines += "### $($it.aspect ?? 'Без категории')"
+    $lines += "- **Проблема**：$($it.issue)"
+    $lines += "- **Предложение**：$($it.suggestion)"
     if ($it.reference_chapters) {
       $lines += "- **参考章节**：$((@($it.reference_chapters) -join ', '))"
     }
     $lines += ""
   }
   Append-Lines $file $lines
-  Write-Host "    ✅ 已更新世界观设定"
+  Write-Host "    ✅ Настройки мира обновлены"
 }
 
 function Process-DialogueSuggestions($data) {
   if (-not $data.suggestions -or -not $data.suggestions.dialogue) { return }
-  Write-Host "  💬 处理对话建议..."
+  Write-Host "  💬 Обработка предложений по диалогам..."
   $items = $data.suggestions.dialogue.items
   if (-not $items) { return }
   $file = Join-Path $KnowledgeDir "character-voices.md"
   if (-not (Test-Path $file)) {
-    Set-Content -LiteralPath $file -Value "# 角色语言规范`n`n## 通用原则`n" -Encoding UTF8
+    Set-Content -LiteralPath $file -Value "# Языковые нормы персонажей`n`n## Общие принципы`n" -Encoding UTF8
   }
   $date = (Get-Date -Format 'yyyy-MM-dd')
-  $lines = @("", "## 对话优化建议 ($date)", "")
+  $lines = @("", "## Предложения по улучшению диалогов ($date)", "")
   foreach ($it in $items) {
-    $lines += "### $($it.character ?? '通用')"
-    $lines += "- **问题**：$($it.issue)"
-    $lines += "- **建议**：$($it.suggestion)"
+    $lines += "### $($it.character ?? 'Общее')"
+    $lines += "- **Проблема**：$($it.issue)"
+    $lines += "- **Предложение**：$($it.suggestion)"
     if ($it.examples -and $it.alternatives) {
-      $lines += "- **替换示例："
+      $lines += "- **Примеры замены:"
       for ($i=0; $i -lt $it.examples.Count; $i++) {
         $ex = $it.examples[$i]
         $alt = if ($i -lt $it.alternatives.Count) { $it.alternatives[$i] } else { $null }
@@ -270,14 +271,14 @@ function Process-DialogueSuggestions($data) {
     $lines += ""
   }
   Append-Lines $file $lines
-  Write-Host "    ✅ 已更新角色语言规范"
+  Write-Host "    ✅ Языковые нормы персонажей обновлены"
 }
 
 function Parse-JsonSuggestions([string]$jsonText) {
-  try { $data = $jsonText | ConvertFrom-Json } catch { throw "JSON格式无效" }
+  try { $data = $jsonText | ConvertFrom-Json } catch { throw "Неверный формат JSON" }
   $source = if ($data.source) { $data.source } else { 'Unknown' }
   $date = if ($data.analysis_date) { $data.analysis_date } else { (Get-Date -Format 'yyyy-MM-dd') }
-  Write-Host "📊 解析来自 $source 的建议 ($date)"
+  Write-Host "📊 Анализ предложений от $source ($date)"
   Process-StyleSuggestions $data
   Process-CharacterSuggestions $data
   Process-PlotSuggestions $data
@@ -286,49 +287,51 @@ function Parse-JsonSuggestions([string]$jsonText) {
 }
 
 function Parse-MarkdownSuggestions([string]$md) {
-  Write-Host "📊 解析Markdown格式建议..."
-  # 简化：提取“写作风格建议”与“角色优化建议”两个区块
+  Write-Host "📊 Анализ предложений в формате Markdown..."
+  # Упрощенно: извлекаем блоки "Предложения по стилю письма" и "Предложения по оптимизации персонажей"
   $constitution = Join-Path $MemoryDir "writing-constitution.md"
   $profiles = Join-Path $KnowledgeDir "character-profiles.md"
   $date = (Get-Date -Format 'yyyy-MM-dd')
 
   if ($md -match "## 写作风格建议") {
-    $lines = @("", "## 外部建议优化 ($date)", "")
+    $lines = @("", "## Оптимизация стиля от внешних источников ($date)", "")
     $segment = ($md -split "## 写作风格建议")[1]
     if ($segment) { $segment = ($segment -split "\n## ")[0] }
     if ($segment) { $lines += ($segment.TrimEnd()).Split("`n") }
     Append-Lines $constitution $lines
-    Write-Host "    ✅ 已更新创作准则"
+    Write-Host "    ✅ Руководство по стилю обновлено"
   }
 
   if ((Test-Path $profiles) -and ($md -match "## 角色优化建议")) {
-    $lines = @("", "## 外部优化建议 ($date)", "")
+    $lines = @("", "## Внешние предложения по оптимизации ($date)", "")
     $segment = ($md -split "## 角色优化建议")[1]
     if ($segment) { $segment = ($segment -split "\n## ")[0] }
     if ($segment) { $lines += ($segment.TrimEnd()).Split("`n") }
     Append-Lines $profiles $lines
-    Write-Host "    ✅ 已更新角色档案"
+    Write-Host "    ✅ Профили персонажей обновлены"
   }
 }
 
 function Update-ImprovementLog([string]$source, [string]$summary) {
   $log = Join-Path $KnowledgeDir "improvement-log.md"
   if (-not (Test-Path $log)) {
-    Set-Content -LiteralPath $log -Value "# 改进建议历史`n`n记录所有外部AI建议和采纳情况。`n" -Encoding UTF8
+    Set-Content -LiteralPath $log -Value "# Журнал улучшений`n`nЗаписывает все внешние предложения ИИ и информацию об их принятии.`n" -Encoding UTF8
   }
   $lines = @()
   $lines += ""
-  $lines += "## $(Get-Date -Format 'yyyy-MM-dd') - $source"
+```
+```powershell
+  $lines += "$(Get-Date -Format 'yyyy-MM-dd') - $source"
   $lines += ""
-  $lines += "### 建议摘要"
+  $lines += "### Сводка предложений"
   $lines += $summary
   $lines += ""
-  $lines += "### 采纳状态"
-  $lines += "- [x] 已自动整合到规范文件"
-  $lines += "- [ ] 待人工审核确认"
-  $lines += "- [ ] 待实施修订"
+  $lines += "### Статус принятия"
+  $lines += "- [x] Автоматически интегрировано в файл спецификаций"
+  $lines += "- [ ] Ожидает ручной проверки"
+  $lines += "- [ ] Ожидает внедрения исправлений"
   $lines += ""
-  $lines += "### 影响文件"
+  $lines += "### Затронутые файлы"
   $lines += "- writing-constitution.md"
   if (Test-Path (Join-Path $KnowledgeDir "character-profiles.md")) { $lines += "- character-profiles.md" }
   if (Test-Path (Join-Path $TrackingDir "plot-tracker.json")) { $lines += "- plot-tracker.json" }
@@ -340,45 +343,45 @@ function Update-ImprovementLog([string]$source, [string]$summary) {
 }
 
 function Refine-Style {
-  Write-Host "🔄 开始整合外部建议..."
+  Write-Host "🔄 Начинаем интеграцию внешних предложений..."
   $text = $null
-  # 读取管道或参数
+  # Чтение из конвейера или параметров
   if ($MyInvocation.ExpectingInput) {
     $text = ($input | Out-String)
   } elseif ($args.Count -gt 0) {
     $text = [string]::Join(' ', $args)
   }
-  if (-not $text -or [string]::IsNullOrWhiteSpace($text)) { throw "请提供建议内容" }
+  if (-not $text -or [string]::IsNullOrWhiteSpace($text)) { throw "Необходимо предоставить содержание предложений" }
 
   $isJson = ($text -match '"version"') -and ($text -match '"suggestions"')
   if ($isJson) {
-    Write-Host "检测到JSON格式"
+    Write-Host "Обнаружен формат JSON"
     Parse-JsonSuggestions $text
-    Update-ImprovementLog "外部AI" "已处理JSON格式建议"
+    Update-ImprovementLog "Внешний ИИ" "Обработаны предложения в формате JSON"
   } elseif ($text -match '# 小说创作建议报告') {
-    Write-Host "检测到Markdown格式"
+    Write-Host "Обнаружен формат Markdown"
     Parse-MarkdownSuggestions $text
-    Update-ImprovementLog "外部AI" "已处理Markdown格式建议"
+    Update-ImprovementLog "Внешний ИИ" "Обработаны предложения в формате Markdown"
   } else {
-    throw "无法识别建议格式。请使用标准JSON或Markdown格式（参考 docs/ai-suggestion-prompt-template.md）"
+    throw "Не удалось распознать формат предложений. Пожалуйста, используйте стандартный JSON или Markdown (см. docs/ai-suggestion-prompt-template.md)"
   }
 
   Write-Host ""
-  Write-Host "✅ 建议整合完成"
+  Write-Host "✅ Интеграция предложений завершена"
   Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-  Write-Host "📊 整合报告："
-  # 简化统计：列出近 2 分钟内修改的文件数
+  Write-Host "📊 Отчет об интеграции:"
+  # Упрощенная статистика: количество файлов, измененных за последние 2 минуты
   $changed = Get-ChildItem $MemoryDir, $KnowledgeDir, $TrackingDir -Recurse -ErrorAction SilentlyContinue |
     Where-Object { $_.LastWriteTime -gt (Get-Date).AddMinutes(-2) }
-  Write-Host "  - 更新文件：$($changed.Count) 个"
-  Write-Host "  - 建议来源：外部AI分析"
-  Write-Host "  - 处理时间：$(Get-Date -Format 'HH:mm:ss')"
+  Write-Host "  - Обновлено файлов: $($changed.Count) шт."
+  Write-Host "  - Источник предложений: Анализ внешнего ИИ"
+  Write-Host "  - Время обработки: $(Get-Date -Format 'HH:mm:ss')"
   Write-Host ""
 }
 
 switch ($Mode.ToLower()) {
   'init'   { Init-Style }
   'refine' { Refine-Style }
-  default  { throw "未知模式：$Mode（可用：init, refine）" }
+  default  { throw "Неизвестный режим: $Mode (доступные: init, refine)" }
 }
-
+```

@@ -1,5 +1,6 @@
+```powershell
 #!/usr/bin/env pwsh
-# 角色关系管理（PowerShell）
+# Управление отношениями персонажей (PowerShell)
 
 param(
   [ValidateSet('show','update','history','check')]
@@ -31,22 +32,22 @@ if ($storyDir -and (Test-Path (Join-Path $storyDir 'spec/tracking/relationships.
   New-Item -ItemType Directory -Path (Split-Path $dest -Parent) -Force | Out-Null
   if (Test-Path $tpl1) { Copy-Item $tpl1 $dest -Force; $relPath = $dest }
   elseif (Test-Path $tpl2) { Copy-Item $tpl2 $dest -Force; $relPath = $dest }
-  else { throw '未找到 relationships.json，且无法从模板创建' }
+  else { throw 'Не найден relationships.json, и невозможно создать из шаблона' }
 }
 
-function Show-Header { Write-Host "👥 角色关系管理"; Write-Host "━━━━━━━━━━━━━━━━━━━━" }
+function Show-Header { Write-Host "👥 Управление отношениями персонажей"; Write-Host "━━━━━━━━━━━━━━━━━━━━" }
 
 function Show-Relations {
   Show-Header
-  try { $j = Get-Content -LiteralPath $relPath -Raw -Encoding UTF8 | ConvertFrom-Json } catch { throw 'relationships.json 格式无效' }
-  Write-Host "文件：$relPath"; Write-Host ''
+  try { $j = Get-Content -LiteralPath $relPath -Raw -Encoding UTF8 | ConvertFrom-Json } catch { throw 'Неверный формат relationships.json' }
+  Write-Host "Файл: $relPath"; Write-Host ''
   $main = $j.characters.PSObject.Properties.Name | Select-Object -First 1
-  if (-not $main) { Write-Host '无角色记录'; return }
-  Write-Host "主角：$main"
+  if (-not $main) { Write-Host 'Нет записей о персонажах'; return }
+  Write-Host "Главный герой: $main"
   $c = $j.characters.$main
   $r = if ($c.relationships) { $c.relationships } else { $c }
   $map = @{
-    romantic = '💕 爱慕'; allies='🤝 盟友'; mentors='📚 导师'; enemies='⚔️ 敌对'; family='👪 家人'; neutral='・ 关系'
+    romantic = '💕 Любовные'; allies='🤝 Союзники'; mentors='📚 Наставники'; enemies='⚔️ Враги'; family='👪 Семья'; neutral='・ Нейтральные'
   }
   foreach ($k in 'romantic','allies','mentors','enemies','family','neutral') {
     $lst = @($r.$k)
@@ -54,12 +55,12 @@ function Show-Relations {
   }
   Write-Host ''
   if ($j.history) {
-    Write-Host '最近变化：'
+    Write-Host 'Последние изменения:'
     $last = $j.history[-1]
     if ($last) { $last.changes | ForEach-Object { Write-Host ("- " + ($_.characters -join '↔') + "：" + ($_.relation ?? $_.type)) } }
   } elseif ($j.relationshipChanges) {
-    Write-Host '最近变化：'
-    $j.relationshipChanges | Select-Object -Last 5 | ForEach-Object { Write-Host ("- " + ($_.type ?? '变化') + ": " + ($_.characters -join '↔')) }
+    Write-Host 'Последние изменения:'
+    $j.relationshipChanges | Select-Object -Last 5 | ForEach-Object { Write-Host ("- " + ($_.type ?? 'Изменение') + ": " + ($_.characters -join '↔')) }
   }
 }
 
@@ -70,7 +71,7 @@ function Ensure-Character($json, [string]$name) {
 }
 
 function Update-Relation([string]$a, [string]$rel, [string]$b) {
-  if (-not $a -or -not $rel -or -not $b) { throw '用法: manage-relations.ps1 update -A 人物A -Relation allies|enemies|romantic|neutral|family|mentors -B 人物B [-Chapter N] [-Note 说明]' }
+  if (-not $a -or -not $rel -or -not $b) { throw 'Использование: manage-relations.ps1 update -A ПерсонажA -Relation allies|enemies|romantic|neutral|family|mentors -B ПерсонажB [-Chapter N] [-Note Примечание]' }
   $j = Get-Content -LiteralPath $relPath -Raw -Encoding UTF8 | ConvertFrom-Json
   Ensure-Character $j $a
   Ensure-Character $j $b
@@ -88,7 +89,7 @@ function Update-Relation([string]$a, [string]$rel, [string]$b) {
     $j | Add-Member -NotePropertyName history -NotePropertyValue @()
   }
   $j | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $relPath -Encoding UTF8
-  Write-Host "✅ 已更新关系：$a [$rel] $b"
+  Write-Host "✅ Отношения обновлены: $a [$rel] $b"
 }
 
 function Show-History {
@@ -98,11 +99,11 @@ function Show-History {
     foreach ($h in $j.history) {
       $chap = if ($h.chapter) { $h.chapter } else { 0 }
       $desc = ($h.changes | ForEach-Object { ($_.characters -join '↔') + '→' + ($_.relation ?? $_.type) }) -join '；'
-      Write-Host ("第{0}章：{1}" -f $chap, $desc)
+      Write-Host ("Глава {0}：{1}" -f $chap, $desc)
     }
   } elseif ($j.relationshipChanges) {
     foreach ($h in $j.relationshipChanges) { Write-Host ((($h.date ?? '') + ' ' + ($h.type ?? '') + ': ' + ($h.characters -join '↔') + '→' + ($h.relation ?? ''))) }
-  } else { Write-Host '暂无历史记录' }
+  } else { Write-Host 'Нет истории изменений' }
 }
 
 function Check-Relations {
@@ -120,9 +121,9 @@ function Check-Relations {
   $refs = $refs | Where-Object { $_ } | Select-Object -Unique
   $missing = @($refs | Where-Object { $names -notcontains $_ })
   if ($missing.Count -gt 0) {
-    Write-Host "⚠ 发现未建档角色引用，建议补充："
+    Write-Host "⚠ Обнаружены ссылки на персонажей без записей, рекомендуется добавить:"
     $missing | ForEach-Object { Write-Host "  - $_" }
-  } else { Write-Host "✅ 关系数据检查通过" }
+  } else { Write-Host "✅ Проверка данных отношений пройдена" }
 }
 
 switch ($Command) {
@@ -131,4 +132,4 @@ switch ($Command) {
   'history'{ Show-History }
   'check'  { Check-Relations }
 }
-
+```

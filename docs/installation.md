@@ -1,222 +1,224 @@
-# 安装指南
+```xml
+# Руководство по установке
 
-## 系统要求
+## Системные требования
 
-- **操作系统**：Windows、macOS 或 Linux
-- **Node.js**：18.0.0 或更高版本
-- **npm**：随 Node.js 一起安装
-- **Git**：用于版本管理（可选但推荐）
-- **AI 助手**：以下任选其一
-  - [Claude](https://claude.ai) （推荐）
+- **Операционная система**: Windows, macOS или Linux
+- **Node.js**: 18.0.0 или выше
+- **npm**: устанавливается вместе с Node.js
+- **Git**: для управления версиями (необязательно, но рекомендуется)
+- **AI-ассистент**: выберите один из следующих вариантов
+  - [Claude](https://claude.ai) (рекомендуется)
   - [Cursor](https://cursor.sh)
   - [Gemini](https://gemini.google.com)
 
-## 安装步骤
+## Шаги установки
 
-### 1. 安装 Node.js
+### 1. Установка Node.js
 
-如果尚未安装 Node.js，请访问 [Node.js 官网](https://nodejs.org/) 下载并安装最新的 LTS 版本。
+Если Node.js еще не установлен, посетите [официальный сайт Node.js](https://nodejs.org/) , чтобы загрузить и установить последнюю LTS-версию.
 
-验证安装：
+Проверка установки:
 ```bash
-node --version  # 应显示 v18.0.0 或更高
-npm --version   # 应显示 npm 版本号
+node --version  # Должно отобразиться v18.0.0 или выше
+npm --version   # Должен отобразиться номер версии npm
 ```
 
-### 2. 安装 Novel Writer
+### 2. Установка Novel Writer
 
-使用 npm 全局安装：
+Установите глобально с помощью npm:
 
 ```bash
 npm install -g novel-writer-cn
 ```
 
-或使用 yarn：
+Или с помощью yarn:
 
 ```bash
 yarn global add novel-writer-cn
 ```
 
-或使用 pnpm：
+Или с помощью pnpm:
 
 ```bash
 pnpm add -g novel-writer-cn
 ```
 
-### 3. 验证安装
+### 3. Проверка установки
 
 ```bash
 novel --version
 novel --help
 ```
 
-## 初始化项目
+## Инициализация проекта
 
-### 创建新项目
+### Создание нового проекта
 
 ```bash
-# 创建名为"我的小说"的项目
-novel init 我的小说
+# Создание проекта под названием "Мой роман"
+novel init Мой роман
 
-# 指定 AI 助手类型
-novel init 我的小说 --ai claude
-novel init 我的小说 --ai cursor
-novel init 我的小说 --ai gemini
+# Указание типа AI-ассистента
+novel init Мой роман --ai claude
+novel init Мой роман --ai cursor
+novel init Мой роман --ai gemini
 ```
 
-### 在现有目录初始化
+### Инициализация в существующем каталоге
 
 ```bash
-# 在当前目录初始化
+# Инициализация в текущем каталоге
 novel init --here
 
-# 指定 AI 助手
+# Указание AI-ассистента
 novel init --here --ai claude
 ```
 
-### 不使用 Git（如果没有安装 Git）
+### Без инициализации Git (если Git не установлен)
 
 ```bash
-novel init 我的小说 --no-git
+novel init Мой роман --no-git
 ```
 
-## AI 助手配置
+## Конфигурация AI-ассистента
 
-### Claude 配置
+### Конфигурация Claude
 
-1. 访问 [Claude](https://claude.ai)
-2. 登录或注册账号
-3. 打开你的小说项目目录
-4. 在 Claude 中使用斜杠命令
+1. Посетите [Claude](https://claude.ai)
+2. Войдите или зарегистрируйтесь
+3. Откройте каталог вашего проекта романа
+4. Используйте команды с косой чертой в Claude
 
-### Cursor 配置
+### Конфигурация Cursor
 
-1. 下载并安装 [Cursor](https://cursor.sh)
-2. 打开 Cursor
-3. 选择 `File > Open Folder` 打开项目目录
-4. 在编辑器中使用斜杠命令
+1. Загрузите и установите [Cursor](https://cursor.sh)
+2. Откройте Cursor
+3. Выберите `File > Open Folder`, чтобы открыть каталог проекта
+4. Используйте команды с косой чертой в редакторе
 
-### Gemini 配置
+### Конфигурация Gemini
 
-1. 访问 [Gemini](https://gemini.google.com)
-2. 登录 Google 账号
-3. 在对话中描述项目路径
-4. 使用斜杠命令进行创作
+1. Посетите [Gemini](https://gemini.google.com)
+2. Войдите в свою учетную запись Google
+3. Опишите путь к проекту в диалоге
+4. Используйте команды с косой чертой для создания
 
-## 项目结构说明
+## Описание структуры проекта
 
-初始化后的项目结构：
+Структура проекта после инициализации:
 
 ```
-我的小说/
-├── .specify/          # Spec Kit 配置目录
-│   ├── config.json    # 项目配置
-│   └── spec.md        # 命令规范文档
-├── memory/            # 创作记忆
-│   └── writing-constitution.md  # 创作风格设定
-├── stories/           # 故事内容
-│   └── 001-故事名/    # 具体故事目录
-│       ├── story.md   # 故事大纲
-│       ├── outline.md # 章节规划
-│       ├── tasks.md   # 任务列表
-│       └── chapters/  # 章节内容
-└── scripts/           # 辅助脚本
-    ├── bash/          # Unix/Linux/Mac 脚本
-    └── powershell/    # Windows 脚本
+Мой роман/
+├── .specify/          # Каталог конфигурации Spec Kit
+│   ├── config.json    # Конфигурация проекта
+│   └── spec.md        # Документ со спецификацией команд
+├── memory/            # Память для творчества
+│   └── writing-constitution.md  # Настройки стиля письма
+├── stories/           # Содержание истории
+│   └── 001-Название истории/    # Каталог конкретной истории
+│       ├── story.md   # План истории
+│       ├── outline.md # Планирование глав
+│       ├── tasks.md   # Список задач
+│       └── chapters/  # Содержание глав
+└── scripts/           # Вспомогательные скрипты
+    ├── bash/          # Скрипты для Unix/Linux/Mac
+    └── powershell/    # Скрипты для Windows
 ```
 
-## 环境检查
+## Проверка окружения
 
-运行环境检查命令：
+Запустите команду проверки окружения:
 
 ```bash
 novel check
 ```
 
-这会检查：
-- Node.js 版本
-- Git 是否安装
-- AI 助手工具状态
+Это проверит:
+- Версию Node.js
+- Установлен ли Git
+- Статус AI-ассистента
 
-## 常见问题
+## Частые вопросы
 
-### Q: 安装时提示权限错误
+### В: При установке возникает ошибка прав доступа
 
-**Windows PowerShell**：
+**Windows PowerShell**:
 ```powershell
-# 以管理员身份运行 PowerShell
+# Запустите PowerShell от имени администратора
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
-**macOS/Linux**：
+**macOS/Linux**:
 ```bash
-# 使用 sudo 安装
+# Установите с помощью sudo
 sudo npm install -g novel-writer-cn
 ```
 
-### Q: 提示 "command not found"
+### В: Сообщение "command not found"
 
-确保 npm 的全局包路径在系统 PATH 中：
+Убедитесь, что путь к глобальным пакетам npm добавлен в системный PATH:
 
 ```bash
-# 查看 npm 全局包路径
+# Просмотр пути к глобальным пакетам npm
 npm config get prefix
 
-# 将路径添加到 PATH（根据你的 shell 调整）
+# Добавьте путь в PATH (настройте в соответствии с вашей оболочкой)
 export PATH="$PATH:$(npm config get prefix)/bin"
 ```
 
-### Q: Git 初始化失败
+### В: Ошибка инициализации Git
 
-如果没有安装 Git 或不需要版本控制：
+Если Git не установлен или вам не нужен контроль версий:
 
 ```bash
-novel init 我的小说 --no-git
+novel init Мой роман --no-git
 ```
 
-### Q: 中文目录名有问题
+### В: Проблемы с именами каталогов на китайском языке
 
-在某些系统上，中文目录名可能导致问题。建议使用英文或拼音：
+В некоторых системах имена каталогов на китайском языке могут вызывать проблемы. Рекомендуется использовать английские имена или пиньинь:
 
 ```bash
 novel init my-novel
-# 或
+# или
 novel init wo-de-xiao-shuo
 ```
 
-### Q: AI 助手无法识别斜杠命令
+### В: AI-ассистент не распознает команды с косой чертой
 
-1. 确保项目已正确初始化
-2. 检查 `.specify/spec.md` 文件是否存在
-3. 在 AI 助手中明确说明你在使用 Novel Writer
-4. 尝试复制命令内容手动输入
+1. Убедитесь, что проект был правильно инициализирован
+2. Проверьте наличие файла `.specify/spec.md`
+3. Четко укажите AI-ассистенту, что вы используете Novel Writer
+4. Попробуйте скопировать команду и ввести ее вручную
 
-## 升级 Novel Writer
+## Обновление Novel Writer
 
 ```bash
-# 查看当前版本
+# Просмотр текущей версии
 novel --version
 
-# 升级到最新版本
+# Обновление до последней версии
 npm update -g novel-writer-cn
 
-# 或重新安装
+# Или переустановите
 npm uninstall -g novel-writer-cn
 npm install -g novel-writer-cn
 ```
 
-## 卸载
+## Удаление
 
 ```bash
 npm uninstall -g novel-writer-cn
 ```
 
-## 获取帮助
+## Получение помощи
 
-- 📖 查看[快速入门指南](quickstart.md)
-- 💬 访问 [GitHub Issues](https://github.com/wordflowlab/novel-writer/issues)
-- 📧 联系支持：support@novelwriter.io
+- 📖 Ознакомьтесь с [кратким руководством](quickstart.md)
+- 💬 Посетите [GitHub Issues](https://github.com/wordflowlab/novel-writer/issues)
+- 📧 Свяжитесь с поддержкой: support@novelwriter.io
 
 ---
 
-下一步：[快速入门](quickstart.md) →
+Далее: [Краткое руководство](quickstart.md) →
+```

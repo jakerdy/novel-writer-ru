@@ -1,3 +1,4 @@
+```json
 #!/usr/bin/env node
 
 import { Command } from '@commander-js/extra-typings';
@@ -331,6 +332,7 @@ program
         await fs.copy(scriptsDir, userScriptsDir);
 
         // 设置 bash 脚本执行权限
+```
         const bashDir = path.join(userScriptsDir, 'bash');
         if (await fs.pathExists(bashDir)) {
           const bashFiles = await fs.readdir(bashDir);
@@ -343,34 +345,34 @@ program
         }
       }
 
-      // 复制模板文件到 .specify/templates 目录
+      // Копирование файлов шаблонов в директорию .specify/templates
       const fullTemplatesDir = path.join(packageRoot, 'templates');
       if (await fs.pathExists(fullTemplatesDir)) {
         const userTemplatesDir = path.join(projectPath, '.specify', 'templates');
         await fs.copy(fullTemplatesDir, userTemplatesDir);
       }
 
-      // 复制 memory 文件到 .specify/memory 目录
+      // Копирование файлов memory в директорию .specify/memory
       const memoryDir = path.join(packageRoot, 'memory');
       if (await fs.pathExists(memoryDir)) {
         const userMemoryDir = path.join(projectPath, '.specify', 'memory');
         await fs.copy(memoryDir, userMemoryDir);
       }
 
-      // 复制追踪文件模板到 spec/tracking 目录
+      // Копирование шаблонов отслеживания в директорию spec/tracking
       const trackingTemplatesDir = path.join(packageRoot, 'templates', 'tracking');
       if (await fs.pathExists(trackingTemplatesDir)) {
         const userTrackingDir = path.join(projectPath, 'spec', 'tracking');
         await fs.copy(trackingTemplatesDir, userTrackingDir);
       }
 
-      // 复制知识库模板到 spec/knowledge 目录
+      // Копирование шаблонов базы знаний в директорию spec/knowledge
       const knowledgeTemplatesDir = path.join(packageRoot, 'templates', 'knowledge');
       if (await fs.pathExists(knowledgeTemplatesDir)) {
         const userKnowledgeDir = path.join(projectPath, 'spec', 'knowledge');
         await fs.copy(knowledgeTemplatesDir, userKnowledgeDir);
 
-        // 更新模板中的日期
+        // Обновление дат в шаблонах
         const knowledgeFiles = await fs.readdir(userKnowledgeDir);
         const currentDate = new Date().toISOString().split('T')[0];
         for (const file of knowledgeFiles) {
@@ -383,67 +385,67 @@ program
         }
       }
 
-      // 复制 spec 目录结构（包括预设和反AI检测规范）
-      // 注意：构建产物已包含 spec/presets 等，此处作为后备确保完整性
+      // Копирование структуры директории spec (включая пресеты и спецификации для обнаружения ИИ)
+      // Примечание: сборка уже включает spec/presets и т. д., это резервный вариант для обеспечения полноты
       const specDir = path.join(packageRoot, 'spec');
       if (await fs.pathExists(specDir)) {
         const userSpecDir = path.join(projectPath, 'spec');
 
-        // 遍历并复制所有 spec 子目录
+        // Обход и копирование всех поддиректорий spec
         const specItems = await fs.readdir(specDir);
         for (const item of specItems) {
           const sourcePath = path.join(specDir, item);
           const targetPath = path.join(userSpecDir, item);
 
-          // presets、checklists、config.json 等直接复制（不覆盖已存在的）
-          // tracking 和 knowledge 已在前面从 templates 复制，跳过
+          // presets, checklists, config.json и т. д. копируются напрямую (без перезаписи существующих)
+          // tracking и knowledge уже скопированы из templates ранее, пропускаем
           if (item !== 'tracking' && item !== 'knowledge') {
             await fs.copy(sourcePath, targetPath, { overwrite: false });
           }
         }
       }
 
-      // 为 Gemini 复制额外的配置文件
+      // Копирование дополнительных конфигурационных файлов для Gemini
       if (aiDirs.some(dir => dir.includes('.gemini'))) {
-        // 复制 settings.json
+        // Копирование settings.json
         const geminiSettingsSource = path.join(packageRoot, 'templates', 'gemini-settings.json');
         const geminiSettingsDest = path.join(projectPath, '.gemini', 'settings.json');
         if (await fs.pathExists(geminiSettingsSource)) {
           await fs.copy(geminiSettingsSource, geminiSettingsDest);
-          console.log('  ✓ 已复制 Gemini settings.json');
+          console.log('  ✓ Gemini settings.json скопирован');
         }
 
-        // 复制 GEMINI.md
+        // Копирование GEMINI.md
         const geminiMdSource = path.join(packageRoot, 'templates', 'GEMINI.md');
         const geminiMdDest = path.join(projectPath, '.gemini', 'GEMINI.md');
         if (await fs.pathExists(geminiMdSource)) {
           await fs.copy(geminiMdSource, geminiMdDest);
-          console.log('  ✓ 已复制 GEMINI.md');
+          console.log('  ✓ GEMINI.md скопирован');
         }
       }
 
-      // 为 GitHub Copilot 复制 VS Code settings
+      // Копирование настроек VS Code для GitHub Copilot
       if (aiDirs.some(dir => dir.includes('.github') || dir.includes('.vscode'))) {
         const vscodeSettingsSource = path.join(packageRoot, 'templates', 'vscode-settings.json');
         const vscodeSettingsDest = path.join(projectPath, '.vscode', 'settings.json');
         if (await fs.pathExists(vscodeSettingsSource)) {
           await fs.copy(vscodeSettingsSource, vscodeSettingsDest);
-          console.log('  ✓ 已复制 GitHub Copilot settings.json');
+          console.log('  ✓ GitHub Copilot settings.json скопирован');
         }
       }
 
-      // 如果指定了 --with-experts，复制专家文件和 expert 命令
+      // Если указан --with-experts, копирование файлов экспертов и команды expert
       if (options.withExperts) {
-        spinner.text = '安装专家模式...';
+        spinner.text = 'Установка режима экспертов...';
 
-        // 复制专家目录
+        // Копирование директории экспертов
         const expertsSourceDir = path.join(packageRoot, 'experts');
         if (await fs.pathExists(expertsSourceDir)) {
           const userExpertsDir = path.join(projectPath, 'experts');
           await fs.copy(expertsSourceDir, userExpertsDir);
         }
 
-        // 复制 expert 命令到各个 AI 目录
+        // Копирование команды expert в каждую директорию AI
         const expertCommandSource = path.join(packageRoot, 'templates', 'commands', 'expert.md');
         if (await fs.pathExists(expertCommandSource)) {
           const expertContent = await fs.readFile(expertCommandSource, 'utf-8');
@@ -453,17 +455,17 @@ program
               const expertPath = path.join(projectPath, aiDir, 'expert.md');
               await fs.writeFile(expertPath, expertContent);
             }
-            // Windsurf 使用 workflows 目录
+            // Windsurf использует директорию workflows
             if (aiDir.includes('windsurf')) {
               const expertPath = path.join(projectPath, aiDir, 'expert.md');
               await fs.writeFile(expertPath, expertContent);
             }
-            // Roo Code 使用 Markdown 命令目录
+            // Roo Code использует директорию Markdown команд
             if (aiDir.includes('.roo')) {
               const expertPath = path.join(projectPath, aiDir, 'expert.md');
               await fs.writeFile(expertPath, expertContent);
             }
-            // Gemini 格式处理
+            // Обработка формата Gemini
             if (aiDir.includes('gemini')) {
               const expertPath = path.join(projectPath, aiDir, 'expert.toml');
               const expertToml = generateTomlCommand(expertContent, '');
@@ -473,62 +475,62 @@ program
         }
       }
 
-      // 如果指定了 --plugins，安装插件
+      // Если указан --plugins, установка плагинов
       if (options.plugins) {
-        spinner.text = '安装插件...';
+        spinner.text = 'Установка плагинов...';
 
         const pluginNames = options.plugins.split(',').map((p: string) => p.trim());
         const pluginManager = new PluginManager(projectPath);
 
         for (const pluginName of pluginNames) {
-          // 检查内置插件
+          // Проверка встроенных плагинов
           const builtinPluginPath = path.join(packageRoot, 'plugins', pluginName);
           if (await fs.pathExists(builtinPluginPath)) {
             await pluginManager.installPlugin(pluginName, builtinPluginPath);
           } else {
-            console.log(chalk.yellow(`\n警告: 插件 "${pluginName}" 未找到`));
+            console.log(chalk.yellow(`\nПредупреждение: плагин "${pluginName}" не найден`));
           }
         }
       }
 
-      // Git 初始化
+      // Инициализация Git
       if (options.git !== false) {
         try {
           execSync('git init', { cwd: projectPath, stdio: 'ignore' });
 
-          // 创建 .gitignore
-          const gitignore = `# 临时文件
+          // Создание .gitignore
+          const gitignore = `# Временные файлы
 *.tmp
 *.swp
 .DS_Store
 
-# 编辑器配置
+# Конфигурация редактора
 .vscode/
 .idea/
 
-# AI 缓存
+# Кэш ИИ
 .ai-cache/
 
-# 节点模块
+# Модули Node
 node_modules/
 `;
           await fs.writeFile(path.join(projectPath, '.gitignore'), gitignore);
 
           execSync('git add .', { cwd: projectPath, stdio: 'ignore' });
-          execSync('git commit -m "初始化小说项目"', { cwd: projectPath, stdio: 'ignore' });
+          execSync('git commit -m "Инициализация проекта романа"', { cwd: projectPath, stdio: 'ignore' });
         } catch {
-          console.log(chalk.yellow('\n提示: Git 初始化失败，但项目已创建成功'));
+          console.log(chalk.yellow('\nПодсказка: Инициализация Git не удалась, но проект успешно создан'));
         }
       }
 
-      spinner.succeed(chalk.green(`小说项目 "${name}" 创建成功！`));
+      spinner.succeed(chalk.green(`Проект романа "${name}" успешно создан!`));
 
-      // 显示后续步骤
-      console.log('\n' + chalk.cyan('接下来:'));
+      // Отображение следующих шагов
+      console.log('\n' + chalk.cyan('Далее:'));
       console.log(chalk.gray('─────────────────────────────'));
 
       if (!options.here) {
-        console.log(`  1. ${chalk.white(`cd ${name}`)} - 进入项目目录`);
+        console.log(`  1. ${chalk.white(`cd ${name}`)} - перейти в директорию проекта`);
       }
 
       const aiName = {
@@ -545,65 +547,65 @@ node_modules/
         'auggie': 'Auggie CLI',
         'codebuddy': 'CodeBuddy',
         'q': 'Amazon Q Developer'
-      }[options.ai] || 'AI 助手';
+      }[options.ai] || 'AI-помощник';
 
       if (options.all) {
-        console.log(`  2. ${chalk.white('在任意 AI 助手中打开项目（Claude Code、Cursor、Gemini、Windsurf、Roo Code、GitHub Copilot、Qwen Code、OpenCode、Codex CLI、Kilo Code、Auggie CLI、CodeBuddy、Amazon Q Developer）')}`);
+        console.log(`  2. ${chalk.white('Открыть проект в любом AI-помощнике (Claude Code, Cursor, Gemini, Windsurf, Roo Code, GitHub Copilot, Qwen Code, OpenCode, Codex CLI, Kilo Code, Auggie CLI, CodeBuddy, Amazon Q Developer)')}`);
       } else {
-        console.log(`  2. ${chalk.white(`在 ${aiName} 中打开项目`)}`);
+        console.log(`  2. ${chalk.white(`Открыть проект в ${aiName}`)}`);
       }
-      console.log(`  3. 使用以下斜杠命令开始创作:`);
+      console.log(`  3. Используйте следующие команды с косой чертой для начала работы:`);
 
-      console.log('\n' + chalk.yellow('     📝 七步方法论:'));
-      console.log(`     ${chalk.cyan('/constitution')} - 创建创作宪法，定义核心原则`);
-      console.log(`     ${chalk.cyan('/specify')}      - 定义故事规格，明确要创造什么`);
-      console.log(`     ${chalk.cyan('/clarify')}      - 澄清关键决策点，明确模糊之处`);
-      console.log(`     ${chalk.cyan('/plan')}         - 制定技术方案，决定如何创作`);
-      console.log(`     ${chalk.cyan('/tasks')}        - 分解执行任务，生成可执行清单`);
-      console.log(`     ${chalk.cyan('/write')}        - AI 辅助写作章节内容`);
-      console.log(`     ${chalk.cyan('/analyze')}      - 综合验证分析，确保质量一致`);
+      console.log('\n' + chalk.yellow('     📝 Семишаговый метод:'));
+      console.log(`     ${chalk.cyan('/constitution')} - создать конституцию для написания, определяющую основные принципы`);
+      console.log(`     ${chalk.cyan('/specify')}      - определить спецификации истории, уточнить, что нужно создать`);
+      console.log(`     ${chalk.cyan('/clarify')}      - прояснить ключевые точки принятия решений, устранить двусмысленность`);
+      console.log(`     ${chalk.cyan('/plan')}         - разработать технический план, решить, как писать`);
+      console.log(`     ${chalk.cyan('/tasks')}        - разбить на исполнимые задачи, создать список выполнимых задач`);
+      console.log(`     ${chalk.cyan('/write')}        - AI-ассистент для написания глав`);
+      console.log(`     ${chalk.cyan('/analyze')}      - комплексный анализ и проверка, обеспечение согласованности качества`);
 
-      console.log('\n' + chalk.yellow('     📊 追踪管理命令:'));
-      console.log(`     ${chalk.cyan('/plot-check')}  - 检查情节一致性`);
-      console.log(`     ${chalk.cyan('/timeline')}    - 管理故事时间线`);
-      console.log(`     ${chalk.cyan('/relations')}   - 追踪角色关系`);
-      console.log(`     ${chalk.cyan('/world-check')} - 验证世界观设定`);
-      console.log(`     ${chalk.cyan('/track')}       - 综合追踪与智能分析`);
+      console.log('\n' + chalk.yellow('     📊 Команды управления отслеживанием:'));
+      console.log(`     ${chalk.cyan('/plot-check')}  - проверить согласованность сюжета`);
+      console.log(`     ${chalk.cyan('/timeline')}    - управлять временной шкалой истории`);
+      console.log(`     ${chalk.cyan('/relations')}   - отслеживать отношения между персонажами`);
+      console.log(`     ${chalk.cyan('/world-check')} - проверить настройки мира`);
+      console.log(`     ${chalk.cyan('/track')}       - комплексное отслеживание и интеллектуальный анализ`);
 
-      // 如果安装了专家模式，显示提示
+      // Если установлен режим экспертов, отобразить подсказку
       if (options.withExperts) {
-        console.log('\n' + chalk.yellow('     🎓 专家模式:'));
-        console.log(`     ${chalk.cyan('/expert')}       - 列出可用专家`);
-        console.log(`     ${chalk.cyan('/expert plot')} - 剧情结构专家`);
-        console.log(`     ${chalk.cyan('/expert character')} - 人物塑造专家`);
+        console.log('\n' + chalk.yellow('     🎓 Режим экспертов:'));
+        console.log(`     ${chalk.cyan('/expert')}       - показать доступных экспертов`);
+        console.log(`     ${chalk.cyan('/expert plot')} - эксперт по структуре сюжета`);
+        console.log(`     ${chalk.cyan('/expert character')} - эксперт по созданию персонажей`);
       }
 
-      // 如果安装了插件，显示插件命令
+      // Если установлены плагины, отобразить команды плагинов
       if (options.plugins) {
         const installedPlugins = options.plugins.split(',').map((p: string) => p.trim());
         if (installedPlugins.includes('translate')) {
-          console.log('\n' + chalk.yellow('     🌍 翻译插件:'));
-          console.log(`     ${chalk.cyan('/translate')}   - 中英文翻译`);
-          console.log(`     ${chalk.cyan('/polish')}      - 英文润色`);
+          console.log('\n' + chalk.yellow('     🌍 Плагин перевода:'));
+          console.log(`     ${chalk.cyan('/translate')}   - перевод с китайского на английский`);
+          console.log(`     ${chalk.cyan('/polish')}      - полировка английского текста`);
         }
       }
 
-      console.log('\n' + chalk.gray('推荐流程: constitution → specify → clarify → plan → tasks → write → analyze'));
-      console.log(chalk.dim('提示: 斜杠命令在 AI 助手内部使用，不是在终端中'));
+      console.log('\n' + chalk.gray('Рекомендуемый порядок: constitution → specify → clarify → plan → tasks → write → analyze'));
+      console.log(chalk.dim('Примечание: команды с косой чертой используются внутри AI-помощника, а не в терминале'));
 
     } catch (error) {
-      spinner.fail(chalk.red('项目初始化失败'));
+      spinner.fail(chalk.red('Инициализация проекта не удалась'));
       console.error(error);
       process.exit(1);
     }
   });
 
-// check 命令 - 检查环境
+// команда check - проверка окружения
 program
   .command('check')
-  .description('检查系统环境和 AI 工具')
+  .description('Проверить системное окружение и инструменты ИИ')
   .action(() => {
-    console.log(chalk.cyan('检查系统环境...\n'));
+    console.log(chalk.cyan('Проверка системного окружения...\n'));
 
     const checks = [
       { name: 'Node.js', command: 'node --version', installed: false },
@@ -617,65 +619,65 @@ program
       try {
         execSync(check.command, { stdio: 'ignore' });
         check.installed = true;
-        console.log(chalk.green('✓') + ` ${check.name} 已安装`);
+        console.log(chalk.green('✓') + ` ${check.name} установлен`);
       } catch {
-        console.log(chalk.yellow('⚠') + ` ${check.name} 未安装`);
+        console.log(chalk.yellow('⚠') + ` ${check.name} не установлен`);
       }
     });
 
     const hasAI = checks.slice(2).some(c => c.installed);
     if (!hasAI) {
-      console.log('\n' + chalk.yellow('警告: 未检测到 AI 助手工具'));
-      console.log('请安装以下任一工具:');
+      console.log('\n' + chalk.yellow('Предупреждение: Не обнаружены инструменты ИИ-помощника'));
+      console.log('Пожалуйста, установите один из следующих инструментов:');
       console.log('  • Claude: https://claude.ai');
       console.log('  • Cursor: https://cursor.sh');
       console.log('  • Gemini: https://gemini.google.com');
       console.log('  • Roo Code: https://roocode.com');
     } else {
-      console.log('\n' + chalk.green('环境检查通过！'));
+      console.log('\n' + chalk.green('Проверка среды пройдена!'));
     }
   });
 
-// plugins 命令 - 插件管理
+// команда plugins - управление плагинами
 program
   .command('plugins')
-  .description('插件管理')
+  .description('Управление плагинами')
   .action(() => {
-    // 显示插件子命令帮助
-    console.log(chalk.cyan('\n📦 插件管理命令:\n'));
-    console.log('  novel plugins list              - 列出已安装的插件');
-    console.log('  novel plugins add <name>        - 安装插件');
-    console.log('  novel plugins remove <name>     - 移除插件');
-    console.log('\n' + chalk.gray('可用插件:'));
-    console.log('  translate         - 中英文翻译插件');
-    console.log('  authentic-voice   - 真实人声写作插件');
+    // Показать справку по подкомандам плагинов
+    console.log(chalk.cyan('\n📦 Команды управления плагинами:\n'));
+    console.log('  novel plugins list              - Показать список установленных плагинов');
+    console.log('  novel plugins add <name>        - Установить плагин');
+    console.log('  novel plugins remove <name>     - Удалить плагин');
+    console.log('\n' + chalk.gray('Доступные плагины:'));
+    console.log('  translate         - Плагин для перевода между китайским и английским');
+    console.log('  authentic-voice   - Плагин для написания текстов с использованием реального голоса');
   });
 
 program
   .command('plugins:list')
-  .description('列出已安装的插件')
+  .description('Показать список установленных плагинов')
   .action(async () => {
     try {
-      // 检测项目
+      // Проверить проект
       const projectPath = await ensureProjectRoot();
       const projectInfo = await getProjectInfo(projectPath);
 
       if (!projectInfo) {
-        console.log(chalk.red('❌ 无法读取项目信息'));
+        console.log(chalk.red('❌ Не удалось прочитать информацию о проекте'));
         process.exit(1);
       }
 
       const pluginManager = new PluginManager(projectPath);
       const plugins = await pluginManager.listPlugins();
 
-      console.log(chalk.cyan('\n📦 已安装的插件\n'));
-      console.log(chalk.gray(`项目: ${path.basename(projectPath)}`));
-      console.log(chalk.gray(`AI 配置: ${projectInfo.installedAI.join(', ') || '无'}\n`));
+      console.log(chalk.cyan('\n📦 Установленные плагины\n'));
+      console.log(chalk.gray(`Проект: ${path.basename(projectPath)}`));
+      console.log(chalk.gray(`Конфигурация ИИ: ${projectInfo.installedAI.join(', ') || 'нет'}\n`));
 
       if (plugins.length === 0) {
-        console.log(chalk.yellow('暂无插件'));
-        console.log(chalk.gray('\n使用 "novel plugins:add <name>" 安装插件'));
-        console.log(chalk.gray('可用插件: translate, authentic-voice, book-analysis, genre-knowledge\n'));
+        console.log(chalk.yellow('Плагинов пока нет'));
+        console.log(chalk.gray('\nИспользуйте "novel plugins:add <name>" для установки плагинов'));
+        console.log(chalk.gray('Доступные плагины: translate, authentic-voice, book-analysis, genre-knowledge\n'));
         return;
       }
 
@@ -684,100 +686,100 @@ program
         console.log(chalk.gray(`    ${plugin.description}`));
 
         if (plugin.commands && plugin.commands.length > 0) {
-          console.log(chalk.gray(`    命令: ${plugin.commands.map(c => `/${c.id}`).join(', ')}`));
+          console.log(chalk.gray(`    Команды: ${plugin.commands.map(c => `/${c.id}`).join(', ')}`));
         }
 
         if (plugin.experts && plugin.experts.length > 0) {
-          console.log(chalk.gray(`    专家: ${plugin.experts.map(e => e.title).join(', ')}`));
+          console.log(chalk.gray(`    Эксперты: ${plugin.experts.map(e => e.title).join(', ')}`));
         }
         console.log('');
       }
     } catch (error: any) {
       if (error.message === 'NOT_IN_PROJECT') {
-        console.log(chalk.red('\n❌ 当前目录不是 novel-writer 项目'));
-        console.log(chalk.gray('   请在项目根目录运行此命令\n'));
+        console.log(chalk.red('\n❌ Текущий каталог не является проектом novel-writer'));
+        console.log(chalk.gray('   Пожалуйста, выполните эту команду в корневом каталоге проекта\n'));
         process.exit(1);
       }
 
-      console.error(chalk.red('❌ 列出插件失败:'), error);
+      console.error(chalk.red('❌ Не удалось перечислить плагины:'), error);
       process.exit(1);
     }
   });
 
 program
   .command('plugins:add <name>')
-  .description('安装插件')
+  .description('Установить плагин')
   .action(async (name) => {
     try {
-      // 1. 检测项目
+      // 1. Проверить проект
       const projectPath = await ensureProjectRoot();
       const projectInfo = await getProjectInfo(projectPath);
 
       if (!projectInfo) {
-        console.log(chalk.red('❌ 无法读取项目信息'));
+        console.log(chalk.red('❌ Не удалось прочитать информацию о проекте'));
         process.exit(1);
       }
 
-      console.log(chalk.cyan('\n📦 Novel Writer 插件安装\n'));
-      console.log(chalk.gray(`项目版本: ${projectInfo.version}`));
-      console.log(chalk.gray(`AI 配置: ${projectInfo.installedAI.join(', ') || '无'}\n`));
+      console.log(chalk.cyan('\n📦 Установка плагина Novel Writer\n'));
+      console.log(chalk.gray(`Версия проекта: ${projectInfo.version}`));
+      console.log(chalk.gray(`Конфигурация ИИ: ${projectInfo.installedAI.join(', ') || 'нет'}\n`));
 
-      // 2. 查找插件
+      // 2. Найти плагин
       const packageRoot = path.resolve(__dirname, '..');
       const builtinPluginPath = path.join(packageRoot, 'plugins', name);
 
       if (!await fs.pathExists(builtinPluginPath)) {
-        console.log(chalk.red(`❌ 插件 ${name} 未找到\n`));
-        console.log(chalk.gray('可用插件:'));
-        console.log(chalk.gray('  - translate (翻译出海插件)'));
-        console.log(chalk.gray('  - authentic-voice (真实人声插件)'));
-        console.log(chalk.gray('  - book-analysis (拆书分析插件)'));
-        console.log(chalk.gray('  - genre-knowledge (类型知识库插件)'));
+        console.log(chalk.red(`❌ Плагин ${name} не найден\n`));
+        console.log(chalk.gray('Доступные плагины:'));
+        console.log(chalk.gray('  - translate (плагин для перевода за рубеж)'));
+        console.log(chalk.gray('  - authentic-voice (плагин для реального голоса)'));
+        console.log(chalk.gray('  - book-analysis (плагин для анализа книг)'));
+        console.log(chalk.gray('  - genre-knowledge (плагин для знаний по жанрам)'));
         process.exit(1);
       }
 
-      // 3. 读取插件配置
+      // 3. Прочитать конфигурацию плагина
       const pluginConfigPath = path.join(builtinPluginPath, 'config.yaml');
-      const yaml = await import('js-yaml');
+      const yaml = (await import('js-yaml')).default;
       const pluginConfigContent = await fs.readFile(pluginConfigPath, 'utf-8');
       const pluginConfig = yaml.load(pluginConfigContent) as any;
 
-      // 4. 显示插件信息
-      console.log(chalk.cyan(`准备安装: ${pluginConfig.description || name}`));
-      console.log(chalk.gray(`版本: ${pluginConfig.version}`));
+      // 4. Показать информацию о плагине
+      console.log(chalk.cyan(`Подготовка к установке: ${pluginConfig.description || name}`));
+      console.log(chalk.gray(`Версия: ${pluginConfig.version}`));
 
       if (pluginConfig.commands && pluginConfig.commands.length > 0) {
-        console.log(chalk.gray(`命令数量: ${pluginConfig.commands.length}`));
+        console.log(chalk.gray(`Количество команд: ${pluginConfig.commands.length}`));
       }
 
       if (pluginConfig.experts && pluginConfig.experts.length > 0) {
-        console.log(chalk.gray(`专家模式: ${pluginConfig.experts.length} 个`));
+        console.log(chalk.gray(`Режим эксперта: ${pluginConfig.experts.length} шт.`));
       }
 
       if (projectInfo.installedAI.length > 0) {
-        console.log(chalk.gray(`目标 AI: ${projectInfo.installedAI.join(', ')}\n`));
+        console.log(chalk.gray(`Целевой ИИ: ${projectInfo.installedAI.join(', ')}\n`));
       } else {
-        console.log(chalk.yellow('\n⚠️  未检测到 AI 配置目录'));
-        console.log(chalk.gray('   插件将被复制，但命令不会被注入到任何 AI 平台\n'));
+        console.log(chalk.yellow('\n⚠️  Каталог конфигурации ИИ не обнаружен'));
+        console.log(chalk.gray('   Плагин будет скопирован, но команды не будут внедрены ни на одну ИИ-платформу\n'));
       }
 
-      // 5. 安装插件
-      const spinner = ora('正在安装插件...').start();
+      // 5. Установить плагин
+      const spinner = ora('Установка плагина...').start();
       const pluginManager = new PluginManager(projectPath);
 
       await pluginManager.installPlugin(name, builtinPluginPath);
-      spinner.succeed(chalk.green('插件安装成功！\n'));
+      spinner.succeed(chalk.green('Плагин успешно установлен!\n'));
 
-      // 6. 显示后续步骤
+      // 6. Показать следующие шаги
       if (pluginConfig.commands && pluginConfig.commands.length > 0) {
-        console.log(chalk.cyan('可用命令:'));
+        console.log(chalk.cyan('Доступные команды:'));
         for (const cmd of pluginConfig.commands) {
           console.log(chalk.gray(`  /${cmd.id} - ${cmd.description || ''}`));
         }
       }
 
       if (pluginConfig.experts && pluginConfig.experts.length > 0) {
-        console.log(chalk.cyan('\n专家模式:'));
+        console.log(chalk.cyan('\nРежим эксперта:'));
         for (const expert of pluginConfig.experts) {
           console.log(chalk.gray(`  /expert ${expert.id} - ${expert.title || ''}`));
         }
@@ -786,12 +788,12 @@ program
       console.log('');
     } catch (error: any) {
       if (error.message === 'NOT_IN_PROJECT') {
-        console.log(chalk.red('\n❌ 当前目录不是 novel-writer 项目'));
-        console.log(chalk.gray('   请在项目根目录运行此命令，或使用 novel init 创建新项目\n'));
+        console.log(chalk.red('\n❌ Текущий каталог не является проектом novel-writer'));
+        console.log(chalk.gray('   Пожалуйста, выполните эту команду в корневом каталоге проекта или используйте novel init для создания нового проекта\n'));
         process.exit(1);
       }
 
-      console.log(chalk.red('\n❌ 安装插件失败'));
+      console.log(chalk.red('\n❌ Не удалось установить плагин'));
       console.error(chalk.gray(error.message || error));
       console.log('');
       process.exit(1);
@@ -800,35 +802,35 @@ program
 
 program
   .command('plugins:remove <name>')
-  .description('移除插件')
+  .description('Удалить плагин')
   .action(async (name) => {
     try {
-      // 检测项目
+      // Проверить проект
       const projectPath = await ensureProjectRoot();
       const projectInfo = await getProjectInfo(projectPath);
 
       if (!projectInfo) {
-        console.log(chalk.red('❌ 无法读取项目信息'));
+        console.log(chalk.red('❌ Не удалось прочитать информацию о проекте'));
         process.exit(1);
       }
 
       const pluginManager = new PluginManager(projectPath);
 
-      console.log(chalk.cyan('\n📦 Novel Writer 插件移除\n'));
-      console.log(chalk.gray(`准备移除插件: ${name}`));
-      console.log(chalk.gray(`AI 配置: ${projectInfo.installedAI.join(', ') || '无'}\n`));
+      console.log(chalk.cyan('\n📦 Удаление плагина Novel Writer\n'));
+      console.log(chalk.gray(`Подготовка к удалению плагина: ${name}`));
+      console.log(chalk.gray(`Конфигурация ИИ: ${projectInfo.installedAI.join(', ') || 'нет'}\n`));
 
-      const spinner = ora('正在移除插件...').start();
+      const spinner = ora('Удаление плагина...').start();
       await pluginManager.removePlugin(name);
-      spinner.succeed(chalk.green('插件移除成功！\n'));
+      spinner.succeed(chalk.green('Плагин успешно удален!\n'));
     } catch (error: any) {
       if (error.message === 'NOT_IN_PROJECT') {
-        console.log(chalk.red('\n❌ 当前目录不是 novel-writer 项目'));
-        console.log(chalk.gray('   请在项目根目录运行此命令\n'));
+        console.log(chalk.red('\n❌ Текущий каталог не является проектом novel-writer'));
+        console.log(chalk.gray('   Пожалуйста, выполните эту команду в корневом каталоге проекта\n'));
         process.exit(1);
       }
 
-      console.log(chalk.red('\n❌ 移除插件失败'));
+      console.log(chalk.red('\n❌ Не удалось удалить плагин'));
       console.error(chalk.gray(error.message || error));
       console.log('');
       process.exit(1);
@@ -836,7 +838,7 @@ program
   });
 
 // ============================================================================
-// Upgrade 辅助函数
+// Вспомогательные функции для Upgrade
 // ============================================================================
 
 interface UpdateContent {
@@ -859,7 +861,7 @@ interface UpgradeStats {
 }
 
 /**
- * 交互式选择要更新的内容
+ * Интерактивный выбор контента для обновления
  */
 async function selectUpdateContentInteractive(): Promise<UpdateContent> {
   const inquirer = (await import('inquirer')).default;
@@ -868,14 +870,14 @@ async function selectUpdateContentInteractive(): Promise<UpdateContent> {
     {
       type: 'checkbox',
       name: 'content',
-      message: '选择要更新的内容:',
+      message: 'Выберите контент для обновления:',
       choices: [
-        { name: '命令文件 (Commands)', value: 'commands', checked: true },
-        { name: '脚本文件 (Scripts)', value: 'scripts', checked: true },
-        { name: '写作规范和预设 (Spec/Presets)', value: 'spec', checked: true },
-        { name: '专家模式文件 (Experts)', value: 'experts', checked: false },
-        { name: '模板文件 (Templates)', value: 'templates', checked: false },
-        { name: '记忆文件 (Memory)', value: 'memory', checked: false }
+        { name: 'Файлы команд (Commands)', value: 'commands', checked: true },
+        { name: 'Файлы скриптов (Scripts)', value: 'scripts', checked: true },
+        { name: 'Спецификации и пресеты (Spec/Presets)', value: 'spec', checked: true },
+        { name: 'Файлы экспертного режима (Experts)', value: 'experts', checked: false },
+        { name: 'Файлы шаблонов (Templates)', value: 'templates', checked: false },
+        { name: 'Файлы памяти (Memory)', value: 'memory', checked: false }
       ]
     }
   ]);
@@ -891,7 +893,7 @@ async function selectUpdateContentInteractive(): Promise<UpdateContent> {
 }
 
 /**
- * 更新命令文件
+ * Обновление файлов команд
  */
 async function updateCommands(
   targetAI: string[],
@@ -926,7 +928,7 @@ async function updateCommands(
     if (await fs.pathExists(sourceDir)) {
       const targetDir = path.join(projectPath, aiConfig.dir);
 
-      // 复制命令文件目录
+      // Копирование каталога команд
       const sourceCommandsDir = path.join(sourceDir, aiConfig.dir, aiConfig.commandsDir);
       const targetCommandsDir = path.join(targetDir, aiConfig.commandsDir);
 
@@ -935,17 +937,16 @@ async function updateCommands(
           await fs.copy(sourceCommandsDir, targetCommandsDir, { overwrite: true });
         }
 
-        // 统计命令文件数
+        // Подсчет файлов команд
         const commandFiles = await fs.readdir(sourceCommandsDir);
         const cmdCount = commandFiles.filter(f =>
           f.endsWith('.md') || f.endsWith('.toml')
         ).length;
 
         count += cmdCount;
-        console.log(chalk.gray(`  ✓ ${aiConfig.displayName}: ${cmdCount} 个文件`));
+        console.log(chalk.gray(`  ✓ ${aiConfig.displayName}: ${cmdCount} файлов`));
       }
-
-      // 处理额外目录 (如 GitHub Copilot 的 .vscode)
+      // Обработка дополнительных каталогов (например, .vscode для GitHub Copilot)
       if (aiConfig.extraDirs) {
         for (const extraDir of aiConfig.extraDirs) {
           const sourceExtraDir = path.join(sourceDir, extraDir);
@@ -955,12 +956,12 @@ async function updateCommands(
             if (!dryRun) {
               await fs.copy(sourceExtraDir, targetExtraDir, { overwrite: true });
             }
-            console.log(chalk.gray(`  ✓ ${aiConfig.displayName}: 已更新 ${extraDir}`));
+            console.log(chalk.gray(`  ✓ ${aiConfig.displayName}: обновлен ${extraDir}`));
           }
         }
       }
     } else {
-      console.log(chalk.yellow(`  ⚠ ${aiConfig?.displayName || ai}: 构建产物未找到`));
+      console.log(chalk.yellow(`  ⚠ Сборка артефактов не найдена для ${aiConfig?.displayName || ai}`));
     }
   }
 
@@ -968,7 +969,7 @@ async function updateCommands(
 }
 
 /**
- * 更新脚本文件
+ * Обновление скриптов
  */
 async function updateScripts(
   projectPath: string,
@@ -979,14 +980,14 @@ async function updateScripts(
   const scriptsDest = path.join(projectPath, '.specify', 'scripts');
 
   if (!await fs.pathExists(scriptsSource)) {
-    console.log(chalk.yellow('  ⚠ 脚本源文件未找到'));
+    console.log(chalk.yellow('  ⚠ Исходные файлы скриптов не найдены'));
     return 0;
   }
 
   if (!dryRun) {
     await fs.copy(scriptsSource, scriptsDest, { overwrite: true });
 
-    // 设置 bash 脚本执行权限
+    // Установка прав на выполнение для bash скриптов
     const bashDir = path.join(scriptsDest, 'bash');
     if (await fs.pathExists(bashDir)) {
       const bashFiles = await fs.readdir(bashDir);
@@ -999,19 +1000,19 @@ async function updateScripts(
     }
   }
 
-  // 统计脚本数量
+  // Подсчет количества скриптов
   const bashScripts = await fs.readdir(path.join(scriptsSource, 'bash'));
   const psScripts = await fs.readdir(path.join(scriptsSource, 'powershell'));
   const totalScripts = bashScripts.length + psScripts.length;
 
-  console.log(chalk.gray(`  ✓ 更新 ${bashScripts.length} 个 bash 脚本`));
-  console.log(chalk.gray(`  ✓ 更新 ${psScripts.length} 个 powershell 脚本`));
+  console.log(chalk.gray(`  ✓ Обновлено ${bashScripts.length} bash скриптов`));
+  console.log(chalk.gray(`  ✓ Обновлено ${psScripts.length} powershell скриптов`));
 
   return totalScripts;
 }
 
 /**
- * 更新模板文件
+ * Обновление шаблонов
  */
 async function updateTemplates(
   projectPath: string,
@@ -1022,7 +1023,7 @@ async function updateTemplates(
   const templatesDest = path.join(projectPath, '.specify', 'templates');
 
   if (!await fs.pathExists(templatesSource)) {
-    console.log(chalk.yellow('  ⚠ 模板源文件未找到'));
+    console.log(chalk.yellow('  ⚠ Исходные файлы шаблонов не найдены'));
     return 0;
   }
 
@@ -1030,17 +1031,17 @@ async function updateTemplates(
     await fs.copy(templatesSource, templatesDest, { overwrite: true });
   }
 
-  // 统计模板文件
+  // Подсчет файлов шаблонов
   const files = await fs.readdir(templatesSource);
   const templateCount = files.filter(f => f.endsWith('.md') || f.endsWith('.yaml')).length;
 
-  console.log(chalk.gray(`  ✓ 更新 ${templateCount} 个模板文件`));
+  console.log(chalk.gray(`  ✓ Обновлено ${templateCount} файлов шаблонов`));
 
   return templateCount;
 }
 
 /**
- * 更新记忆文件
+ * Обновление памяти
  */
 async function updateMemory(
   projectPath: string,
@@ -1051,7 +1052,7 @@ async function updateMemory(
   const memoryDest = path.join(projectPath, '.specify', 'memory');
 
   if (!await fs.pathExists(memorySource)) {
-    console.log(chalk.yellow('  ⚠ 记忆源文件未找到'));
+    console.log(chalk.yellow('  ⚠ Исходные файлы памяти не найдены'));
     return 0;
   }
 
@@ -1059,17 +1060,17 @@ async function updateMemory(
     await fs.copy(memorySource, memoryDest, { overwrite: true });
   }
 
-  // 统计记忆文件
+  // Подсчет файлов памяти
   const files = await fs.readdir(memorySource);
   const memoryCount = files.filter(f => f.endsWith('.md')).length;
 
-  console.log(chalk.gray(`  ✓ 更新 ${memoryCount} 个记忆文件`));
+  console.log(chalk.gray(`  ✓ Обновлено ${memoryCount} файлов памяти`));
 
   return memoryCount;
 }
 
 /**
- * 更新 spec 目录（包括 presets、反AI检测规范等）
+ * Обновление каталога spec (включая пресеты, спецификации анти-AI детектирования и т. д.)
  */
 async function updateSpec(
   projectPath: string,
@@ -1080,15 +1081,15 @@ async function updateSpec(
   const specDest = path.join(projectPath, 'spec');
 
   if (!await fs.pathExists(specSource)) {
-    console.log(chalk.yellow('  ⚠ Spec 源文件未找到'));
+    console.log(chalk.yellow('  ⚠ Исходные файлы spec не найдены'));
     return 0;
   }
 
   let count = 0;
 
   if (!dryRun) {
-    // 遍历 spec 目录，只更新 presets、checklists、config.json 等
-    // 不覆盖 tracking 和 knowledge（用户数据）
+    // Перебор каталога spec, обновление только presets, checklists, config.json и т. д.
+    // Не перезаписывать tracking и knowledge (данные пользователя)
     const specItems = await fs.readdir(specSource);
     for (const item of specItems) {
       if (item !== 'tracking' && item !== 'knowledge') {
@@ -1096,7 +1097,7 @@ async function updateSpec(
         const targetPath = path.join(specDest, item);
         await fs.copy(sourcePath, targetPath, { overwrite: true });
 
-        // 统计文件数
+        // Подсчет файлов
         if (await fs.stat(sourcePath).then(s => s.isDirectory())) {
           const files = await fs.readdir(sourcePath);
           count += files.filter(f => f.endsWith('.md') || f.endsWith('.json')).length;
@@ -1106,7 +1107,7 @@ async function updateSpec(
       }
     }
   } else {
-    // dry run - 只统计
+    // dry run - только подсчет
     const specItems = await fs.readdir(specSource);
     for (const item of specItems) {
       if (item !== 'tracking' && item !== 'knowledge') {
@@ -1121,13 +1122,13 @@ async function updateSpec(
     }
   }
 
-  console.log(chalk.gray(`  ✓ 更新 spec/ (presets 等 ${count} 个文件)`));
+  console.log(chalk.gray(`  ✓ Обновлено spec/ (${count} файлов, включая presets)`));
 
   return count;
 }
 
 /**
- * 更新专家模式文件
+ * Обновление файлов экспертного режима
  */
 async function updateExperts(
   projectPath: string,
@@ -1137,14 +1138,14 @@ async function updateExperts(
   const expertsSource = path.join(packageRoot, 'experts');
   const expertsDest = path.join(projectPath, '.specify', 'experts');
 
-  // 检查项目是否安装了专家模式
+  // Проверка, установлен ли экспертный режим в проекте
   if (!await fs.pathExists(expertsDest)) {
-    console.log(chalk.gray('  ⓘ 项目未安装专家模式，跳过'));
+    console.log(chalk.gray('  ⓘ Экспертный режим не установлен в проекте, пропуск'));
     return 0;
   }
 
   if (!await fs.pathExists(expertsSource)) {
-    console.log(chalk.yellow('  ⚠ 专家源文件未找到'));
+    console.log(chalk.yellow('  ⚠ Исходные файлы экспертов не найдены'));
     return 0;
   }
 
@@ -1152,7 +1153,7 @@ async function updateExperts(
     await fs.copy(expertsSource, expertsDest, { overwrite: true });
   }
 
-  // 统计专家文件
+  // Подсчет файлов экспертов
   const countFiles = async (dir: string): Promise<number> => {
     let count = 0;
     const items = await fs.readdir(dir);
@@ -1170,13 +1171,13 @@ async function updateExperts(
 
   const expertsCount = await countFiles(expertsSource);
 
-  console.log(chalk.gray(`  ✓ 更新 ${expertsCount} 个专家文件`));
+  console.log(chalk.gray(`  ✓ Обновлено ${expertsCount} файлов экспертов`));
 
   return expertsCount;
 }
 
 /**
- * 创建选择性备份
+ * Создание выборочной резервной копии
  */
 async function createBackup(
   projectPath: string,
@@ -1188,9 +1189,9 @@ async function createBackup(
   const backupPath = path.join(projectPath, 'backup', timestamp);
   await fs.ensureDir(backupPath);
 
-  console.log(chalk.cyan('📦 创建备份...'));
+  console.log(chalk.cyan('📦 Создание резервной копии...'));
 
-  // 备份命令文件
+  // Резервное копирование файлов команд
   if (updateContent.commands) {
     for (const ai of targetAI) {
       const aiConfig = AI_CONFIGS.find(c => c.name === ai);
@@ -1201,39 +1202,39 @@ async function createBackup(
 
       if (await fs.pathExists(source)) {
         await fs.copy(source, dest);
-        console.log(chalk.gray(`  ✓ 备份 ${aiConfig.dir}/`));
+        console.log(chalk.gray(`  ✓ Резервная копия ${aiConfig.dir}/`));
       }
     }
   }
 
-  // 备份脚本
+  // Резервное копирование скриптов
   if (updateContent.scripts) {
     const scriptsSource = path.join(projectPath, '.specify', 'scripts');
     if (await fs.pathExists(scriptsSource)) {
       await fs.copy(scriptsSource, path.join(backupPath, '.specify', 'scripts'));
-      console.log(chalk.gray('  ✓ 备份 .specify/scripts/'));
+      console.log(chalk.gray('  ✓ Резервная копия .specify/scripts/'));
     }
   }
 
-  // 备份模板
+  // Резервное копирование шаблонов
   if (updateContent.templates) {
     const templatesSource = path.join(projectPath, '.specify', 'templates');
     if (await fs.pathExists(templatesSource)) {
       await fs.copy(templatesSource, path.join(backupPath, '.specify', 'templates'));
-      console.log(chalk.gray('  ✓ 备份 .specify/templates/'));
+      console.log(chalk.gray('  ✓ Резервная копия .specify/templates/'));
     }
   }
 
-  // 备份记忆
+  // Резервное копирование памяти
   if (updateContent.memory) {
     const memorySource = path.join(projectPath, '.specify', 'memory');
     if (await fs.pathExists(memorySource)) {
       await fs.copy(memorySource, path.join(backupPath, '.specify', 'memory'));
-      console.log(chalk.gray('  ✓ 备份 .specify/memory/'));
+      console.log(chalk.gray('  ✓ Резервная копия .specify/memory/'));
     }
   }
 
-  // 保存备份信息
+  // Сохранение информации о резервной копии
   const backupInfo = {
     timestamp,
     fromVersion: projectVersion,
@@ -1244,13 +1245,13 @@ async function createBackup(
   };
   await fs.writeJson(path.join(backupPath, 'BACKUP_INFO.json'), backupInfo, { spaces: 2 });
 
-  console.log(chalk.green(`✓ 备份完成: ${backupPath}\n`));
+  console.log(chalk.green(`✓ Резервное копирование завершено: ${backupPath}\n`));
 
   return backupPath;
 }
 
 /**
- * 显示升级报告
+ * Отображение отчета об обновлении
  */
 function displayUpgradeReport(
   stats: UpgradeStats,
@@ -1258,85 +1259,86 @@ function displayUpgradeReport(
   backupPath: string,
   updateContent: UpdateContent
 ): void {
-  console.log(chalk.cyan('\n📊 升级报告\n'));
-  console.log(chalk.green('✅ 升级完成！\n'));
+  console.log(chalk.cyan('\n📊 Отчет об обновлении\n'));
+  console.log(chalk.green('✅ Обновление завершено!\n'));
 
-  console.log(chalk.yellow('升级统计:'));
-  console.log(`  • 版本: ${projectVersion} → ${getVersion()}`);
-  console.log(`  • AI 平台: ${stats.platforms.join(', ')}`);
+  console.log(chalk.yellow('Статистика обновления:'));
+  console.log(`  • Версия: ${projectVersion} → ${getVersion()}`);
+  console.log(`  • Платформы ИИ: ${stats.platforms.join(', ')}`);
 
   if (updateContent.commands && stats.commands > 0) {
-    console.log(`  • 命令文件: ${stats.commands} 个`);
+    console.log(`  • Файлы команд: ${stats.commands} шт.`);
   }
   if (updateContent.scripts && stats.scripts > 0) {
-    console.log(`  • 脚本文件: ${stats.scripts} 个`);
+    console.log(`  • Файлы скриптов: ${stats.scripts} шт.`);
   }
   if (updateContent.spec && stats.spec > 0) {
-    console.log(`  • 写作规范和预设: ${stats.spec} 个`);
+    console.log(`  • Правила написания и пресеты: ${stats.spec} шт.`);
   }
   if (updateContent.experts && stats.experts > 0) {
-    console.log(`  • 专家模式文件: ${stats.experts} 个`);
+    console.log(`  • Файлы экспертного режима: ${stats.experts} шт.`);
   }
   if (updateContent.templates && stats.templates > 0) {
-    console.log(`  • 模板文件: ${stats.templates} 个`);
+    console.log(`  • Файлы шаблонов: ${stats.templates} шт.`);
   }
   if (updateContent.memory && stats.memory > 0) {
-    console.log(`  • 记忆文件: ${stats.memory} 个`);
+    console.log(`  • Файлы памяти: ${stats.memory} шт.`);
   }
 
   if (backupPath) {
-    console.log(chalk.gray(`\n📦 备份位置: ${backupPath}`));
-    console.log(chalk.gray('   如需回滚，删除当前文件并从备份恢复'));
+    console.log(chalk.gray(`\n📦 Местоположение резервной копии: ${backupPath}`));
+    console.log('   Для отката удалите текущие файлы и восстановите из резервной копии');
   }
 
-  console.log(chalk.cyan('\n✨ 本次升级包含:'));
-  console.log('  • 反AI检测规范: 基于朱雀实测的0% AI浓度写作指南');
-  console.log('  • 专家模式增强: 核心专家系统（角色、剧情、风格、世界观）');
-  console.log('  • AI 温度控制: write 命令新增创作强化指令');
-  console.log('  • 多平台支持: 所有 13 个 AI 平台的命令已更新');
+  console.log(chalk.cyan('\n✨ Обновление включает:'));
+  console.log('  • Правила анти-AI детектирования: Руководство по написанию с 0% AI-концентрацией, основанное на реальных тестах Zhuque');
+  console.log('  • Улучшения экспертного режима: Основные экспертные системы (персонажи, сюжет, стиль, мировоззрение)');
+  console.log('  • Контроль температуры ИИ: Добавлены инструкции по усилению творчества в команду write');
+  console.log('  • Поддержка нескольких платформ: Обновлены команды для всех 13 платформ ИИ');
 
-  console.log(chalk.gray('\n📚 查看详细升级指南: docs/upgrade-guide.md'));
-  console.log(chalk.gray('   或访问: https://github.com/wordflowlab/novel-writer/blob/main/docs/upgrade-guide.md'));
+  console.log(chalk.gray('\n📚 Просмотр подробного руководства по обновлению: docs/upgrade-guide.md'));
+  console.log(chalk.gray('   Или посетите: https://github.com/wordflowlab/novel-writer/blob/main/docs/upgrade-guide.md'));
 }
 
-// upgrade 命令 - 升级现有项目
+// команда upgrade - обновление существующего проекта
 program
   .command('upgrade')
-  .option('--ai <type>', '指定要升级的 AI 配置: claude | cursor | gemini | windsurf | roocode | copilot | qwen | opencode | codex | kilocode | auggie | codebuddy | q')
-  .option('--all', '升级所有 AI 配置')
-  .option('-i, --interactive', '交互式选择要更新的内容')
-  .option('--commands', '仅更新命令文件')
-  .option('--scripts', '仅更新脚本文件')
-  .option('--spec', '仅更新写作规范和预设')
-  .option('--experts', '仅更新专家模式文件')
-  .option('--templates', '仅更新模板文件')
-  .option('--memory', '仅更新记忆文件')
-  .option('-y, --yes', '跳过确认提示')
-  .option('--no-backup', '跳过备份')
-  .option('--dry-run', '预览升级内容，不实际修改')
-  .description('升级现有项目到最新版本')
+  .option('--ai <type>', 'Указать конфигурацию ИИ для обновления: claude | cursor | gemini | windsurf | roocode | copilot | qwen | opencode | codex | kilocode | auggie | codebuddy | q')
+  .option('--all', 'Обновить все конфигурации ИИ')
+  .option('-i, --interactive', 'Интерактивный выбор обновляемого контента')
+  .option('--commands', 'Обновить только файлы команд')
+  .option('--scripts', 'Обновить только файлы скриптов')
+  .option('--spec', 'Обновить только правила написания и пресеты')
+  .option('--experts', 'Обновить только файлы экспертного режима')
+  .option('--templates', 'Обновить только файлы шаблонов')
+  .option('--memory', 'Обновить только файлы памяти')
+  .option('-y, --yes', 'Пропустить подтверждение')
+  .option('--no-backup', 'Пропустить резервное копирование')
+  .option('--dry-run', 'Предварительный просмотр обновляемого контента, без фактических изменений')
+  .description('Обновление существующего проекта до последней версии')
   .action(async (options) => {
     const projectPath = process.cwd();
     const packageRoot = path.resolve(__dirname, '..');
 
     try {
-      // 1. 检测项目
+      // 1. Проверка проекта
       const configPath = path.join(projectPath, '.specify', 'config.json');
       if (!await fs.pathExists(configPath)) {
-        console.log(chalk.red('❌ 当前目录不是 novel-writer 项目'));
-        console.log(chalk.gray('   请在项目根目录运行此命令，或使用 novel init 创建新项目'));
+```typescript
+        console.log(chalk.red('❌ Текущий каталог не является проектом novel-writer'));
+        console.log(chalk.gray('   Пожалуйста, выполните эту команду в корневом каталоге проекта или используйте novel init для создания нового проекта'));
         process.exit(1);
       }
 
-      // 读取项目配置
+      // Чтение конфигурации проекта
       const config = await fs.readJson(configPath);
-      const projectVersion = config.version || '未知';
+      const projectVersion = config.version || 'Неизвестно';
 
-      console.log(chalk.cyan('\n📦 Novel Writer 项目升级\n'));
-      console.log(chalk.gray(`当前版本: ${projectVersion}`));
-      console.log(chalk.gray(`目标版本: ${getVersion()}\n`));
+      console.log(chalk.cyan('\n📦 Обновление проекта Novel Writer\n'));
+      console.log(chalk.gray(`Текущая версия: ${projectVersion}`));
+      console.log(chalk.gray(`Целевая версия: ${getVersion()}\n`));
 
-      // 2. 检测已安装的 AI 配置
+      // 2. Обнаружение установленных конфигураций ИИ
       const installedAI: string[] = [];
       for (const aiConfig of AI_CONFIGS) {
         if (await fs.pathExists(path.join(projectPath, aiConfig.dir))) {
@@ -1345,7 +1347,7 @@ program
       }
 
       if (installedAI.length === 0) {
-        console.log(chalk.yellow('⚠️  未检测到任何 AI 配置目录'));
+        console.log(chalk.yellow('⚠️  Не обнаружено ни одной директории с конфигурацией ИИ'));
         process.exit(1);
       }
 
@@ -1354,18 +1356,18 @@ program
         return config?.displayName || name;
       });
 
-      console.log(chalk.green('✓') + ' 检测到 AI 配置: ' + displayNames.join(', '));
+      console.log(chalk.green('✓') + ' Обнаружены конфигурации ИИ: ' + displayNames.join(', '));
 
-      // 3. 确定要升级的 AI 配置
+      // 3. Определение конфигураций ИИ для обновления
       let targetAI = installedAI;
       if (options.ai) {
         if (!installedAI.includes(options.ai)) {
-          console.log(chalk.red(`❌ AI 配置 "${options.ai}" 未安装`));
+          console.log(chalk.red(`❌ Конфигурация ИИ "${options.ai}" не установлена`));
           process.exit(1);
         }
         targetAI = [options.ai];
       } else if (!options.all) {
-        // 默认升级所有已安装的 AI 配置
+        // По умолчанию обновляем все установленные конфигурации ИИ
         targetAI = installedAI;
       }
 
@@ -1374,16 +1376,16 @@ program
         return config?.displayName || name;
       });
 
-      console.log(chalk.cyan(`\n升级目标: ${targetDisplayNames.join(', ')}\n`));
+      console.log(chalk.cyan(`\nЦели обновления: ${targetDisplayNames.join(', ')}\n`));
 
-      // 4. 确定要更新的内容
+      // 4. Определение обновляемого содержимого
       let updateContent: UpdateContent;
 
       if (options.interactive) {
-        // 交互式选择
+        // Интерактивный выбор
         updateContent = await selectUpdateContentInteractive();
       } else {
-        // 根据选项确定更新内容
+        // Определение содержимого для обновления на основе опций
         const hasSpecificOption = options.commands || options.scripts || options.spec || options.experts || options.templates || options.memory;
 
         updateContent = {
@@ -1396,46 +1398,46 @@ program
         };
       }
 
-      // 显示将要更新的内容
+      // Отображение обновляемого содержимого
       const updateList: string[] = [];
-      if (updateContent.commands) updateList.push('命令文件');
-      if (updateContent.scripts) updateList.push('脚本文件');
-      if (updateContent.spec) updateList.push('写作规范和预设');
-      if (updateContent.experts) updateList.push('专家模式');
-      if (updateContent.templates) updateList.push('模板文件');
-      if (updateContent.memory) updateList.push('记忆文件');
+      if (updateContent.commands) updateList.push('файлы команд');
+      if (updateContent.scripts) updateList.push('файлы скриптов');
+      if (updateContent.spec) updateList.push('спецификации и пресеты для письма');
+      if (updateContent.experts) updateList.push('режим эксперта');
+      if (updateContent.templates) updateList.push('файлы шаблонов');
+      if (updateContent.memory) updateList.push('файлы памяти');
 
-      console.log(chalk.cyan(`更新内容: ${updateList.join(', ')}\n`));
+      console.log(chalk.cyan(`Обновляемое содержимое: ${updateList.join(', ')}\n`));
 
       if (options.dryRun) {
-        console.log(chalk.yellow('🔍 预览模式（不会实际修改文件）\n'));
+        console.log(chalk.yellow('🔍 Режим предварительного просмотра (файлы не будут изменены)\n'));
       }
 
-      // 5. 确认执行
+      // 5. Подтверждение выполнения
       if (!options.yes && !options.dryRun && !options.interactive) {
         const inquirer = (await import('inquirer')).default;
         const answers = await inquirer.prompt([
           {
             type: 'confirm',
             name: 'proceed',
-            message: '确认执行升级?',
+            message: 'Подтвердить выполнение обновления?',
             default: true
           }
         ]);
 
         if (!answers.proceed) {
-          console.log(chalk.yellow('\n升级已取消'));
+          console.log(chalk.yellow('\nОбновление отменено'));
           process.exit(0);
         }
       }
 
-      // 6. 创建备份
+      // 6. Создание резервной копии
       let backupPath = '';
       if (options.backup !== false && !options.dryRun) {
         backupPath = await createBackup(projectPath, updateContent, targetAI, projectVersion);
       }
 
-      // 7. 执行更新
+      // 7. Выполнение обновления
       const stats: UpgradeStats = {
         commands: 0,
         scripts: 0,
@@ -1449,98 +1451,99 @@ program
       const dryRun = !!options.dryRun;
 
       if (updateContent.commands) {
-        console.log(chalk.cyan('📝 更新命令文件...'));
+        console.log(chalk.cyan('📝 Обновление файлов команд...'));
         stats.commands = await updateCommands(targetAI, projectPath, packageRoot, dryRun);
       }
 
       if (updateContent.scripts) {
-        console.log(chalk.cyan('\n🔧 更新脚本文件...'));
+        console.log(chalk.cyan('\n🔧 Обновление файлов скриптов...'));
         stats.scripts = await updateScripts(projectPath, packageRoot, dryRun);
       }
 
       if (updateContent.spec) {
-        console.log(chalk.cyan('\n📋 更新写作规范和预设...'));
+        console.log(chalk.cyan('\n📋 Обновление спецификаций и пресетов для письма...'));
         stats.spec = await updateSpec(projectPath, packageRoot, dryRun);
       }
 
       if (updateContent.experts) {
-        console.log(chalk.cyan('\n🎓 更新专家模式文件...'));
+        console.log(chalk.cyan('\n🎓 Обновление файлов режима эксперта...'));
         stats.experts = await updateExperts(projectPath, packageRoot, dryRun);
       }
 
       if (updateContent.templates) {
-        console.log(chalk.cyan('\n📄 更新模板文件...'));
+        console.log(chalk.cyan('\n📄 Обновление файлов шаблонов...'));
         stats.templates = await updateTemplates(projectPath, packageRoot, dryRun);
       }
 
       if (updateContent.memory) {
-        console.log(chalk.cyan('\n🧠 更新记忆文件...'));
+        console.log(chalk.cyan('\n🧠 Обновление файлов памяти...'));
         stats.memory = await updateMemory(projectPath, packageRoot, dryRun);
       }
 
-      // 8. 显示升级报告
+      // 8. Отображение отчета об обновлении
       displayUpgradeReport(stats, projectVersion, backupPath, updateContent);
 
-      // 9. 更新项目版本号
+      // 9. Обновление номера версии проекта
       if (!options.dryRun) {
         config.version = getVersion();
         await fs.writeJson(configPath, config, { spaces: 2 });
       }
 
     } catch (error) {
-      console.error(chalk.red('\n❌ 升级失败:'), error);
+      console.error(chalk.red('\n❌ Обновление не удалось:'), error);
       process.exit(1);
     }
   });
 
-// info 命令 - 查看方法信息（保留简单版本）
+// Команда info — просмотр информации о методах (простая версия)
 program
   .command('info')
-  .description('查看可用的写作方法')
+  .description('Просмотр доступных методов письма')
   .action(() => {
-    console.log(chalk.cyan('\n📚 可用的写作方法:\n'));
-    console.log(chalk.yellow('  三幕结构') + ' - 经典的故事结构，适合大多数类型');
-    console.log(chalk.yellow('  英雄之旅') + ' - 12阶段的成长之旅，适合奇幻冒险');
-    console.log(chalk.yellow('  故事圈') + ' - 8环节的循环结构，适合角色驱动');
-    console.log(chalk.yellow('  七点结构') + ' - 紧凑的情节结构，适合悬疑惊悚');
-    console.log(chalk.yellow('  皮克斯公式') + ' - 简单有力的故事模板，适合短篇');
-    console.log(chalk.yellow('  雪花十步') + ' - 系统化的递进式规划，适合细致构建');
-    console.log('\n' + chalk.gray('提示：在 AI 助手中使用 /method 命令进行智能选择'));
-    console.log(chalk.gray('AI 会通过对话了解你的需求，推荐最适合的方法'));
-    console.log(chalk.gray('追踪系统会在写作过程中自动更新，保持数据同步'));
+    console.log(chalk.cyan('\n📚 Доступные методы письма:\n'));
+    console.log(chalk.yellow('  Трехактная структура') + ' — классическая структура истории, подходит для большинства жанров');
+    console.log(chalk.yellow('  Путешествие героя') + ' — 12-этапное путешествие роста, подходит для фэнтези и приключений');
+    console.log(chalk.yellow('  Круг историй') + ' — 8-этапная циклическая структура, подходит для историй, ориентированных на персонажей');
+    console.log(chalk.yellow('  Семиточечная структура') + ' — компактная структура сюжета, подходит для триллеров и детективов');
+    console.log(chalk.yellow('  Формула Пиксар') + ' — простой и мощный шаблон истории, подходит для коротких рассказов');
+    console.log(chalk.yellow('  Десять шагов снежинки') + ' — систематическое пошаговое планирование, подходит для детального построения');
+    console.log('\n' + chalk.gray('Подсказка: Используйте команду /method в помощнике ИИ для интеллектуального выбора'));
+    console.log(chalk.gray('ИИ поймет ваши потребности в ходе диалога и порекомендует наиболее подходящий метод'));
+    console.log(chalk.gray('Система отслеживания будет автоматически обновляться во время письма для синхронизации данных'));
   });
 
-// 自定义帮助信息
+// Пользовательская справка
 program.on('--help', () => {
   console.log('');
-  console.log(chalk.yellow('使用示例:'));
+  console.log(chalk.yellow('Примеры использования:'));
   console.log('');
-  console.log('  $ novel init my-story           # 创建新项目');
-  console.log('  $ novel init --here              # 在当前目录初始化');
-  console.log('  $ novel check                    # 检查环境');
-  console.log('  $ novel info                     # 查看写作方法');
+  console.log('  $ novel init my-story           # Создать новый проект');
+  console.log('  $ novel init --here              # Инициализировать в текущем каталоге');
+  console.log('  $ novel check                    # Проверить окружение');
+  console.log('  $ novel info                     # Просмотреть методы письма');
   console.log('');
-  console.log(chalk.cyan('核心创作命令:'));
-  console.log('  /method      - 智能选择写作方法（推荐先执行）');
-  console.log('  /style       - 设定创作风格和准则');
-  console.log('  /story       - 创建故事大纲（使用选定方法）');
-  console.log('  /outline     - 规划章节结构（基于方法模板）');
-  console.log('  /track-init  - 初始化追踪系统');
-  console.log('  /write       - AI 辅助章节创作（自动更新追踪）');
+  console.log(chalk.cyan('Основные команды для творчества:'));
+  console.log('  /method      - Интеллектуальный выбор метода письма (рекомендуется выполнить первым)');
+  console.log('  /style       - Установка стиля и руководящих принципов письма');
+  console.log('  /story       - Создание синопсиса истории (с использованием выбранного метода)');
+  console.log('  /outline     - Планирование структуры глав (на основе шаблона метода)');
+  console.log('  /track-init  - Инициализация системы отслеживания');
+  console.log('  /write       - Создание глав с помощью ИИ (автоматическое обновление отслеживания)');
   console.log('');
-  console.log(chalk.cyan('追踪管理命令:'));
-  console.log('  /plot-check  - 智能检查情节发展一致性');
-  console.log('  /timeline    - 管理和验证时间线');
-  console.log('  /relations   - 追踪角色关系变化');
-  console.log('  /track       - 综合追踪与智能分析');
+  console.log(chalk.cyan('Команды управления отслеживанием:'));
+  console.log('  /plot-check  - Интеллектуальная проверка согласованности развития сюжета');
+  console.log('  /timeline    - Управление и проверка временной шкалы');
+  console.log('  /relations   - Отслеживание изменений в отношениях персонажей');
+  console.log('  /track       - Комплексное отслеживание и интеллектуальный анализ');
   console.log('');
-  console.log(chalk.gray('更多信息: https://github.com/wordflowlab/novel-writer'));
+  console.log(chalk.gray('Дополнительная информация: https://github.com/wordflowlab/novel-writer'));
 });
 
-// 解析命令行参数
+// Разбор аргументов командной строки
 program.parse(process.argv);
 
-// 如果没有提供任何命令，显示帮助信息
+// Если не указана ни одна команда, показать справку
 if (!process.argv.slice(2).length) {
   program.outputHelp();
 }
+```

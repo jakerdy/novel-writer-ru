@@ -1,9 +1,9 @@
 #!/usr/bin/env pwsh
-# 设置章节规划
+# Настройка плана глав
 
 $STORIES_DIR = "stories"
 
-# 查找最新的故事目录
+# Поиск самой последней директории с историей
 function Get-LatestStory {
     $latest = Get-ChildItem -Path $STORIES_DIR -Directory |
               Sort-Object Name -Descending |
@@ -18,25 +18,25 @@ function Get-LatestStory {
 $storyDir = Get-LatestStory
 
 if (!$storyDir) {
-    Write-Host "错误：没有找到故事项目"
-    Write-Host "请先使用 /story 命令创建故事"
+    Write-Host "Ошибка: не найдено ни одного проекта истории"
+    Write-Host "Пожалуйста, сначала создайте историю с помощью команды /story"
     exit 1
 }
 
 $outlineFile = "$storyDir/outline.md"
 $chaptersDir = "$storyDir/chapters"
 
-# 创建章节目录
+# Создание директории для глав
 if (!(Test-Path $chaptersDir)) {
     New-Item -ItemType Directory -Path $chaptersDir | Out-Null
 }
 
-Write-Host "故事目录: $storyDir"
-Write-Host "规划文件: $outlineFile"
-Write-Host "准备创建章节规划..."
+Write-Host "Директория истории: $storyDir"
+Write-Host "Файл плана: $outlineFile"
+Write-Host "Подготовка к созданию плана глав..."
 Write-Host ""
-Write-Host "请基于故事大纲创建："
-Write-Host "- 总体结构"
-Write-Host "- 卷/部划分"
-Write-Host "- 详细章节"
-Write-Host "- 节奏控制"
+Write-Host "Пожалуйста, создайте план на основе общей структуры истории:"
+Write-Host "- Общая структура"
+Write-Host "- Разделение на тома/части"
+Write-Host "- Подробные главы"
+Write-Host "- Контроль темпа"

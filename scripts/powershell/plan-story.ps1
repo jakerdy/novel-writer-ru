@@ -1,18 +1,19 @@
-# 创作计划脚本
-# 用于 /plan 命令
+<RESULT>
+# Скрипт планирования сюжета
+# Используется для команды /plan
 
 param(
     [string]$StoryName
 )
 
-# 导入通用函数
+# Импорт общих функций
 . "$PSScriptRoot\common.ps1"
 
-# 获取项目根目录
+# Получение корневого каталога проекта
 $ProjectRoot = Get-ProjectRoot
 Set-Location $ProjectRoot
 
-# 确定故事名称
+# Определение имени истории
 if ([string]::IsNullOrEmpty($StoryName)) {
     $StoryName = Get-ActiveStory
 }
@@ -22,75 +23,76 @@ $SpecFile = "$StoryDir\specification.md"
 $ClarifyFile = "$StoryDir\clarification.md"
 $PlanFile = "$StoryDir\creative-plan.md"
 
-Write-Host "创作计划制定"
+Write-Host "Планирование сюжета"
 Write-Host "============"
-Write-Host "故事：$StoryName"
+Write-Host "История: $StoryName"
 Write-Host ""
 
-# 检查前置文档
+# Проверка предварительных документов
 $missing = @()
 
 if (-not (Test-Path "memory\constitution.md")) {
-    $missing += "宪法文件"
+    $missing += "Конституция"
 }
 
 if (-not (Test-Path $SpecFile)) {
-    $missing += "规格文件"
+    $missing += "Спецификация"
 }
 
 if ($missing.Count -gt 0) {
-    Write-Host "⚠️ 缺少以下前置文档：" -ForegroundColor Yellow
+    Write-Host "⚠️ Отсутствуют следующие предварительные документы:" -ForegroundColor Yellow
     foreach ($doc in $missing) {
         Write-Host "  - $doc"
     }
     Write-Host ""
-    Write-Host "请先完成："
+    Write-Host "Пожалуйста, сначала выполните:"
     if (-not (Test-Path "memory\constitution.md")) {
-        Write-Host "  1. /constitution - 创建创作宪法"
+        Write-Host "  1. /constitution - Создать конституцию сюжета"
     }
     if (-not (Test-Path $SpecFile)) {
-        Write-Host "  2. /specify - 定义故事规格"
+        Write-Host "  2. /specify - Определить спецификацию сюжета"
     }
     exit 1
 }
 
-# 检查是否有未澄清的点
+# Проверка наличия пунктов, требующих уточнения
 if (Test-Path $SpecFile) {
     $content = Get-Content $SpecFile -Raw
     $unclearCount = ([regex]::Matches($content, '\[需要澄清\]')).Count
 
     if ($unclearCount -gt 0) {
-        Write-Host "⚠️ 规格中有 $unclearCount 处需要澄清" -ForegroundColor Yellow
-        Write-Host "建议先运行 /clarify 澄清关键决策"
+        Write-Host "⚠️ В спецификации $unclearCount пунктов требуют уточнения" -ForegroundColor Yellow
+        Write-Host "Рекомендуется сначала запустить /clarify для уточнения ключевых решений"
         Write-Host ""
     }
 }
 
-# 检查澄清记录
+# Проверка записей об уточнении
 if (Test-Path $ClarifyFile) {
-    Write-Host "✅ 已完成澄清，将基于澄清决策制定计划" -ForegroundColor Green
+    Write-Host "✅ Записи об уточнении найдены, план будет составлен на основе уточненных решений" -ForegroundColor Green
 }
 else {
-    Write-Host "📝 未找到澄清记录，将基于原始规格制定计划"
+    Write-Host "📝 Записи об уточнении не найдены, план будет составлен на основе исходной спецификации"
 }
 
-# 检查计划文件
+# Проверка файла плана
 if (Test-Path $PlanFile) {
     Write-Host ""
-    Write-Host "📋 计划文件已存在，将更新现有计划"
+    Write-Host "📋 Файл плана существует, существующий план будет обновлен"
 
-    # 显示当前版本
+    # Отображение текущей версии
     $planContent = Get-Content $PlanFile -Raw
     if ($planContent -match "版本：(.+)") {
-        Write-Host "  当前版本：$($matches[1])"
+        Write-Host "  Текущая версия: $($matches[1])"
     }
 }
 else {
     Write-Host ""
-    Write-Host "📝 将创建新的创作计划"
+    Write-Host "📝 Будет создан новый план сюжета"
 }
 
 Write-Host ""
-Write-Host "计划文件路径：$PlanFile"
+Write-Host "Путь к файлу плана: $PlanFile"
 Write-Host ""
-Write-Host "准备就绪，可以制定创作计划"
+Write-Host "Готово к созданию плана сюжета"
+</RESULT>

@@ -1,724 +1,601 @@
-# 章节配置系统 PRD
-
-## 文档信息
-
-- **产品名称**: 章节配置系统 (Chapter Configuration System)
-- **版本**: v1.0.0
-- **创建日期**: 2025-10-14
-- **负责人**: Novel Writer Team
-- **状态**: 设计阶段
-
----
-
-## 一、背景与问题分析
-
-### 1.1 现状分析
-
-**novel-writer-cn 当前架构**：
-
-```
-全局规格系统（✅ 完善）：
-├── memory/novel-constitution.md      # 创作宪法
-├── stories/*/specification.md        # 故事规格
-├── spec/tracking/
-│   ├── character-state.json         # 角色状态追踪
-│   ├── relationships.json           # 关系网络
-│   ├── plot-tracker.json            # 情节追踪
-│   └── timeline.json                # 时间线
-└── spec/knowledge/
-    ├── character-profiles.md        # 角色档案
-    ├── world-setting.md             # 世界观
-    └── locations.md                 # 地点库
-
-章节写作流程（❌ 待优化）：
-用户在AI编辑器输入：
-/write 第5章
-
-本章要点：
-- 出场角色：林晨、苏婉
-- 场景：公司会议室
-- 情绪：紧张
-- 剧情类型：能力展现
-- 风格：快节奏，短句为主
-- 字数：3000字
-```
-
-**问题识别**：
-
-1. **参数表达方式**：纯自然语言，AI需要解析，容易遗漏或误解
-2. **重复配置**：相似场景（如多个动作章节）需要重复描述
-3. **一致性保障**：依赖用户记忆保持风格一致，容易出现偏差
-4. **配置门槛**：每次都要想清楚所有参数，增加认知负担
-5. **无法复用**：之前的配置无法快速应用到新章节
-
-### 1.2 对标分析：星月写作平台
-
-**星月的方式**：
-
-```
-Web表单界面：
-┌─────────────────────────┐
-│ 章节号: [5]             │
-│ 标题: [初露锋芒]         │
-│                         │
-│ 出场角色: (多选)         │
-│  ☑ 林晨 (主角)          │
-│  ☑ 苏婉 (女主)          │
-│  ☐ 张伟 (同事)          │
-│                         │
-│ 场景: (下拉)             │
-│  [办公室-会议室 ▼]      │
-│                         │
-│ 快捷预设: (可选)         │
-│  [能力展现场景 ▼]       │
-│  [应用预设]             │
-│                         │
-│ [生成章节]              │
-└─────────────────────────┘
-```
-
-**优势分析**：
-
-✅ **结构化输入**：下拉选择、多选框，参数明确
-✅ **降低门槛**：不需要每次都想清楚所有细节
-✅ **预设系统**：快捷选项（动作场景、情感戏等）
-✅ **可视化**：所见即所得
-
-**劣势分析**：
-
-❌ **一致性弱**：无全局规格系统，依赖人记忆
-❌ **无追踪**：缺乏角色状态、关系网络追踪
-❌ **无法追溯**：历史配置无法查看
-❌ **即时导向**：每次写作都是独立的，无整体规划
-
-### 1.3 差距本质
-
-**不是功能完整度差距，而是输入方式差距**：
-
-| 维度 | novel-writer-cn | 星月写作平台 | 差距 |
-|------|----------------|-------------|------|
-| 全局规格 | ✅ specification.md | ❌ 无 | 我们更强 |
-| 角色追踪 | ✅ character-state.json | ❌ 无 | 我们更强 |
-| 关系网络 | ✅ relationships.json | ❌ 无 | 我们更强 |
-| 时间线管理 | ✅ timeline.json | ❌ 无 | 我们更强 |
-| **章节参数输入** | ❌ **自然语言** | ✅ **结构化表单** | **这是差距** |
-| 预设模板 | ❌ 无 | ✅ 有 | 缺失功能 |
-
-**结论**：我们不缺全局配置，缺的是**章节级参数的结构化管理**。
-
----
-
-## 二、产品目标
-
-### 2.1 核心目标
-
-**目标1：降低章节写作的配置门槛**
-- 从"每次都要想清楚所有参数"变为"快速选择/复用配置"
-- 用户配置时间降低 50%
-
-**目标2：保持规格驱动哲学**
-- 增强而非替代现有系统
-- 章节配置 = 全局规格 + 章节参数
-- 配置文件可Git追踪、版本管理
-
-**目标3：建立预设生态**
-- 提供官方预设（动作场景、情感戏等）
-- 支持用户自定义预设
-- 支持社区分享预设
-
-### 2.2 非目标（Not Goals）
-
-❌ **不是**：替代全局规格系统（specification.md等）
-❌ **不是**：每章写作都必须创建配置
-❌ **不是**：强制使用Web界面
-❌ **不是**：改变规格驱动创作的哲学
-
-### 2.3 成功指标
-
-**定量指标**：
-- 章节配置创建时间 < 2分钟（vs 当前5-10分钟）
-- 配置复用率 > 30%（同一类型章节复用配置）
-- 预设使用率 > 40%（使用官方或社区预设）
-- 用户满意度 > 4.5/5.0
-
-**定性指标**：
-- 用户反馈"配置更方便了"
-- 新用户上手时间缩短
-- 创作连续性提升（不因配置中断思路）
-
----
-
-## 三、用户场景
-
-### 3.1 场景1：快速创建章节配置（CLI交互式）
-
-**用户角色**：作者张三，正在写第5章
-
-**操作流程**：
-
-```bash
-# 步骤1：CLI交互式创建配置
-$ novel chapter-config create 5 --interactive
-
-┌─ 📝 章节配置向导 ─────────────────────┐
-│ 章节号: 5                             │
-│ 标题: [输入] 初露锋芒                  │
-│                                       │
-│ 选择出场角色 (空格选择，Enter确认):   │
-│  [x] 林晨 (主角 - 男 - 24岁)         │
-│  [x] 苏婉 (女主 - 女 - 26岁)         │
-│  [ ] 张伟 (同事 - 男 - 28岁)         │
-│                                       │
-│ 选择场景:                              │
-│  ( ) 办公室-工位                       │
-│  (*) 办公室-会议室                     │
-│  ( ) 咖啡厅                           │
-│                                       │
-│ 氛围情绪:                              │
-│  (*) 紧张    ( ) 轻松                 │
-│  ( ) 悲伤    ( ) 激昂                 │
-│                                       │
-│ 剧情类型:                              │
-│  (*) 能力展现  ( ) 关系发展            │
-│  ( ) 冲突对抗  ( ) 悬念铺垫            │
-│                                       │
-│ 写作风格:                              │
-│  (*) 快节奏    ( ) 细腻描写            │
-│  ( ) 对话为主  ( ) 叙事推进            │
-│                                       │
-│ 目标字数: [━━━━━●──] 3000字          │
-│                                       │
-│ [确认] [取消]                          │
-└───────────────────────────────────────┘
-
-✅ 配置已保存: stories/my-story/chapters/chapter-5-config.yaml
-```
-
-**生成的配置文件**：
-
-```yaml
-# stories/my-story/chapters/chapter-5-config.yaml
-chapter: 5
-title: 初露锋芒
-
-characters:
-  - id: protagonist
-    name: 林晨
-    focus: high    # 本章重点角色
-  - id: female-lead
-    name: 苏婉
-    focus: medium
-
-scene:
-  location_id: office-meeting-room
-  location_name: 办公室-会议室
-  time: 上午10点
-  atmosphere: tense
-
-plot:
-  type: ability_showcase
-  summary: 主角在技术会议上解决难题，引起女主注意
-  key_points:
-    - 展现编程能力
-    - 首次引起女主关注
-    - 埋下反派线索
-
-style:
-  pace: fast
-  sentence_length: short
-  focus: dialogue_action
-
-wordcount:
-  target: 3000
-  min: 2500
-  max: 3500
-
-created_at: 2025-10-14T10:30:00Z
-```
-
-**步骤2：在AI编辑器中写作**
-
-```
-用户在Claude Code中输入:
-/write 第5章
-
-AI自动执行:
-1. 检测到 chapter-5-config.yaml 存在
-2. 加载配置 + 全局规格(constitution.md, specification.md等)
-3. 基于结构化参数生成章节内容
-4. 保存到 stories/my-story/content/第5章.md
-```
-
-**价值**：
-✅ 结构化参数，AI理解更准确
-✅ 配置可复用（如第10章也是能力展现场景）
-✅ Git可追踪，方便回溯修改
-
-### 3.2 场景2：使用预设模板
-
-**用户角色**：作者李四，要写一个激烈的打斗章节
-
-**操作流程**：
-
-```bash
-# 步骤1：查看可用预设
-$ novel preset list --category scene
-
-📦 可用场景预设:
-
-  action-intense         激烈动作场景
-    适合：打斗、追逐等高强度动作
-    风格：快节奏、短句、密集动作描写
-
-  emotional-dialogue     情感对话场景
-    适合：告白、争吵等情感戏
-    风格：对话密集、心理描写、细腻情感
-
-  mystery-suspense       悬念铺垫场景
-    适合：悬疑推理、伏笔埋设
-    风格：气氛营造、细节描写、留白艺术
-
-# 步骤2：使用预设创建配置
-$ novel chapter-config create 8 --preset action-intense
-
-✅ 已应用预设: action-intense
-📝 请补充章节信息:
-
-出场角色: [输入] 林晨,反派A
-场景: [输入] 废弃工厂
-剧情概要: [输入] 主角与反派首次交手
-
-✅ 配置已保存: stories/my-story/chapters/chapter-8-config.yaml
-```
-
-**生成的配置（预设+用户输入）**：
-
-```yaml
-chapter: 8
-title: 首次交锋
-
-# 用户输入
-characters:
-  - id: protagonist
-    name: 林晨
-    focus: high
-  - id: villain-a
-    name: 反派A
-    focus: high
-
-scene:
-  location: 废弃工厂
-  atmosphere: tense
-
-plot:
-  summary: 主角与反派首次交手
-
-# 从预设继承
-style:
-  pace: fast                    # 预设: 快节奏
-  sentence_length: short        # 预设: 短句
-  focus: action_description     # 预设: 动作描写
-
-wordcount:
-  target: 3000                  # 预设: 2500-3500
-  min: 2500
-  max: 3500
-
-special_requirements: |         # 预设的写作要求
-  - 短句为主，单句15-25字
-  - 密集动作描写，突出打击感
-  - 减少心理活动，重点在动作
-  - 快速切换场景和视角
-
-preset_used: action-intense
-```
-
-**价值**：
-✅ 极大降低配置门槛，新手也能快速上手
-✅ 保证场景类型的写作风格一致性
-✅ 社区可贡献预设，形成生态
-
-### 3.3 场景3：复用和修改已有配置
-
-**用户角色**：作者王五，第15章和第5章类似（都是能力展现）
-
-**操作流程**：
-
-```bash
-# 步骤1：查看历史配置
-$ novel chapter-config list
-
-📋 已有章节配置:
-
-  第5章  初露锋芒  (能力展现 - 办公室)
-  第8章  首次交锋  (动作场景 - 废弃工厂)
-  第12章 深入探索  (悬念铺垫 - 地下室)
-
-# 步骤2：复用配置
-$ novel chapter-config copy 5 15
-
-✅ 已复制配置 第5章 → 第15章
-📝 请修改差异部分:
-
-标题: [初露锋芒] → [输入] 惊艳全场
-场景: [办公室-会议室] → [输入] 公司年会
-剧情概要: [保持/修改?] [输入] 主角在年会上展示项目成果
-
-✅ 配置已保存: stories/my-story/chapters/chapter-15-config.yaml
-```
-
-**价值**：
-✅ 快速复用相似场景的配置
-✅ 只修改差异部分，节省时间
-✅ 保持同类场景的风格一致性
-
-### 3.4 场景4：AI编辑器内无配置写作（向后兼容）
-
-**用户角色**：老用户赵六，习惯直接使用自然语言
-
-**操作流程**：
-
-```
-用户在AI编辑器输入（无配置文件）:
-/write 第20章
-
-本章要点：
-- 角色：林晨、苏婉
-- 场景：海边
-- 情绪：轻松浪漫
-- 剧情：表白
-- 字数：2500字
-
-AI执行:
-1. 检测无 chapter-20-config.yaml
-2. 解析自然语言描述（传统方式）
-3. 加载全局规格
-4. 生成章节内容
-
-可选提示:
-💡 检测到您使用自然语言配置，要创建结构化配置吗？
-   $ novel chapter-config create 20 --from-prompt
-```
-
-**价值**：
-✅ 完全向后兼容，不破坏现有工作流
-✅ 可选择性采用新功能，无强制
-✅ 提示用户新功能，引导迁移
-
----
-
-## 四、功能设计
-
-### 4.1 章节配置文件格式（YAML Schema）
-
-#### 4.1.1 完整Schema定义
-
 ```yaml
 # 章节配置文件完整结构
 chapter: <number>           # 章节号（必填）
 title: <string>             # 章节标题（必填）
+description: <string>       # 章节简介（选填）
+preset_used: <string>       # 使用的预设名称（选填）
+created_at: <datetime>      # 配置创建时间（自动生成）
+updated_at: <datetime>      # 配置更新时间（自动生成）
 
-# 出场角色配置
-characters:
-  - id: <string>            # 角色ID（引用character-profiles.md）
-    name: <string>          # 角色名称
-    focus: <high|medium|low>  # 本章重点程度
-    state_changes:          # 本章角色状态变化（可选）
-      - 受伤
-      - 心情转好
+characters:                 # 出场角色列表（选填）
+  - id: <string>            # 角色ID（全局规格中的ID，如 protagonist, female-lead）
+    name: <string>          # 角色名（用于显示和AI理解）
+    focus: <string>         # 角色在本章的焦点程度 (high, medium, low) (选填)
+    role: <string>          # 角色在本章的定位 (e.g., antagonist, supporting) (选填)
+    state_changes:          # 角色状态变化（选填）
+      - attribute: <string> # 属性名 (e.g., relationship_with_protagonist)
+        value: <any>        # 新值
+        reason: <string>    # 状态变化原因
 
-# 场景配置
-scene:
-  location_id: <string>     # 地点ID（引用locations.md）
-  location_name: <string>   # 地点名称
-  time: <string>            # 时间（如"上午10点"、"傍晚"）
-  weather: <string>         # 天气（可选）
-  atmosphere: <tense|relaxed|sad|exciting>  # 氛围
+scene:                      # 场景信息（选填）
+  location_id: <string>     # 地点ID（全局规格中的ID，如 office-meeting-room）
+  location_name: <string>   # 地点名称（用于显示和AI理解）
+  time: <string>            # 时间描述 (e.g., "上午10点", "夜晚")
+  atmosphere: <string>      # 氛围情绪 (e.g., tense, relaxed, romantic, suspenseful)
+  weather: <string>         # 天气状况 (e.g., sunny, rainy, foggy) (选填)
 
-# 剧情配置
-plot:
-  type: <enum>              # 剧情类型（见枚举）
-  summary: <string>         # 本章剧情概要（必填）
-  key_points:               # 关键要点（数组）
+plot:                       # 情节信息（选填）
+  type: <string>            # 剧情类型 (e.g., ability_showcase, relationship_development, conflict, mystery)
+  summary: <string>         # 剧情概要
+  key_points:               # 关键情节节点（选填）
     - <string>
-  plotlines:                # 涉及的线索（引用specification.md）
-    - PL-01
-    - PL-02
-  foreshadowing:            # 本章埋设的伏笔（可选）
-    - id: F-005
-      content: 提及神秘组织
+  goals:                    # 角色目标（选填）
+    - character_id: <string>
+      objective: <string>
+  constraints:              # 情节限制/挑战（选填）
+    - <string>
 
-# 写作风格配置
-style:
-  pace: <fast|medium|slow>  # 节奏
-  sentence_length: <short|medium|long>  # 句子长度
-  focus: <action|dialogue|psychology|description>  # 描写重点
-  tone: <serious|humorous|dark|light>  # 基调（可选）
+style:                      # 写作风格（选填）
+  pace: <string>            # 节奏 (fast, medium, slow)
+  sentence_length: <string> # 句子长度 (short, medium, long)
+  focus: <string>           # 描写侧重 (dialogue, action, description, internal_monologue)
+  tone: <string>            # 语气 (e.g., humorous, serious, formal, informal)
+  literary_devices:         # 文学手法（选填）
+    - <string>              # e.g., metaphor, simile, foreshadowing
 
-# 字数要求
-wordcount:
-  target: <number>          # 目标字数
-  min: <number>             # 最小字数
-  max: <number>             # 最大字数
+wordcount:                  # 字数要求（选填）
+  target: <integer>         # 目标字数
+  min: <integer>            # 最低字数
+  max: <integer>            # 最高字数
 
-# 特殊要求
-special_requirements: |     # 其他特殊写作要求（文本块）
-  - 要求1
-  - 要求2
+special_requirements: |     # 特殊要求（选填）
+  # 多行文本，用于描述AI难以结构化的具体要求
+  - 保持悬念
+  - 突出角色A的内心挣扎
+  - 避免使用陈词滥调
 
-# 元信息
-preset_used: <string>       # 使用的预设（可选）
-created_at: <datetime>      # 创建时间
-updated_at: <datetime>      # 更新时间
+# ------------------------------------------
+# 示例：一个简单的章节配置
+# ------------------------------------------
+# chapter: 5
+# title: 初露锋芒
+# preset_used: ability_showcase_scene
+# created_at: 2025-10-14T10:30:00Z
+#
+# characters:
+#   - id: protagonist
+#     name: 林晨
+#     focus: high
+#   - id: female-lead
+#     name: 苏婉
+#     focus: medium
+#
+# scene:
+#   location_id: office-meeting-room
+#   location_name: 办公室-会议室
+#   time: 上午10点
+#   atmosphere: tense
+#
+# plot:
+#   type: ability_showcase
+#   summary: 主角在技术会议上解决难题，引起女主注意
+#   key_points:
+#     - 展现编程能力
+#     - 首次引起女主关注
+#
+# style:
+#   pace: fast
+#   sentence_length: short
+#   focus: dialogue_action
+#
+# wordcount:
+#   target: 3000
+#   min: 2500
+#   max: 3500
+#
+# special_requirements: |
+#   - 重点描写主角解决技术难题的过程
+#   - 苏婉的反应要 subtle
 ```
 
-#### 4.1.2 剧情类型枚举
+#### 4.1.2 字段解释
+
+*   **chapter** (int, required): 章节号。
+*   **title** (string, required): 章节标题。
+*   **description** (string, optional): 章节的简短描述或摘要。
+*   **preset\_used** (string, optional): 如果此配置是基于某个预设生成的，则记录预设的名称。
+*   **created\_at** (datetime, auto-generated): 配置文件的创建时间戳。
+*   **updated\_at** (datetime, auto-generated): 配置文件最后更新的时间戳。
+*   **characters** (list of objects, optional):
+    *   **id** (string, required): 角色的唯一标识符，应与全局规格系统中的ID匹配（例如 `protagonist`, `female-lead`）。
+    *   **name** (string, required): 角色的显示名称。
+    *   **focus** (string, optional): 角色在本章的重要性或关注度 (`high`, `medium`, `low`)。
+    *   **role** (string, optional): 角色在本章的特定角色（例如 `antagonist`, `supporting_character`, `mentor`）。
+    *   **state\_changes** (list of objects, optional): 记录角色在本章中可能发生的状态变化。
+        *   **attribute** (string, required): 要更改的状态属性的名称（例如 `relationship_with_protagonist`, `knowledge_level`）。
+        *   **value** (any, required): 属性的新值。
+        *   **reason** (string, optional): 导致状态变化的原因。
+*   **scene** (object, optional):
+    *   **location\_id** (string, optional): 地点的唯一标识符，应与全局规格系统中的ID匹配（例如 `office-meeting-room`, `forest-clearing`）。
+    *   **location\_name** (string, required): 地点的显示名称。
+    *   **time** (string, optional): 对场景发生时间的描述（例如 `"上午10点"`, `"黄昏"`, `"三天后"`）。
+    *   **atmosphere** (string, optional): 场景的整体氛围或情绪（例如 `tense`, `relaxed`, `romantic`, `suspenseful`, `chaotic`）。
+    *   **weather** (string, optional): 天气状况（例如 `sunny`, `rainy`, `foggy`, `stormy`）。
+*   **plot** (object, optional):
+    *   **type** (string, optional): 剧情的核心类型或子类型（例如 `ability_showcase`, `relationship_development`, `conflict`, `mystery`, `exposition`）。
+    *   **summary** (string, required): 对本章主要情节的简短总结。
+    *   **key\_points** (list of strings, optional): 本章需要包含的关键情节节点或事件。
+    *   **goals** (list of objects, optional): 角色在本章设定的具体目标。
+        *   **character\_id** (string, required): 目标所属角色的ID。
+        *   **objective** (string, required): 角色的具体目标。
+    *   **constraints** (list of strings, optional): 本章情节中可能遇到的限制、挑战或障碍。
+*   **style** (object, optional):
+    *   **pace** (string, optional): 写作节奏 (`fast`, `medium`, `slow`)。
+    *   **sentence\_length** (string, optional): 句子长度偏好 (`short`, `medium`, `long`)。
+    *   **focus** (string, optional): 描写的主要侧重点 (`dialogue`, `action`, `description`, `internal_monologue`, `exposition`)。
+    *   **tone** (string, optional): 文本的整体语气（例如 `humorous`, `serious`, `formal`, `informal`, `melancholic`）。
+    *   **literary\_devices** (list of strings, optional): 希望使用的文学手法（例如 `metaphor`, `simile`, `foreshadowing`, `irony`）。
+*   **wordcount** (object, optional):
+    *   **target** (integer, optional): 期望达到的目标字数。
+    *   **min** (integer, optional): 允许的最低字数。
+    *   **max** (integer, optional): 允许的最高字数。
+*   **special\_requirements** (string, optional): 一个多行文本字段，用于输入任何AI难以结构化或需要特别强调的写作要求。
+
+### 4.2 CLI交互式命令
+
+#### 4.2.1 `novel chapter-config create`
+
+*   **功能**: 创建新的章节配置文件。
+*   **用法**: `novel chapter-config create <chapter_number> [options]`
+*   **模式**:
+    *   **交互式 (`--interactive`)**: 启动一个引导式命令行界面，逐步收集章节信息。
+    *   **基于预设 (`--preset <preset_name>`)**: 使用指定的预设作为基础，然后允许用户修改。
+    *   **从Prompt (`--from-prompt`)**: 尝试解析最近一次AI编辑器中的自然语言Prompt来填充配置。
+    *   **直接指定参数**: 允许通过命令行参数直接设置部分字段（例如 `--title "新章节"`）。
+*   **交互式界面设计**:
+    *   使用类似 `inquirer.js` 或 `prompts` 的库实现。
+    *   提供清晰的提示和选项。
+    *   支持空格键多选、回车键确认、方向键选择。
+    *   对必填项进行校验。
+    *   允许用户输入自定义内容。
+    *   提供预览和确认步骤。
+*   **输出**: 在 `stories/<story_name>/chapters/` 目录下生成 `.yaml` 文件。
+
+#### 4.2.2 `novel chapter-config edit`
+
+*   **功能**: 编辑现有的章节配置文件。
+*   **用法**: `novel chapter-config edit <chapter_number_or_file_path>`
+*   **行为**:
+    *   如果提供章节号，则查找对应的 `.yaml` 文件并打开。
+    *   如果提供文件路径，则直接打开该文件。
+    *   默认使用系统配置的文本编辑器打开文件。
+    *   （可选）可以集成交互式编辑模式，类似 `create --interactive`。
+
+#### 4.2.3 `novel chapter-config list`
+
+*   **功能**: 列出项目中所有已存在的章节配置文件。
+*   **用法**: `novel chapter-config list [options]`
+*   **选项**:
+    *   `--sort <field>`: 按指定字段排序（如 `chapter`, `updated_at`）。
+    *   `--filter <field>=<value>`: 过滤配置（例如 `--filter scene.location_id=office`）。
+    *   `--output <format>`: 指定输出格式（如 `table`, `json`, `yaml`）。
+*   **输出**: 以表格或列表形式显示配置摘要信息（章节号、标题、场景、类型等）。
+
+#### 4.2.4 `novel chapter-config copy`
+
+*   **功能**: 将一个章节配置复制并重命名为新的章节号。
+*   **用法**: `novel chapter-config copy <source_chapter> <target_chapter> [options]`
+*   **行为**:
+    *   复制源章节的配置文件内容。
+    *   修改 `chapter` 字段为目标章节号。
+    *   更新 `created_at` 和 `updated_at` 时间戳。
+    *   （可选）允许用户在复制后立即进入交互式编辑模式 (`--edit`)。
+
+#### 4.2.5 `novel preset list`
+
+*   **功能**: 列出可用的预设模板。
+*   **用法**: `novel preset list [options]`
+*   **选项**:
+    *   `--category <category_name>`: 按类别过滤预设（例如 `scene`, `plot_type`, `style`）。
+    *   `--search <keyword>`: 按关键词搜索预设名称或描述。
+*   **输出**: 显示预设名称、简短描述、适用场景等信息。
+
+#### 4.2.6 `novel preset create`
+
+*   **功能**: 创建一个新的预设模板。
+*   **用法**: `novel preset create <preset_name> [options]`
+*   **行为**:
+    *   允许用户通过交互式界面或命令行参数定义预设内容（可以基于现有配置或手动输入）。
+    *   将预设保存在预定义的预设目录中。
+
+#### 4.2.7 `novel preset edit`
+
+*   **功能**: 编辑现有的预设模板。
+*   **用法**: `novel preset edit <preset_name>`
+
+### 4.3 AI编辑器集成
+
+*   **命令**: `/write <chapter_number>`
+*   **逻辑**:
+    1.  **检测配置文件**: 检查 `stories/<story_name>/chapters/chapter-<chapter_number>-config.yaml` 是否存在。
+    2.  **无配置**:
+        *   如果文件不存在，则回退到传统的自然语言解析模式。
+        *   AI尝试解析用户输入的自然语言指令（如“本章要点：...”）。
+        *   加载全局规格系统。
+        *   生成章节内容。
+        *   （可选）在输出或编辑器中提示用户：“检测到您使用的是自然语言配置，是否要为其创建结构化配置？”并提供创建命令。
+    3.  **有配置**:
+        *   加载找到的章节配置文件 (`chapter-<chapter_number>-config.yaml`)。
+        *   加载全局规格系统（`novel-constitution.md`, `character-profiles.md`, `world-setting.md` 等）。
+        *   AI结合章节配置和全局规格，生成章节内容。
+        *   将生成的内容保存到 `stories/<story_name>/content/第<chapter_number>章.md`。
+        *   （可选）在配置文件中更新 `updated_at` 时间戳。
+*   **AI能力要求**:
+    *   能够理解YAML结构化数据。
+    *   能够根据结构化参数和自然语言提示（来自全局规格）生成连贯、符合要求的文本。
+    *   能够处理参数间的冲突或优先级（例如，`style.pace` 在配置中和全局规格中都有定义时，以章节配置为准）。
+
+### 4.4 预设系统
+
+*   **目的**: 提供常用场景、风格、情节类型的预设配置，降低用户门槛，保证一致性。
+*   **结构**: 预设可以存储在独立的目录（例如 `presets/`）下，每个预设是一个 `.yaml` 文件，定义了部分或全部章节配置字段。
+*   **类型**:
+    *   **场景预设**: 如 `action-intense`, `emotional-dialogue`, `mystery-suspense`。
+    *   **风格预设**: 如 `fast-paced-short-sentences`, `detailed-description`。
+    *   **情节预设**: 如 `ability-showcase`, `character-introduction`。
+*   **继承与覆盖**: 当用户使用预设创建配置时，预设内容会被加载，用户后续的输入或修改会覆盖预设中的相应字段。
+*   **社区生态**: 允许用户自定义预设并分享，形成预设库。
+
+### 4.5 版本控制与追踪
+
+*   **Git集成**:
+    *   所有章节配置文件（`.yaml`）应被纳入Git版本控制。
+    *   每次使用 `/write` 命令生成章节内容后，如果配置文件有更新（例如 `updated_at` 变化），或者生成了新的章节内容文件，都应被视为一次可提交的变更。
+    *   用户可以通过Git命令（`git diff`, `git log`）查看配置和内容的变更历史。
+*   **追踪价值**:
+    *   **可追溯性**: 清楚了解每一章的写作参数是如何确定的。
+    *   **可复现性**: 能够回滚到之前的配置状态。
+    *   **协作**: 团队成员可以共享和审查配置。
+
+---
+
+## 五、未来展望
+
+*   **可视化配置界面**: 开发一个Web或桌面应用，提供图形化的章节配置编辑器，替代CLI。
+*   **智能推荐**: 基于用户写作历史和全局规格，AI自动推荐合适的章节配置或预设。
+*   **预设市场**: 建立一个社区平台，供用户分享、下载和评价预设。
+*   **与其他工具集成**: 与项目管理工具、云存储等集成。
+*   **动态配置**: 允许在写作过程中动态调整章节配置，AI实时响应。
+
+---
+
+## 六、附录
+
+### 6.1 全局规格系统引用
+
+本系统依赖以下全局规格文件：
+
+*   `memory/novel-constitution.md`
+*   `stories/*/specification.md`
+*   `spec/tracking/character-state.json`
+*   `spec/tracking/relationships.json`
+*   `spec/tracking/plot-tracker.json`
+*   `spec/tracking/timeline.json`
+*   `spec/knowledge/character-profiles.md`
+*   `spec/knowledge/world-setting.md`
+*   `spec/knowledge/locations.md`
+
+### 6.2 术语表
+
+*   **章节配置文件 (Chapter Configuration File)**: 用于定义单章写作参数的YAML文件。
+*   **预设 (Preset)**: 预先定义好的章节配置模板，用于快速创建新配置。
+*   **全局规格系统 (Global Specification System)**: 存储小说整体设定的文件集合，为章节写作提供背景和约束。
+*   **CLI (Command Line Interface)**: 命令行交互界面。
+*   **AI编辑器 (AI Editor)**: 集成AI写作功能的编辑器（如Claude Code）。
+
+---
+```
+# Конфигурация персонажей
+characters:
+  - id: <string>            # ID персонажа (ссылка на character-profiles.md)
+    name: <string>          # Имя персонажа
+    focus: <high|medium|low>  # Степень важности персонажа в главе
+    state_changes:          # Изменения состояния персонажа в главе (опционально)
+      - ранен
+      - настроение улучшилось
+
+# Конфигурация сцены
+scene:
+  location_id: <string>     # ID локации (ссылка на locations.md)
+  location_name: <string>   # Название локации
+  time: <string>            # Время (например, "10 утра", "вечер")
+  weather: <string>         # Погода (опционально)
+  atmosphere: <tense|relaxed|sad|exciting>  # Атмосфера
+
+# Конфигурация сюжета
+plot:
+  type: <enum>              # Тип сюжета (см. перечисление)
+  summary: <string>         # Краткое содержание главы (обязательно)
+  key_points:               # Ключевые моменты (массив)
+    - <string>
+  plotlines:                # Задействованные сюжетные линии (ссылка на specification.md)
+    - PL-01
+    - PL-02
+  foreshadowing:            # Заложенные в главе предзнаменования (опционально)
+    - id: F-005
+      content: Упоминание таинственной организации
+
+# Конфигурация стиля письма
+style:
+  pace: <fast|medium|slow>  # Темп
+  sentence_length: <short|medium|long>  # Длина предложений
+  focus: <action|dialogue|psychology|description>  # Фокус описания
+  tone: <serious|humorous|dark|light>  # Тон (опционально)
+
+# Требования к объему
+wordcount:
+  target: <number>          # Целевой объем
+  min: <number>             # Минимальный объем
+  max: <number>             # Максимальный объем
+
+# Особые требования
+special_requirements: |     # Другие особые требования к написанию (текстовый блок)
+  - Требование 1
+  - Требование 2
+
+# Метаинформация
+preset_used: <string>       # Использованный пресет (опционально)
+created_at: <datetime>      # Время создания
+updated_at: <datetime>      # Время обновления
+```
+
+#### 4.1.2 Перечисление типов сюжета
 
 ```yaml
 plot_types:
-  - ability_showcase      # 能力展现
-  - relationship_dev      # 关系发展
-  - conflict_combat       # 冲突对抗
-  - mystery_suspense      # 悬念铺垫
-  - transition            # 过渡承接
-  - climax                # 高潮对决
-  - emotional_scene       # 情感戏
-  - world_building        # 世界观展开
-  - plot_twist            # 剧情反转
+  - ability_showcase      # Демонстрация способностей
+  - relationship_dev      # Развитие отношений
+  - conflict_combat       # Конфликт и противостояние
+  - mystery_suspense      # Загадка и напряжение
+  - transition            # Переход, связка
+  - climax                # Кульминация, решающее противостояние
+  - emotional_scene       # Эмоциональная сцена
+  - world_building        # Раскрытие мира
+  - plot_twist            # Сюжетный поворот
 ```
 
-#### 4.1.3 配置文件示例
+#### 4.1.3 Пример конфигурационного файла
 
-见 `docs/prd/chapter/examples/` 目录下的完整示例。
+См. полный пример в каталоге `docs/prd/chapter/examples/`.
 
-### 4.2 CLI命令设计
+### 4.2 Проектирование команд CLI
 
-#### 4.2.1 命令列表
+#### 4.2.1 Список команд
 
 ```bash
-# ========== 章节配置管理 ==========
-novel chapter-config create <chapter>       # 创建章节配置
-  --interactive                              # 交互式创建（推荐）
-  --preset <preset-id>                       # 使用预设
-  --from-prompt                              # 从自然语言生成
+# ========== Управление конфигурацией глав ==========
+novel chapter-config create <chapter>       # Создать конфигурацию главы
+  --interactive                              # Интерактивное создание (рекомендуется)
+  --preset <preset-id>                       # Использовать пресет
+  --from-prompt                              # Сгенерировать из естественного языка
 
-novel chapter-config edit <chapter>         # 编辑章节配置
-  --editor <editor>                          # 指定编辑器（默认vim）
+novel chapter-config edit <chapter>         # Редактировать конфигурацию главы
+  --editor <editor>                          # Указать редактор (по умолчанию vim)
 
-novel chapter-config list                   # 列出所有章节配置
-  --format <table|json|yaml>                 # 输出格式
+novel chapter-config list                   # Вывести список всех конфигураций глав
+  --format <table|json|yaml>                 # Формат вывода
 
-novel chapter-config copy <from> <to>       # 复制配置
-  --interactive                              # 交互式修改差异
+novel chapter-config copy <from> <to>       # Скопировать конфигурацию
+  --interactive                              # Интерактивно изменить различия
 
-novel chapter-config delete <chapter>       # 删除配置
+novel chapter-config delete <chapter>       # Удалить конфигурацию
 
-novel chapter-config validate <chapter>     # 验证配置文件
+novel chapter-config validate <chapter>     # Проверить конфигурационный файл
 
-# ========== 预设管理 ==========
-novel preset list                           # 列出所有预设
-  --category <scene|style|chapter>           # 按类别筛选
+# ========== Управление пресетами ==========
+novel preset list                           # Вывести список всех пресетов
+  --category <scene|style|chapter>           # Фильтр по категории
 
-novel preset show <preset-id>               # 查看预设详情
+novel preset show <preset-id>               # Показать детали пресета
 
-novel preset create <preset-id>             # 创建自定义预设
-  --interactive                              # 交互式创建
+novel preset create <preset-id>             # Создать пользовательский пресет
+  --interactive                              # Интерактивное создание
 
-novel preset import <file>                  # 导入社区预设
+novel preset import <file>                  # Импортировать пресет сообщества
 
-novel preset export <preset-id>             # 导出预设
-  --output <file>                            # 输出文件
+novel preset export <preset-id>             # Экспортировать пресет
+  --output <file>                            # Выходной файл
 
-# ========== 配置模板管理 ==========
-novel chapter-template list                 # 列出章节配置模板
+# ========== Управление шаблонами глав ==========
+novel chapter-template list                 # Вывести список шаблонов конфигурации глав
 
-novel chapter-template export <chapter>     # 导出为模板
+novel chapter-template export <chapter>     # Экспортировать как шаблон
   --name <template-name>
 ```
 
-#### 4.2.2 命令详细设计
+#### 4.2.2 Детальный дизайн команд
 
-**命令1: `novel chapter-config create`**
+**Команда 1: `novel chapter-config create`**
 
 ```typescript
 interface CreateOptions {
-  interactive?: boolean;    // 交互式模式
-  preset?: string;         // 使用预设ID
-  fromPrompt?: boolean;    // 从自然语言生成
-  characters?: string[];   // 指定角色
-  scene?: string;          // 指定场景
-  plotType?: string;       // 剧情类型
-  wordcount?: number;      // 目标字数
+  interactive?: boolean;    // Интерактивный режим
+  preset?: string;         // ID используемого пресета
+  fromPrompt?: boolean;    // Генерация из естественного языка
+  characters?: string[];   // Указание персонажей
+  scene?: string;          // Указание сцены
+  plotType?: string;       // Тип сюжета
+  wordcount?: number;      // Целевой объем
 }
 
-// 使用示例
+// Пример использования
 $ novel chapter-config create 5 --interactive
 $ novel chapter-config create 8 --preset action-intense
 $ novel chapter-config create 10 --characters protagonist,female-lead --scene office
 ```
 
-**命令2: `novel preset list`**
+**Команда 2: `novel preset list`**
 
 ```bash
-# 输出格式
+# Формат вывода
 $ novel preset list --category scene
 
-📦 场景预设 (6个):
+📦 Пресеты сцен (6 шт.):
 
-  action-intense         激烈动作场景
-    适合: 打斗、追逐等高强度动作
-    风格: 快节奏、短句、密集动作描写
-    字数: 2500-3500字
+  action-intense         Интенсивная экшн-сцена
+    Подходит для: драк, погонь и других высокоинтенсивных действий
+    Стиль: быстрый темп, короткие предложения, плотное описание действий
+    Объем: 2500-3500 слов
 
-  emotional-dialogue     情感对话场景
-    适合: 告白、争吵等情感戏
-    风格: 对话密集、心理描写、细腻情感
-    字数: 2000-3000字
+  emotional-dialogue     Эмоциональная диалоговая сцена
+    Подходит для: признаний, ссор и других эмоциональных сцен
+    Стиль: плотные диалоги, психологическое описание, тонкие эмоции
+    Объем: 2000-3000 слов
 
-  [更多...]
+  [Больше...]
 ```
 
-### 4.3 斜杠命令集成（更新write.md模板）
+### 4.3 Интеграция команд с косой чертой (обновление шаблона write.md)
 
-#### 4.3.1 更新后的write.md流程
+#### 4.3.1 Обновленный процесс write.md
 
 ```markdown
 ---
-description: 基于任务清单执行章节写作，自动加载上下文和验证规则
-argument-hint: [章节编号或任务ID]
+description: Выполнение написания главы на основе списка задач, автоматическая загрузка контекста и правил проверки
+argument-hint: [Номер главы или ID задачи]
 model: claude-sonnet-4-5-20250929
 ---
 
-## 前置检查
+## Предварительные проверки
 
-1. **检查章节配置文件**（新增）
-   - 检查是否存在 `stories/*/chapters/chapter-X-config.yaml`
-   - 如果存在，加载配置文件
-   - 解析章节配置，提取结构化参数
+1. **Проверка конфигурационного файла главы** (Новое)
+   - Проверить наличие `stories/*/chapters/chapter-X-config.yaml`
+   - Если существует, загрузить конфигурационный файл
+   - Распарсить конфигурацию главы, извлечь структурированные параметры
 
-2. **加载全局上下文**（保持原有）
-   - `memory/novel-constitution.md`（创作宪法 - 最高原则）
-   - `memory/style-reference.md`（风格参考）
-   - `stories/*/specification.md`（故事规格）
-   - `stories/*/creative-plan.md`（创作计划）
-   - `spec/tracking/character-state.json`（角色状态）
-   - `spec/tracking/relationships.json`（关系网络）
-   - `spec/knowledge/` 相关文件
+2. **Загрузка глобального контекста** (Сохранено)
+   - `memory/novel-constitution.md` (Конституция творчества - высшие принципы)
+   - `memory/style-reference.md` (Справочник по стилю)
+   - `stories/*/specification.md` (Спецификация истории)
+   - `stories/*/creative-plan.md` (План творчества)
+   - `spec/tracking/character-state.json` (Состояние персонажей)
+   - `spec/tracking/relationships.json` (Сеть отношений)
+   - Соответствующие файлы `spec/knowledge/`
 
-3. **根据配置加载详细信息**（新增）
+3. **Загрузка подробной информации в соответствии с конфигурацией** (Новое)
    ```
-   如果配置指定了:
+   Если конфигурация указывает:
    - characters: [protagonist, female-lead]
-     → 从 spec/knowledge/character-profiles.md 加载详细档案
-     → 从 spec/tracking/character-state.json 加载最新状态
+     → Загрузить подробные профили из spec/knowledge/character-profiles.md
+     → Загрузить последнее состояние из spec/tracking/character-state.json
 
    - scene.location_id: office-meeting-room
-     → 从 spec/knowledge/locations.md 加载场景详情
+     → Загрузить детали сцены из spec/knowledge/locations.md
 
    - plotlines: [PL-01, PL-02]
-     → 从 stories/*/specification.md 加载线索详情
+     → Загрузить детали сюжетных линий из stories/*/specification.md
    ```
 
-## 写作执行流程
+## Процесс выполнения написания
 
-### 1. 构建章节提示词（新增结构化参数注入）
+### 1. Построение промпта для главы (Новая инъекция структурированных параметров)
 
-**如果有配置文件**：
-
-```
-📋 本章配置:
-
-**基本信息**:
-- 章节: 第5章 - 初露锋芒
-- 字数要求: 2500-3500字（目标3000字）
-
-**出场角色**:
-- 林晨（主角 - 重点角色）
-  当前状态: [从character-state.json读取]
-  性格: [从character-profiles.md读取]
-
-- 苏婉（女主 - 中等戏份）
-  当前状态: [读取]
-  性格: [读取]
-
-**场景设定**:
-- 地点: 办公室-会议室
-  详情: [从locations.md读取场景描述]
-- 时间: 上午10点
-- 氛围: 紧张
-
-**剧情要求**:
-- 类型: 能力展现
-- 概要: 主角在技术会议上解决难题，引起女主注意
-- 关键要点:
-  1. 展现编程能力
-  2. 首次引起女主关注
-  3. 埋下反派线索
-
-**写作风格**:
-- 节奏: 快节奏
-- 句长: 短句为主（15-25字）
-- 重点: 对话+动作描写
-- 特殊要求:
-  - 技术描写要准确但不晦涩
-  - 女主的反应要微妙
-  - 结尾留悬念
-
-[然后加载全局规格...]
-```
-
-**如果无配置文件**（向后兼容）：
+**При наличии конфигурационного файла**:
 
 ```
-📋 基于用户描述:
+📋 Конфигурация главы:
 
-[解析自然语言]
+**Основная информация**:
+- Глава: Глава 5 - Первые успехи
+- Требования к объему: 2500-3500 слов (цель 3000 слов)
 
-[加载全局规格...]
+**Появляющиеся персонажи**:
+- Линь Чэнь (Главный герой - ключевой персонаж)
+  Текущее состояние: [Чтение из character-state.json]
+  Характер: [Чтение из character-profiles.md]
+
+- Су Вань (Главная героиня - средняя роль)
+  Текущее состояние: [Чтение]
+  Характер: [Чтение]
+
+**Настройка сцены**:
+- Место: Офис - конференц-зал
+  Детали: [Чтение описания сцены из locations.md]
+- Время: 10 утра
+- Атмосфера: Напряженная
+
+**Требования к сюжету**:
+- Тип: Демонстрация способностей
+- Краткое содержание: Главный герой решает техническую проблему на совещании, привлекая внимание главной героини
+- Ключевые моменты:
+  1. Демонстрация навыков программирования
+  2. Первое привлечение внимания главной героини
+  3. Заложение основы для линии злодея
+
+**Стиль письма**:
+- Темп: Быстрый
+- Длина предложений: Преимущественно короткие (15-25 слов)
+- Фокус: Диалоги + описание действий
+- Особые требования:
+  - Технические описания должны быть точными, но не запутанными
+  - Реакция главной героини должна быть тонкой
+  - Оставить интригу в конце
+
+[Затем загрузить глобальную спецификацию...]
 ```
 
-### 2. 生成章节内容（保持原有流程）
-
-### 3. 质量自检（保持原有流程）
-
-### 4. 保存和更新（新增配置记录）
-
-- 保存章节内容到 `stories/*/content/第X章.md`
-- 更新 `chapter-X-config.yaml` 的 `updated_at` 时间戳
-- 更新任务状态
-```
-
-#### 4.3.2 配置加载优先级
+**При отсутствии конфигурационного файла** (обратная совместимость):
 
 ```
-优先级（高 → 低）:
+📋 На основе описания пользователя:
 
-1. 章节配置文件 (chapter-X-config.yaml)
-   └─ 章节特定参数
+[Парсинг естественного языка]
 
-2. 预设文件（如使用预设）
-   └─ 预设的默认值
-
-3. 全局规格 (specification.md)
-   └─ 故事级别的设定
-
-4. 创作宪法 (novel-constitution.md)
-   └─ 最高原则和价值观
-
-合并策略：
-- 章节配置覆盖预设
-- 预设补充默认值
-- 全局规格提供背景
-- 宪法提供原则
+[Загрузка глобальной спецификации...]
 ```
 
-### 4.4 预设系统设计
+### 2. Генерация контента главы (Сохранение исходного процесса)
 
-#### 4.4.1 预设文件结构
+### 3. Самопроверка качества (Сохранение исходного процесса)
+
+### 4. Сохранение и обновление (Новая запись конфигурации)
+
+- Сохранить контент главы в `stories/*/content/Глава X.md`
+- Обновить временную метку `updated_at` в `chapter-X-config.yaml`
+- Обновить статус задачи
+```
+
+#### 4.3.2 Приоритет загрузки конфигурации
 
 ```
-~/.novel/presets/           # 用户目录下的预设库
-├── official/               # 官方预设
+Приоритет (Высокий → Низкий):
+
+1. Конфигурационный файл главы (chapter-X-config.yaml)
+   └─ Параметры, специфичные для главы
+
+2. Файл пресета (если используется)
+   └─ Значения по умолчанию пресета
+
+3. Глобальная спецификация (specification.md)
+   └─ Настройки на уровне истории
+
+4. Конституция творчества (novel-constitution.md)
+   └─ Высшие принципы и ценности
+
+5. Стратегия слияния:
+- Конфигурация главы переопределяет пресет
+- Пресет дополняет значения по умолчанию
+- Глобальная спецификация предоставляет фон
+- Конституция предоставляет принципы
+```
+
+### 4.4 Проектирование системы пресетов
+
+#### 4.4.1 Структура файлов пресетов
+
+```
+~/.novel/presets/           # Библиотека пресетов в пользовательском каталоге
+├── official/               # Официальные пресеты
 │   ├── scenes/
 │   │   ├── action-intense.yaml
 │   │   ├── emotional-dialogue.yaml
@@ -729,24 +606,24 @@ model: claude-sonnet-4-5-20250929
 │   └── chapters/
 │       ├── opening.yaml
 │       └── climax.yaml
-├── user/                   # 用户自定义预设
+├── user/                   # Пользовательские пресеты
 │   └── my-battle-scene.yaml
-└── community/              # 社区预设（从Dreams下载）
+└── community/              # Пресеты сообщества (загруженные из Dreams)
     └── popular-preset-1.yaml
 ```
 
-#### 4.4.2 预设文件格式
+#### 4.4.2 Формат файлов пресетов
 
 ```yaml
 # ~/.novel/presets/official/scenes/action-intense.yaml
 id: action-intense
-name: 激烈动作场景
-description: 适合打斗、追逐等高强度动作描写
+name: Интенсивная экшн-сцена
+description: Подходит для описания драк, погонь и других высокоинтенсивных действий
 category: scene
 author: Novel Writer Official
 version: 1.0.0
 
-# 预设的默认配置
+# Значения конфигурации по умолчанию
 defaults:
   style:
     pace: fast
@@ -760,13 +637,13 @@ defaults:
     max: 3500
 
   special_requirements: |
-    - 短句为主，单句15-25字
-    - 密集动作描写，突出打击感和节奏感
-    - 减少心理活动描写，重点在动作
-    - 快速切换场景和视角
-    - 避免冗长的环境描写
+    - Преимущественно короткие предложения, 15-25 слов в каждом
+    - Плотное описание действий, подчеркивающее ощущение удара и ритм
+    - Уменьшить описание психологических состояний, сосредоточиться на действиях
+    - Быстрое переключение сцен и точек зрения
+    - Избегать избыточных описаний окружения
 
-# 推荐设置
+# Рекомендуемые настройки
 recommended:
   plot_types:
     - conflict_combat
@@ -775,52 +652,52 @@ recommended:
     - tense
     - exciting
 
-# 兼容性
+# Совместимость
 compatible_genres:
   - xuanhuan
   - wuxia
   - dushi
   - kehuan
 
-# 使用提示
+# Советы по использованию
 usage_tips:
-  - 适合章节的高潮部分
-  - 建议配合短章节（2000-3500字）
-  - 前后需要铺垫和收尾章节
+  - Подходит для кульминационных частей главы
+  - Рекомендуется использовать с короткими главами (2000-3500 слов)
+  - Требует глав для подготовки и завершения
 ```
 
-#### 4.4.3 预设应用逻辑
+#### 4.4.3 Логика применения пресетов
 
 ```typescript
-// 预设应用算法
+// Алгоритм применения пресетов
 function applyPreset(
   preset: Preset,
   userInput: Partial<ChapterConfig>
 ): ChapterConfig {
   return {
-    // 用户输入优先
+    // Ввод пользователя имеет наивысший приоритет
     ...preset.defaults,
     ...userInput,
 
-    // 合并special_requirements
+    // Слияние special_requirements
     special_requirements: [
       preset.defaults.special_requirements,
       userInput.special_requirements
     ].filter(Boolean).join('\n\n'),
 
-    // 记录预设
+    // Запись использованного пресета
     preset_used: preset.id,
   };
 }
 ```
 
-### 4.5 配置验证规则
+### 4.5 Правила проверки конфигурации
 
-#### 4.5.1 验证检查清单
+#### 4.5.1 Контрольный список проверок
 
 ```typescript
 interface ValidationRules {
-  // 必填字段检查
+  // Проверка обязательных полей
   required_fields: [
     'chapter',
     'title',
@@ -828,7 +705,7 @@ interface ValidationRules {
     'wordcount.target'
   ];
 
-  // 数据类型检查
+  // Проверка типов данных
   type_checks: {
     chapter: 'number',
     title: 'string',
@@ -837,14 +714,14 @@ interface ValidationRules {
     // ...
   };
 
-  // 引用完整性检查
+  // Проверка целостности ссылок
   reference_checks: {
     'characters[].id': 'character-profiles.md',
     'scene.location_id': 'locations.md',
     'plot.plotlines[]': 'specification.md',
   };
 
-  // 逻辑一致性检查
+  // Проверка логической согласованности
   logic_checks: [
     'wordcount.min <= wordcount.target <= wordcount.max',
     'characters.length >= 1',
@@ -853,205 +730,205 @@ interface ValidationRules {
 }
 ```
 
-#### 4.5.2 验证错误提示
+#### 4.5.2 Сообщения об ошибках проверки
 
 ```bash
 $ novel chapter-config validate 5
 
-🔍 验证配置文件: chapter-5-config.yaml
+🔍 Проверка конфигурационного файла: chapter-5-config.yaml
 
-❌ 验证失败 (2个错误):
+❌ Проверка не пройдена (2 ошибки):
 
-  1. 引用错误 (characters[1].id)
-     └─ 角色ID "unknown-person" 不存在于 character-profiles.md
-     建议: 检查角色档案或修正ID
+  1. Ошибка ссылки (characters[1].id)
+     └─ ID персонажа "unknown-person" не существует в character-profiles.md
+     Рекомендация: Проверьте профиль персонажа или исправьте ID
 
-  2. 逻辑错误 (wordcount)
+  2. Логическая ошибка (wordcount)
      └─ min(3500) > target(3000)
-     建议: 调整字数范围为 min <= target <= max
+     Рекомендация: Отрегулируйте диапазон объема так, чтобы min <= target <= max
 
-⚠️  警告 (1个):
+⚠️  Предупреждение (1):
 
-  1. 最佳实践 (plot.key_points)
-     └─ 关键要点建议至少3个，当前只有2个
+  1. Лучшая практика (plot.key_points)
+     └─ Рекомендуется иметь не менее 3 ключевых моментов, сейчас их 2
 ```
 
 ---
 
-## 五、技术方案
+## Пять. Техническое решение
 
-### 5.1 文件结构设计
+### 5.1 Проектирование структуры файлов
 
 ```
-项目结构:
+Структура проекта:
 
 stories/
   └── my-story/
-      ├── specification.md           # 全局规格（已有）
-      ├── creative-plan.md           # 创作计划（已有）
-      ├── chapters/                  # 🆕 章节配置目录
+      ├── specification.md           # Глобальная спецификация (существует)
+      ├── creative-plan.md           # План творчества (существует)
+      ├── chapters/                  # 🆕 Каталог конфигурации глав
       │   ├── chapter-1-config.yaml
       │   ├── chapter-2-config.yaml
       │   ├── chapter-5-config.yaml
       │   └── ...
-      └── content/                   # 章节内容（已有）
+      └── content/                   # Содержимое глав (существует)
           ├── 第1章.md
           ├── 第2章.md
           └── ...
 
-预设库:
+Библиотека пресетов:
 
-~/.novel/presets/                  # 🆕 全局预设目录
-├── official/                      # 官方预设
+~/.novel/presets/                  # 🆕 Глобальный каталог пресетов
+├── official/                      # Официальные пресеты
 │   ├── scenes/
 │   ├── styles/
 │   └── chapters/
-├── user/                          # 用户自定义
-└── community/                     # 社区预设
+├── user/                          # Пользовательские
+└── community/                     # Общедоступные
 
-node_modules/novel-writer-cn/      # npm包内置
-└── presets/                       # 内置官方预设
+node_modules/novel-writer-cn/      # Встроенные в пакет npm
+└── presets/                       # Встроенные официальные пресеты
     ├── action-intense.yaml
     ├── emotional-dialogue.yaml
     └── ...
 ```
 
-### 5.2 配置加载流程
+### 5.2 Процесс загрузки конфигурации
 
 ```mermaid
 graph TD
-    A[用户执行 /write 第5章] --> B{检查配置文件}
-    B -->|存在| C[加载 chapter-5-config.yaml]
-    B -->|不存在| D[使用自然语言模式]
+    A[Пользователь выполняет /write Глава 5] --> B{Проверка файла конфигурации}
+    B -->|Существует| C[Загрузка chapter-5-config.yaml]
+    B -->|Не существует| D[Использование режима естественного языка]
 
-    C --> E{配置使用预设?}
-    E -->|是| F[加载预设文件]
-    E -->|否| G[直接使用配置]
+    C --> E{Использование пресета в конфигурации?}
+    E -->|Да| F[Загрузка файла пресета]
+    E -->|Нет| G[Прямое использование конфигурации]
 
-    F --> H[合并预设+配置]
+    F --> H[Объединение пресета + конфигурации]
     G --> H
-    H --> I[加载全局规格]
+    H --> I[Загрузка глобальной спецификации]
 
     D --> I
 
-    I --> J[加载角色详情]
-    I --> K[加载场景详情]
-    I --> L[加载线索详情]
+    I --> J[Загрузка деталей персонажа]
+    I --> K[Загрузка деталей сцены]
+    I --> L[Загрузка деталей сюжетной линии]
 
-    J --> M[构建完整提示词]
+    J --> M[Построение полного промпта]
     K --> M
     L --> M
 
-    M --> N[AI生成章节内容]
-    N --> O[保存章节文件]
+    M --> N[AI генерирует содержимое главы]
+    N --> O[Сохранение файла главы]
 ```
 
-### 5.3 与现有系统集成点
+### 5.3 Точки интеграции с существующей системой
 
-#### 5.3.1 与write.md模板集成
+#### 5.3.1 Интеграция с шаблоном write.md
 
-**修改点1：前置检查步骤**
+**Пункт изменения 1: Шаг предварительной проверки**
 
 ```markdown
-## 前置检查
+## Предварительная проверка
 
-1. 运行脚本 `{SCRIPT}` 检查创作状态
+1. Запуск скрипта `{SCRIPT}` для проверки статуса творчества
 
-2. **🆕 检查章节配置文件**
+2. **🆕 Проверка файла конфигурации главы**
    ```bash
    config_file="stories/*/chapters/chapter-$CHAPTER-config.yaml"
    if [ -f "$config_file" ]; then
-     echo "✅ 发现配置文件，加载中..."
-     # 解析YAML并提取参数
+     echo "✅ Обнаружен файл конфигурации, загрузка..."
+     # Парсинг YAML и извлечение параметров
    else
-     echo "ℹ️  无配置文件，使用自然语言模式"
+     echo "ℹ️  Файл конфигурации не найден, используется режим естественного языка"
    fi
    ```
 
-3. 查询协议（最高优先级文档）
+3. Запрос протокола (документ наивысшего приоритета)
    - `memory/novel-constitution.md`
-   - ...（保持原有）
+   - ... (сохраняется как есть)
 ```
 
-**修改点2：构建提示词**
+**Пункт изменения 2: Построение промпта**
 
 ```markdown
-### 构建章节写作提示词
+### Построение промпта для написания главы
 
-**如果有配置文件**：
+**При наличии файла конфигурации**:
 ```
-📋 本章配置:
-[结构化参数注入]
+📋 Конфигурация главы:
+[Внедрение структурированных параметров]
 
-**基本信息**:
-- 章节: 第{{chapter}}章 - {{title}}
-- 字数: {{wordcount.min}}-{{wordcount.max}}字（目标{{wordcount.target}}字）
+**Основная информация**:
+- Глава: Глава {{chapter}} - {{title}}
+- Объем: {{wordcount.min}}-{{wordcount.max}} слов (цель {{wordcount.target}} слов)
 
-**出场角色** ({{characters.length}}人):
+**Появляющиеся персонажи** ({{characters.length}} чел.):
 {{#each characters}}
-- {{name}}（{{role}} - {{focus}}重点）
-  性格: [从character-profiles.md读取]
-  当前状态: [从character-state.json读取]
+- {{name}} ({{role}} - фокус на {{focus}})
+  Характер: [Чтение из character-profiles.md]
+  Текущее состояние: [Чтение из character-state.json]
 {{/each}}
 
 ...
 ```
 
-**如果无配置文件**（向后兼容）：
+**При отсутствии файла конфигурации** (обратная совместимость):
 ```
-📋 基于用户输入:
-[保持原有自然语言解析]
+📋 На основе ввода пользователя:
+[Сохранение парсинга естественного языка]
 ```
 ```
 
-#### 5.3.2 与character-state.json集成
+#### 5.3.2 Интеграция с character-state.json
 
 ```typescript
-// 配置文件中引用角色ID
+// Ссылка на ID персонажа в файле конфигурации
 characters:
-  - id: protagonist    // 引用ID
-    name: 林晨
+  - id: protagonist    // Ссылка на ID
+    name: Лин Чен
     focus: high
 
-// AI加载时
-1. 读取 spec/knowledge/character-profiles.md
-   → 找到 protagonist 的完整档案
+// При загрузке AI
+1. Чтение spec/knowledge/character-profiles.md
+   → Поиск полного профиля protagonist
 
-2. 读取 spec/tracking/character-state.json
-   → 获取最新状态
+2. Чтение spec/tracking/character-state.json
+   → Получение последнего состояния
    {
      "protagonist": {
-       "location": "公司",
-       "health": "良好",
-       "mood": "自信",
+       "location": "Компания",
+       "health": "Хорошее",
+       "mood": "Уверенный",
        "relationships": {
-         "female-lead": "初识，有好感"
+         "female-lead": "Только познакомились, есть симпатия"
        }
      }
    }
 
-3. 合并信息注入提示词
+3. Объединение информации и внедрение в промпт
 ```
 
-#### 5.3.3 与specification.md线索系统集成
+#### 5.3.3 Интеграция с specification.md (система сюжетных линий)
 
 ```yaml
-# 配置文件指定涉及的线索
+# Указание затрагиваемых сюжетных линий в файле конфигурации
 plot:
   plotlines:
-    - PL-01    # 主线：事业发展
-    - PL-02    # 支线：情感线
+    - PL-01    # Основная линия: развитие карьеры
+    - PL-02    # Побочная линия: любовная линия
 
-# AI加载时
-1. 读取 stories/*/specification.md 的线索定义表
-2. 提取 PL-01 和 PL-02 的详细信息
-3. 确保本章推进这两条线索
-4. 写作后更新 spec/tracking/plot-tracker.json
+# При загрузке AI
+1. Чтение таблицы определения сюжетных линий из stories/*/specification.md
+2. Извлечение подробной информации о PL-01 и PL-02
+3. Обеспечение продвижения этих двух сюжетных линий в данной главе
+4. Обновление spec/tracking/plot-tracker.json после написания
 ```
 
-### 5.4 CLI实现要点（TypeScript）
+### 5.4 Основные моменты реализации CLI (TypeScript)
 
-#### 5.4.1 核心类设计
+#### 5.4.1 Дизайн основного класса
 
 ```typescript
 // src/core/chapter-config.ts
@@ -1061,13 +938,13 @@ import fs from 'fs-extra';
 import path from 'path';
 
 /**
- * 章节配置管理器
+ * Менеджер конфигурации глав
  */
 export class ChapterConfigManager {
   constructor(private projectPath: string) {}
 
   /**
-   * 创建章节配置
+   * Создание конфигурации главы
    */
   async createConfig(
     chapter: number,
@@ -1075,7 +952,7 @@ export class ChapterConfigManager {
   ): Promise<ChapterConfig> {
     const config: ChapterConfig = {
       chapter,
-      title: options.title || `第${chapter}章`,
+      title: options.title || `Глава ${chapter}`,
       characters: [],
       scene: {},
       plot: {
@@ -1096,13 +973,13 @@ export class ChapterConfigManager {
       created_at: new Date().toISOString()
     };
 
-    // 如果使用预设
+    // Если используется пресет
     if (options.preset) {
       const preset = await this.loadPreset(options.preset);
       Object.assign(config, this.applyPreset(preset, config));
     }
 
-    // 保存配置文件
+    // Сохранение файла конфигурации
     const configPath = this.getConfigPath(chapter);
     await fs.writeFile(
       configPath,
@@ -1113,7 +990,7 @@ export class ChapterConfigManager {
   }
 
   /**
-   * 加载章节配置
+   * Загрузка конфигурации главы
    */
   async loadConfig(chapter: number): Promise<ChapterConfig | null> {
     const configPath = this.getConfigPath(chapter);
@@ -1126,41 +1003,41 @@ export class ChapterConfigManager {
   }
 
   /**
-   * 验证配置
+   * Валидация конфигурации
    */
   async validateConfig(chapter: number): Promise<ValidationResult> {
     const config = await this.loadConfig(chapter);
     if (!config) {
       return {
         valid: false,
-        errors: ['配置文件不存在']
+        errors: ['Файл конфигурации не существует']
       };
     }
 
     const errors: string[] = [];
     const warnings: string[] = [];
 
-    // 必填字段检查
-    if (!config.title) errors.push('缺少标题');
-    if (!config.plot.summary) errors.push('缺少剧情概要');
+    // Проверка обязательных полей
+    if (!config.title) errors.push('Отсутствует заголовок');
+    if (!config.plot.summary) errors.push('Отсутствует краткое изложение сюжета');
 
-    // 引用完整性检查
+    // Проверка целостности ссылок
     for (const char of config.characters || []) {
       const exists = await this.checkCharacterExists(char.id);
       if (!exists) {
-        errors.push(`角色ID "${char.id}" 不存在`);
+        errors.push(`ID персонажа "${char.id}" не существует`);
       }
     }
 
-    // 逻辑一致性检查
+    // Проверка логической согласованности
     const { min, target, max } = config.wordcount;
     if (min > target || target > max) {
-      errors.push('字数范围逻辑错误');
+      errors.push('Ошибка логики диапазона количества слов');
     }
 
-    // 最佳实践警告
+    // Предупреждения о лучших практиках
     if ((config.plot.key_points?.length || 0) < 3) {
-      warnings.push('建议至少列出3个关键要点');
+      warnings.push('Рекомендуется указать как минимум 3 ключевых момента');
     }
 
     return {
@@ -1171,7 +1048,7 @@ export class ChapterConfigManager {
   }
 
   /**
-   * 列出所有配置
+   * Список всех конфигураций
    */
   async listConfigs(): Promise<ChapterConfigSummary[]> {
     const chaptersDir = path.join(
@@ -1181,31 +1058,31 @@ export class ChapterConfigManager {
       'chapters'
     );
 
-    // 实现省略...
+    // Реализация опущена...
   }
 
   private getConfigPath(chapter: number): string {
-    // 实现省略...
+    // Реализация опущена...
   }
 
   private async loadPreset(presetId: string): Promise<Preset> {
-    // 实现省略...
+    // Реализация опущена...
   }
 
   private applyPreset(
     preset: Preset,
     config: ChapterConfig
   ): Partial<ChapterConfig> {
-    // 实现省略...
+    // Реализация опущена...
   }
 
   private async checkCharacterExists(id: string): Promise<boolean> {
-    // 实现省略...
+    // Реализация опущена...
   }
 }
 ```
 
-#### 5.4.2 交互式CLI实现
+#### 5.4.2 Интерактивная реализация CLI
 
 ```typescript
 // src/commands/chapter-config.ts
@@ -1218,31 +1095,31 @@ export async function createConfigInteractive(
 ): Promise<void> {
   const manager = new ChapterConfigManager(process.cwd());
 
-  // 加载可用资源
+  // Загрузка доступных ресурсов
   const characters = await loadAvailableCharacters();
   const scenes = await loadAvailableScenes();
 
-  // 交互式问答
+  // Интерактивные вопросы
   const answers = await inquirer.prompt([
     {
       type: 'input',
       name: 'title',
-      message: '章节标题:',
+      message: 'Заголовок главы:',
       validate: (input) => input.length > 0
     },
     {
       type: 'checkbox',
       name: 'characters',
-      message: '选择出场角色 (空格选择，Enter确认):',
+      message: 'Выберите появляющихся персонажей (пробел для выбора, Enter для подтверждения):',
       choices: characters.map(c => ({
-        name: `${c.name} (${c.role} - ${c.gender} - ${c.age}岁)`,
+        name: `${c.name} (${c.role} - ${c.gender} - ${c.age} лет)`,
         value: c.id
       }))
     },
     {
       type: 'list',
       name: 'scene',
-      message: '选择场景:',
+      message: 'Выберите сцену:',
       choices: scenes.map(s => ({
         name: s.name,
         value: s.id
@@ -1251,46 +1128,46 @@ export async function createConfigInteractive(
     {
       type: 'list',
       name: 'atmosphere',
-      message: '氛围情绪:',
+      message: 'Атмосфера/Настроение:',
       choices: [
-        { name: '紧张', value: 'tense' },
-        { name: '轻松', value: 'relaxed' },
-        { name: '悲伤', value: 'sad' },
-        { name: '激昂', value: 'exciting' }
+        { name: 'Напряженная', value: 'tense' },
+        { name: 'Расслабленная', value: 'relaxed' },
+        { name: 'Грустная', value: 'sad' },
+        { name: 'Воодушевляющая', value: 'exciting' }
       ]
     },
     {
       type: 'list',
       name: 'plotType',
-      message: '剧情类型:',
+      message: 'Тип сюжета:',
       choices: [
-        { name: '能力展现', value: 'ability_showcase' },
-        { name: '关系发展', value: 'relationship_dev' },
-        { name: '冲突对抗', value: 'conflict_combat' },
-        { name: '悬念铺垫', value: 'mystery_suspense' }
+        { name: 'Демонстрация способностей', value: 'ability_showcase' },
+        { name: 'Развитие отношений', value: 'relationship_dev' },
+        { name: 'Конфронтация', value: 'conflict_combat' },
+        { name: 'Создание интриги', value: 'mystery_suspense' }
       ]
     },
     {
       type: 'list',
       name: 'pace',
-      message: '写作风格:',
+      message: 'Стиль письма:',
       choices: [
-        { name: '快节奏', value: 'fast' },
-        { name: '细腻描写', value: 'detailed' },
-        { name: '对话为主', value: 'dialogue' },
-        { name: '叙事推进', value: 'narrative' }
+        { name: 'Быстрый темп', value: 'fast' },
+        { name: 'Детальное описание', value: 'detailed' },
+        { name: 'Много диалогов', value: 'dialogue' },
+        { name: 'Повествование', value: 'narrative' }
       ]
     },
     {
       type: 'number',
       name: 'wordcount',
-      message: '目标字数:',
+      message: 'Целевое количество слов:',
       default: 3000,
       validate: (input) => input >= 1000 && input <= 10000
     }
   ]);
 
-  // 创建配置
+  // Создание конфигурации
   const config = await manager.createConfig(chapter, {
     title: answers.title,
     characters: answers.characters,
@@ -1305,150 +1182,151 @@ export async function createConfigInteractive(
     }
   });
 
-  console.log(chalk.green(`\n✅ 配置已保存: ${getConfigPath(chapter)}`));
+  console.log(chalk.green(`\n✅ Конфигурация сохранена: ${getConfigPath(chapter)}`));
 }
 ```
 
-### 5.5 预设库设计
+### 5.5 Дизайн библиотеки пресетов
 
-#### 5.5.1 内置预设列表
+#### 5.5.1 Встроенный список пресетов
 
-**场景预设（6个）**：
-1. `action-intense` - 激烈动作场景
-2. `emotional-dialogue` - 情感对话场景
-3. `mystery-suspense` - 悬念铺垫场景
-4. `world-building` - 世界观展开场景
-5. `comedic-relief` - 轻松幽默场景
-6. `transition` - 过渡承接场景
+**Пресеты сцен (6 шт.)**:
+1. `action-intense` - Сцена напряженного действия
+2. `emotional-dialogue` - Сцена эмоционального диалога
+3. `mystery-suspense` - Сцена интриги и напряжения
+4. `world-building` - Сцена раскрытия мироустройства
+5. `comedic-relief` - Сцена для разрядки юмором
+6. `transition` - Переходная сцена
 
-**风格预设（4个）**：
-1. `fast-paced` - 快节奏写作
-2. `detailed-narrative` - 细腻叙事
-3. `dialogue-heavy` - 对话密集
-4. `psychological-deep` - 心理深描
+**Пресеты стиля (4 шт.)**:
+1. `fast-paced` - Быстрый темп письма
+2. `detailed-narrative` - Детальное повествование
+3. `dialogue-heavy` - С преобладанием диалогов
+4. `psychological-deep` - Глубокое психологическое описание
 
-**章节预设（4个）**：
-1. `opening-chapter` - 开篇章节
-2. `climax-chapter` - 高潮章节
-3. `turning-point` - 转折章节
-4. `ending-chapter` - 结局章节
+**Пресеты глав (4 шт.)**:
+1. `opening-chapter` - Вступительная глава
+2. `climax-chapter` - Кульминационная глава
+3. `turning-point` - Поворотная глава
+4. `ending-chapter` - Заключительная глава
 
-#### 5.5.2 预设加载优先级
+#### 5.5.2 Приоритет загрузки пресетов
 
 ```
-加载顺序:
+Порядок загрузки:
 
-1. 项目本地预设
+1. Локальные пресеты проекта
    stories/*/presets/*.yaml
 
-2. 用户自定义预设
+2. Пользовательские пресеты
    ~/.novel/presets/user/*.yaml
 
-3. 社区预设
+3. Общедоступные пресеты
    ~/.novel/presets/community/*.yaml
 
-4. 官方预设
+4. Официальные пресеты
    ~/.novel/presets/official/*.yaml
 
-5. 内置预设
+5. Встроенные пресеты
    node_modules/novel-writer-cn/presets/*.yaml
 
-规则: 同名预设，优先级高的覆盖低的
+Правило: Одноименные пресеты с более высоким приоритетом перезаписывают пресеты с более низким приоритетом.
 ```
 
 ---
 
-## 六、与Dreams集成（长期规划）
+## Шесть. Интеграция с Dreams (долгосрочное планирование)
 
-### 6.1 集成架构
+### 6.1 Архитектура интеграции
 
 ```
 ┌────────── Dreams Web ──────────┐
 │                                │
-│  📝 章节配置表单               │
-│  - 角色选择（从角色库）        │
-│  - 场景选择（从场景库）        │
-│  - 风格配置（下拉/单选）       │
-│  - 预设选择（推荐预设）        │
+│  📝 Форма конфигурации главы    │
+│  - Выбор персонажа (из библиотеки) │
+│  - Выбор сцены (из библиотеки)   │
+│  - Конфигурация стиля (выпадающий список/выбор одного) │
+│  - Выбор пресета (рекомендуемые пресеты) │
 │                                │
-│  [保存配置] [同步到本地]       │
+│  [Сохранить конфигурацию] [Синхронизировать с локальной] │
 │                                │
 └────────┬───────────────────────┘
          │
          │ API: POST /api/chapter-config
          │ Response: { configId, yamlContent }
          ↓
-┌────────── CLI同步 ────────────┐
-│                                │
-│  $ novel sync chapter 5        │
-│                                │
-│  1. 调用 Dreams API            │
-│  2. 下载配置 YAML              │
-│  3. 保存到本地                 │
-│     stories/*/chapters/        │
-│                                │
-└────────┬───────────────────────┘
+```markdown
+┌────────── Синхронизация CLI ──────────┐
+│                                     │
+│  $ novel sync chapter 5             │
+│                                     │
+│  1. Вызов Dreams API               │
+│  2. Загрузка конфигурации YAML       │
+│  3. Сохранение локально            │
+│     stories/*/chapters/             │
+│                                     │
+└────────┬────────────────────────────┘
          │
-         │ 本地文件
+         │ Локальные файлы
          ↓
-┌──── AI编辑器 (Claude Code) ───┐
-│                                │
-│  用户输入: /write 第5章        │
-│                                │
-│  AI执行:                       │
-│  1. 读取 chapter-5-config.yaml│
-│  2. 加载全局规格               │
-│  3. 生成章节内容               │
-│                                │
-└────────────────────────────────┘
+┌──── AI Редактор (Claude Code) ────┐
+│                                     │
+│  Ввод пользователя: /write Глава 5  │
+│                                     │
+│  Действия ИИ:                      │
+│  1. Чтение chapter-5-config.yaml  │
+│  2. Загрузка глобальных спецификаций│
+│  3. Генерация контента главы        │
+│                                     │
+└─────────────────────────────────────┘
 ```
 
-### 6.2 Dreams功能设计
+### 6.2 Дизайн функции Dreams
 
-#### 6.2.1 章节配置表单页面
+#### 6.2.1 Страница конфигурации главы
 
-**页面路径**：`https://dreams.wordflowlab.com/chapter-config/create`
+**Путь к странице**: `https://dreams.wordflowlab.com/chapter-config/create`
 
-**功能模块**：
+**Модули функции**:
 
-1. **基本信息**
-   - 章节号（输入框）
-   - 标题（输入框）
+1. **Основная информация**
+   - Номер главы (поле ввода)
+   - Заголовок (поле ввода)
 
-2. **角色选择**
-   - 从用户角色库加载（`character-profiles.md`）
-   - 多选框，显示角色名、性别、年龄、角色定位
-   - 可设置每个角色的戏份（high/medium/low）
+2. **Выбор персонажей**
+   - Загрузка из библиотеки профилей персонажей (`character-profiles.md`)
+   - Флажки, отображающие имя персонажа, пол, возраст, роль
+   - Возможность установить долю участия для каждого персонажа (high/medium/low)
 
-3. **场景配置**
-   - 从场景库加载（`locations.md`）
-   - 下拉选择场景
-   - 显示场景详情预览
-   - 可快速创建新场景
+3. **Конфигурация сцены**
+   - Загрузка из библиотеки сцен (`locations.md`)
+   - Выбор сцены из выпадающего списка
+   - Предварительный просмотр деталей сцены
+   - Возможность быстрого создания новой сцены
 
-4. **剧情配置**
-   - 剧情类型（单选）
-   - 剧情概要（文本框）
-   - 关键要点（动态列表）
-   - 涉及线索（多选，从specification.md加载）
+4. **Конфигурация сюжета**
+   - Тип сюжета (один выбор)
+   - Краткое изложение сюжета (текстовое поле)
+   - Ключевые моменты (динамический список)
+   - Задействованные сюжетные линии (множественный выбор, загрузка из specification.md)
 
-5. **风格配置**
-   - 节奏（单选：快/中/慢）
-   - 句长（单选：短/中/长）
-   - 描写重点（单选：动作/对话/心理/描写）
-   - 字数目标（滑块：1000-10000）
+5. **Конфигурация стиля**
+   - Темп (один выбор: быстрый/средний/медленный)
+   - Длина предложений (один выбор: короткие/средние/длинные)
+   - Фокус описания (один выбор: действие/диалог/психология/описание)
+   - Целевое количество слов (ползунок: 1000-10000)
 
-6. **预设系统**
-   - 推荐预设列表（基于剧情类型）
-   - 预设预览
-   - 一键应用预设
+6. **Система пресетов**
+   - Список рекомендуемых пресетов (на основе типа сюжета)
+   - Предварительный просмотр пресетов
+   - Применение пресетов в один клик
 
-#### 6.2.2 同步机制设计
+#### 6.2.2 Дизайн механизма синхронизации
 
-**方案1：实时同步**
+**Решение 1: Синхронизация в реальном времени**
 
 ```typescript
-// 用户在Dreams点击"同步到本地"
+// Пользователь нажимает "Синхронизировать с локальным" в Dreams
 POST /api/chapter-config/sync
 Request: {
   configId: "abc123",
@@ -1457,47 +1335,47 @@ Request: {
 
 Response: {
   success: true,
-  yamlContent: "...",  // 配置文件内容
+  yamlContent: "...",  // Содержимое файла конфигурации
   localPath: "stories/my-story/chapters/chapter-5-config.yaml"
 }
 
-// CLI接收并保存
+// CLI получает и сохраняет
 $ novel sync chapter 5 --from-web abc123
 
-✅ 配置已同步到本地
+✅ Конфигурация синхронизирована локально
 📁 stories/my-story/chapters/chapter-5-config.yaml
 ```
 
-**方案2：Session机制（推荐）**
+**Решение 2: Механизм сессий (рекомендуется)**
 
 ```typescript
-// 1. 用户在Dreams创建配置
+// 1. Пользователь создает конфигурацию в Dreams
 POST /api/chapter-config/create
 Response: {
   sessionId: "sess_xyz789",
-  expiresIn: 1800  // 30分钟
+  expiresIn: 1800  // 30 минут
 }
 
-// 2. CLI轮询或直接获取
+// 2. CLI опрашивает или получает напрямую
 $ novel write 5 --web-session sess_xyz789
 
-// 3. CLI调用API获取配置
+// 3. CLI вызывает API для получения конфигурации
 GET /api/sessions/sess_xyz789
 Response: {
-  chapterConfig: { ... },  // YAML对象
+  chapterConfig: { ... },  // Объект YAML
   projectInfo: { ... }
 }
 
-// 4. CLI生成本地配置文件并执行写作
+// 4. CLI генерирует локальный файл конфигурации и запускает написание
 ```
 
-### 6.3 Dreams API设计
+### 6.3 Дизайн API Dreams
 
 ```typescript
-// Dreams API 规范
+// Спецификация API Dreams
 
 /**
- * 创建章节配置
+ * Создание конфигурации главы
  */
 POST /api/chapter-config
 Request: ChapterConfig
@@ -1508,13 +1386,13 @@ Response: {
 }
 
 /**
- * 获取章节配置
+ * Получение конфигурации главы
  */
 GET /api/chapter-config/:id
 Response: ChapterConfig
 
 /**
- * 生成Session（供CLI使用）
+ * Создание сессии (для использования CLI)
  */
 POST /api/chapter-config/:id/session
 Response: {
@@ -1524,7 +1402,7 @@ Response: {
 }
 
 /**
- * 获取Session数据
+ * Получение данных сессии
  */
 GET /api/sessions/:sessionId
 Response: {
@@ -1536,12 +1414,12 @@ Response: {
 }
 
 /**
- * 同步到本地项目
+ * Синхронизация с локальным проектом
  */
 POST /api/sync/chapter-config
 Request: {
   configId: string;
-  projectToken: string;  // 项目认证token
+  projectToken: string;  // Токен аутентификации проекта
 }
 Response: {
   success: boolean;
@@ -1549,248 +1427,249 @@ Response: {
 }
 ```
 
-### 6.4 集成优先级
+### 6.4 Приоритеты интеграции
 
-**阶段1（短期）**：纯CLI本地方案
-- 实现章节配置文件系统
-- 实现预设系统
-- 更新write.md模板
+**Этап 1 (Краткосрочный)**: Локальное решение только CLI
+- Реализация системы конфигурационных файлов глав
+- Реализация системы пресетов
+- Обновление шаблона write.md
 
-**阶段2（中期）**：Dreams基础集成
-- Dreams表单页面
-- Session机制
-- CLI同步命令
+**Этап 2 (Среднесрочный)**: Базовая интеграция с Dreams
+- Страница формы Dreams
+- Механизм сессий
+- Команда синхронизации CLI
 
-**阶段3（长期）**：完整生态
-- 云端配置管理
-- 社区预设分享
-- 可视化配置编辑器
-
----
-
-## 七、实施计划
-
-### 7.1 阶段划分
-
-#### 阶段1：核心配置系统（2-3天）
-
-**目标**：实现章节配置文件的创建、加载、验证
-
-**交付物**：
-- [ ] 章节配置YAML Schema定义
-- [ ] ChapterConfigManager核心类
-- [ ] CLI命令：`chapter-config create/edit/list/validate`
-- [ ] 配置文件示例（5个）
-- [ ] 单元测试
-
-**验收标准**：
-- 可通过CLI创建配置文件
-- 配置文件可被正确验证
-- 列出所有配置功能正常
-
-#### 阶段2：预设系统（1-2天）
-
-**目标**：实现预设库和预设应用机制
-
-**交付物**：
-- [ ] 预设文件格式定义
-- [ ] PresetManager核心类
-- [ ] CLI命令：`preset list/show/create/import/export`
-- [ ] 内置预设（14个）
-- [ ] 预设应用逻辑
-
-**验收标准**：
-- 可列出和查看预设
-- 可使用预设创建配置
-- 预设可正确应用到配置
-
-#### 阶段3：write.md集成（1天）
-
-**目标**：更新write.md模板，支持配置文件加载
-
-**交付物**：
-- [ ] 更新write.md前置检查步骤
-- [ ] 配置文件加载逻辑
-- [ ] 结构化参数注入模板
-- [ ] 向后兼容性测试
-
-**验收标准**：
-- AI可正确加载配置文件
-- 无配置文件时保持原有行为
-- 生成的章节内容符合配置要求
-
-#### 阶段4：交互式CLI（1天）
-
-**目标**：实现友好的交互式配置创建
-
-**交付物**：
-- [ ] 交互式创建流程
-- [ ] 字符选择界面
-- [ ] 场景选择界面
-- [ ] 实时预览和确认
-
-**验收标准**：
-- 交互式流程流畅
-- 可正确加载角色和场景库
-- 生成的配置符合预期
-
-#### 阶段5：文档和示例（1天）
-
-**目标**：完善文档和使用示例
-
-**交付物**：
-- [ ] 用户使用指南
-- [ ] API文档
-- [ ] 配置示例库
-- [ ] 视频教程（可选）
-
-**验收标准**：
-- 文档完整清晰
-- 示例可直接使用
-- 新用户可快速上手
-
-### 7.2 开发资源
-
-**开发人员**：
-- 后端开发：1人（核心系统、CLI命令）
-- 前端开发：0人（暂不需要）
-- 测试：0.5人（单元测试、集成测试）
-- 文档：0.5人（文档编写）
-
-**总工时估算**：
-- 阶段1：16-24小时
-- 阶段2：8-16小时
-- 阶段3：8小时
-- 阶段4：8小时
-- 阶段5：8小时
-- **总计**：48-64小时（约6-8个工作日）
-
-### 7.3 风险评估
-
-| 风险 | 概率 | 影响 | 应对措施 |
-|------|------|------|---------|
-| 配置格式设计不合理 | 中 | 高 | 前期充分调研，提供示例，快速迭代 |
-| 与现有系统集成复杂 | 中 | 中 | 渐进式集成，保持向后兼容 |
-| 用户学习曲线陡峭 | 低 | 中 | 提供交互式CLI，丰富文档和示例 |
-| 预设系统设计不灵活 | 低 | 中 | 支持用户自定义，社区贡献 |
+**Этап 3 (Долгосрочный)**: Полная экосистема
+- Управление облачными конфигурациями
+- Обмен пресетами в сообществе
+- Визуальный редактор конфигураций
 
 ---
 
-## 八、成功指标
+## Семь. План реализации
 
-### 8.1 定量指标
+### 7.1 Разделение на этапы
 
-| 指标 | 当前值 | 目标值 | 测量方式 |
-|------|--------|--------|---------|
-| 章节配置时间 | 5-10分钟 | <2分钟 | 用户计时测试 |
-| 配置复用率 | 0% | >30% | 统计复用命令使用 |
-| 预设使用率 | 0% | >40% | 统计预设应用次数 |
-| 用户满意度 | N/A | >4.5/5.0 | 用户调研问卷 |
-| 新用户上手时间 | 30分钟 | <15分钟 | 新用户观察测试 |
+#### Этап 1: Основная система конфигурации (2-3 дня)
 
-### 8.2 定性指标
+**Цель**: Реализация создания, загрузки и проверки конфигурационных файлов глав
 
-**用户反馈**：
-- "配置更方便了，不需要每次都想清楚所有细节"
-- "预设系统很有用，常用场景一键配置"
-- "配置文件可以版本管理，方便追踪修改"
-- "交互式CLI很友好，新手也能快速上手"
+**Результаты**:
+- [ ] Определение схемы YAML для конфигурации глав
+- [ ] Основной класс ChapterConfigManager
+- [ ] Команды CLI: `chapter-config create/edit/list/validate`
+- [ ] Примеры конфигурационных файлов (5 шт.)
+- [ ] Модульные тесты
 
-**技术指标**：
-- 代码覆盖率 > 80%
-- 配置验证成功率 > 95%
-- CLI响应时间 < 500ms
-- 配置文件加载成功率 > 99%
+**Критерии приемки**:
+- Конфигурационные файлы могут быть созданы через CLI
+- Файлы конфигурации корректно проверяются
+- Функция перечисления всех конфигураций работает корректно
 
----
+#### Этап 2: Система пресетов (1-2 дня)
 
-## 九、后续演进
+**Цель**: Реализация библиотеки пресетов и механизма их применения
 
-### 9.1 短期优化（3-6个月）
+**Результаты**:
+- [ ] Определение формата файлов пресетов
+- [ ] Основной класс PresetManager
+- [ ] Команды CLI: `preset list/show/create/import/export`
+- [ ] Встроенные пресеты (14 шт.)
+- [ ] Логика применения пресетов
 
-1. **预设生态建设**
-   - 官方预设库扩充到50+
-   - 开放社区预设贡献通道
-   - 预设评分和推荐系统
+**Критерии приемки**:
+- Пресеты можно перечислять и просматривать
+- Конфигурация может быть создана с использованием пресетов
+- Пресеты корректно применяются к конфигурации
 
-2. **配置模板系统**
-   - 支持配置模板（多章节模板）
-   - 模板变量替换
-   - 批量应用模板
+#### Этап 3: Интеграция write.md (1 день)
 
-3. **智能推荐**
-   - 基于已有配置推荐预设
-   - 分析写作风格，推荐配置
-   - 学习用户习惯，个性化建议
+**Цель**: Обновление шаблона write.md для поддержки загрузки конфигурационных файлов
 
-### 9.2 中期规划（6-12个月）
+**Результаты**:
+- [ ] Обновление шагов предварительной проверки write.md
+- [ ] Логика загрузки конфигурационного файла
+- [ ] Внедрение структурированных параметров в шаблон
+- [ ] Тестирование обратной совместимости
 
-1. **Dreams Web集成**
-   - 可视化配置编辑器
-   - 云端配置管理
-   - Session同步机制
+**Критерии приемки**:
+- ИИ может корректно загружать конфигурационный файл
+- Поведение остается прежним при отсутствии конфигурационного файла
+- Сгенерированный контент главы соответствует требованиям конфигурации
 
-2. **配置可视化**
-   - 配置文件可视化编辑
-   - 配置对比和diff
-   - 配置历史追踪
+#### Этап 4: Интерактивный CLI (1 день)
 
-3. **团队协作**
-   - 共享预设库
-   - 团队配置标准
-   - 配置权限管理
+**Цель**: Реализация удобного интерактивного создания конфигурации
 
-### 9.3 长期愿景（12个月+）
+**Результаты**:
+- [ ] Интерактивный процесс создания
+- [ ] Интерфейс выбора персонажей
+- [ ] Интерфейс выбора сцен
+- [ ] Предварительный просмотр в реальном времени и подтверждение
 
-1. **AI辅助配置**
-   - 根据剧情自动推荐配置
-   - 智能填充配置参数
-   - 配置优化建议
+**Критерии приемки**:
+- Интерактивный процесс проходит гладко
+- Библиотеки персонажей и сцен загружаются корректно
+- Сгенерированная конфигурация соответствует ожиданиям
 
-2. **社区生态**
-   - 预设市场（买卖预设）
-   - 配置模板交易
-   - 达人认证和推荐
+#### Этап 5: Документация и примеры (1 день)
 
-3. **跨平台支持**
-   - VSCode插件（可视化配置）
-   - 移动端配置（手机快速创建）
-   - 浏览器插件（网页配置）
+**Цель**: Доработка документации и примеров использования
 
----
+**Результаты**:
+- [ ] Руководство пользователя
+- [ ] Документация API
+- [ ] Библиотека примеров конфигураций
+- [ ] Видеоурок (опционально)
 
-## 十、附录
+**Критерии приемки**:
+- Документация полная и понятная
+- Примеры можно использовать напрямую
+- Новые пользователи могут быстро начать работу
 
-### 10.1 相关文档
+### 7.2 Ресурсы разработки
 
-- [技术规范详细文档](./tech-spec.md)
-- [配置示例库](./examples/)
-- [Dreams集成计划](./integration-plan.md)
-- [用户使用指南](../commands.md#章节配置系统)
+**Разработчики**:
+- Backend разработка: 1 человек (основная система, команды CLI)
+- Frontend разработка: 0 человек (пока не требуется)
+- Тестирование: 0.5 человека (модульное, интеграционное тестирование)
+- Документация: 0.5 человека (написание документации)
 
-### 10.2 变更记录
+**Оценка общего рабочего времени**:
+- Этап 1: 16-24 часа
+- Этап 2: 8-16 часов
+- Этап 3: 8 часов
+- Этап 4: 8 часов
+- Этап 5: 8 часов
+- **Итого**: 48-64 часа (примерно 6-8 рабочих дней)
 
-| 版本 | 日期 | 变更内容 | 作者 |
-|------|------|---------|------|
-| v1.0.0 | 2025-10-14 | 初始版本，完整PRD | Novel Writer Team |
+### 7.3 Оценка рисков
 
-### 10.3 参考资料
-
-- [星月写作平台](https://example.com) - 竞品分析
-- [YAML规范](https://yaml.org/spec/1.2.2/) - 配置文件格式
-- [Inquirer.js](https://github.com/SBoudrias/Inquirer.js) - 交互式CLI库
-- [novel-writer-cn现有架构](../../README.md)
-
----
-
-## 审批记录
-
-| 角色 | 姓名 | 审批意见 | 日期 |
-|------|------|---------|------|
-| 产品负责人 | - | - | - |
-| 技术负责人 | - | - | - |
-| 测试负责人 | - | - | - |
+| Риск | Вероятность | Влияние | Меры реагирования |
+|------|-------------|---------|-------------------|
+| Необоснованный дизайн формата конфигурации | Средняя | Высокое | Тщательное исследование на начальном этапе, предоставление примеров, быстрая итерация |
+| Сложность интеграции с существующей системой | Средняя | Среднее | Постепенная интеграция, поддержание обратной совместимости |
+| Крутая кривая обучения для пользователей | Низкая | Среднее | Предоставление интерактивного CLI, обширной документации и примеров |
+| Негибкий дизайн системы пресетов | Низкая | Среднее | Поддержка пользовательских настроек, вклад сообщества |
 
 ---
 
-**END OF PRD**
+## Восемь. Критерии успеха
+
+### 8.1 Количественные показатели
+
+| Показатель | Текущее значение | Целевое значение | Способ измерения |
+|------------|-----------------|-----------------|-----------------|
+| Время конфигурации главы | 5-10 минут | < 2 минут | Тестирование с замером времени пользователями |
+| Коэффициент повторного использования конфигураций | 0% | > 30% | Статистика использования команды повторного использования |
+| Коэффициент использования пресетов | 0% | > 40% | Статистика количества применений пресетов |
+| Удовлетворенность пользователей | Н/А | > 4.5/5.0 | Опрос пользователей |
+| Время освоения для новых пользователей | 30 минут | < 15 минут | Наблюдение за новыми пользователями |
+
+### 8.2 Качественные показатели
+
+**Отзывы пользователей**:
+- «Конфигурировать стало удобнее, не нужно каждый раз продумывать все детали»
+- «Система пресетов очень полезна, частые сценарии настраиваются в один клик»
+- «Конфигурационные файлы можно версионировать, удобно отслеживать изменения»
+- «Интерактивный CLI очень дружелюбен, новички тоже быстро разбираются»
+
+**Технические показатели**:
+- Покрытие кода > 80%
+- Коэффициент успешной проверки конфигураций > 95%
+- Время отклика CLI < 500 мс
+- Коэффициент успешной загрузки конфигурационных файлов > 99%
+
+---
+
+## Девять. Дальнейшее развитие
+
+### 9.1 Краткосрочная оптимизация (3-6 месяцев)
+
+1. **Развитие экосистемы пресетов**
+   - Расширение библиотеки официальных пресетов до 50+
+   - Открытие канала для вклада пресетов от сообщества
+   - Система оценки и рекомендаций пресетов
+
+2. **Система шаблонов конфигураций**
+   - Поддержка шаблонов конфигураций (шаблоны для нескольких глав)
+   - Замена переменных в шаблонах
+   - Массовое применение шаблонов
+
+3. **Интеллектуальные рекомендации**
+   - Рекомендация пресетов на основе существующих конфигураций
+   - Анализ стиля письма для рекомендации конфигураций
+   - Изучение привычек пользователя для персонализированных предложений
+
+### 9.2 Среднесрочное планирование (6-12 месяцев)
+
+1. **Интеграция с Dreams Web**
+   - Визуальный редактор конфигураций
+   - Управление облачными конфигурациями
+   - Механизм синхронизации сессий
+
+2. **Визуализация конфигураций**
+   - Визуальное редактирование конфигурационных файлов
+   - Сравнение и отображение различий конфигураций
+   - Отслеживание истории конфигураций
+
+3. **Командная работа**
+   - Общая библиотека пресетов
+   - Стандарты конфигурации для команды
+   - Управление правами доступа к конфигурациям
+
+### 9.3 Долгосрочное видение (12+ месяцев)
+
+1. **AI-ассистированная конфигурация**
+   - Автоматическая рекомендация конфигураций на основе сюжета
+   - Интеллектуальное заполнение параметров конфигурации
+   - Предложения по оптимизации конфигурации
+
+2. **Экосистема сообщества**
+   - Маркетплейс пресетов (покупка/продажа пресетов)
+   - Торговля шаблонами конфигураций
+   - Сертификация и рекомендации экспертов
+
+3. **Кроссплатформенная поддержка**
+   - Плагин для VSCode (визуальная конфигурация)
+   - Конфигурация на мобильных устройствах (быстрое создание)
+   - Плагин для браузера (конфигурация в веб)
+
+---
+
+## Десять. Приложения
+
+### 10.1 Связанные документы
+
+- [Подробная техническая спецификация](./tech-spec.md)
+- [Библиотека примеров конфигураций](./examples/)
+- [План интеграции с Dreams](./integration-plan.md)
+- [Руководство пользователя](../commands.md#система-конфигурации-глав)
+
+### 10.2 История изменений
+
+| Версия | Дата | Содержание изменений | Автор |
+|--------|------|---------------------|-------|
+| v1.0.0 | 2025-10-14 | Начальная версия, полный PRD | Novel Writer Team |
+
+### 10.3 Справочные материалы
+
+- [Платформа для письма Xingyue](https://example.com) - Анализ конкурентов
+- [Спецификация YAML](https://yaml.org/spec/1.2.2/) - Формат конфигурационных файлов
+- [Библиотека для интерактивного CLI Inquirer.js](https://github.com/SBoudrias/Inquirer.js) - Библиотека для интерактивного CLI
+- [Существующая архитектура novel-writer-cn](../../README.md) - Существующая архитектура
+
+---
+
+## Записи об утверждении
+
+| Роль | Имя | Заключение | Дата |
+|------|-----|------------|------|
+| Руководитель продукта | - | - | - |
+| Технический руководитель | - | - | - |
+| Руководитель тестирования | - | - | - |
+
+---
+
+**КОНЕЦ PRD**
+```

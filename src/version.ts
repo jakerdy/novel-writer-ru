@@ -1,6 +1,7 @@
+```typescript
 /**
- * 统一版本管理模块
- * 从 package.json 中读取版本号，确保整个项目版本一致
+ * Единый модуль управления версиями
+ * Читает номер версии из package.json, обеспечивая единообразие версий во всем проекте
  */
 
 import fs from 'fs';
@@ -11,16 +12,16 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /**
- * 获取当前项目版本号
- * @returns 版本号字符串
+ * Получает текущий номер версии проекта
+ * @returns Строка с номером версии
  */
 export function getVersion(): string {
   try {
-    // 尝试从多个可能的路径读取 package.json
+    // Попытка чтения package.json из нескольких возможных путей
     const possiblePaths = [
-      path.join(__dirname, '../package.json'),      // src 目录相对路径
-      path.join(__dirname, '../../package.json'),   // dist 目录相对路径
-      path.join(process.cwd(), 'package.json'),     // 当前工作目录
+      path.join(__dirname, '../package.json'),      // Относительный путь от каталога src
+      path.join(__dirname, '../../package.json'),   // Относительный путь от каталога dist
+      path.join(process.cwd(), 'package.json'),     // Текущий рабочий каталог
     ];
 
     for (const pkgPath of possiblePaths) {
@@ -30,29 +31,30 @@ export function getVersion(): string {
       }
     }
 
-    // 如果找不到 package.json，返回默认版本
+    // Если package.json не найден, возвращает версию по умолчанию
     return '0.4.2';
   } catch (error) {
-    // 发生错误时返回默认版本
+    // В случае ошибки возвращает версию по умолчанию
     return '0.4.2';
   }
 }
 
 /**
- * 获取版本信息字符串
- * @returns 格式化的版本信息
+ * Получает строку с информацией о версии
+ * @returns Форматированная информация о версии
  */
 export function getVersionInfo(): string {
-  return `版本: ${getVersion()} | 基于 Spec Kit 架构 | 增强追踪系统`;
+  return `Версия: ${getVersion()} | Архитектура на базе Spec Kit | Улучшенная система отслеживания`;
 }
 
 /**
- * 获取简短版本信息
- * @returns 简短的版本信息
+ * Получает краткую информацию о версии
+ * @returns Краткая информация о версии
  */
 export function getShortVersionInfo(): string {
   return `v${getVersion()}`;
 }
 
-// 导出版本常量（向后兼容）
+// Экспорт константы версии (для обратной совместимости)
 export const VERSION = getVersion();
+```

@@ -1,22 +1,22 @@
-# Novel Writer API 文档
+# Документация Novel Writer API
 
-## 概述
+## Обзор
 
-Novel Writer 提供了一套完整的 API 用于 AI 驱动的小说创作。API 支持多种 AI 模型提供商，包括 OpenAI、Claude、Gemini 和国内的通义千问、文心一言等。
+Novel Writer предоставляет полный набор API для создания романов с помощью ИИ. API поддерживает различных поставщиков моделей ИИ, включая OpenAI, Claude, Gemini, а также отечественные Tongyi Qianwen, Wenxin Yiyan и другие.
 
-## 认证
+## Аутентификация
 
-### API Key 配置
+### Настройка API Key
 
 ```bash
-# 环境变量设置
+# Настройка переменных окружения
 export OPENAI_API_KEY="sk-..."
 export ANTHROPIC_API_KEY="sk-ant-..."
 export GEMINI_API_KEY="..."
 export QWEN_API_KEY="..."
 ```
 
-### 配置文件
+### Файл конфигурации
 
 ```json
 {
@@ -33,29 +33,29 @@ export QWEN_API_KEY="..."
 }
 ```
 
-## CLI 命令
+## Команды CLI
 
-### 1. style - 风格定义
+### 1. style - Определение стиля
 
-定义小说的整体风格和基调。
+Определяет общий стиль и тон романа.
 
 ```bash
 novel style <project-name> [options]
 ```
 
-**参数：**
-- `project-name`: 项目名称
-- `--genre`: 小说类型（fantasy/scifi/romance/mystery/horror）
-- `--tone`: 叙述基调（serious/humorous/dark/light/neutral）
-- `--ai`: AI 提供商（openai/claude/gemini/qwen）
-- `--model`: 具体模型（gpt-4/claude-3/gemini-pro）
+**Параметры:**
+- `project-name`: Название проекта
+- `--genre`: Жанр романа (fantasy/scifi/romance/mystery/horror)
+- `--tone`: Тон повествования (serious/humorous/dark/light/neutral)
+- `--ai`: Поставщик ИИ (openai/claude/gemini/qwen)
+- `--model`: Конкретная модель (gpt-4/claude-3/gemini-pro)
 
-**示例：**
+**Пример:**
 ```bash
 novel style my-fantasy-novel --genre fantasy --tone serious --ai claude
 ```
 
-**输出：**
+**Вывод:**
 ```yaml
 # specs/001-my-fantasy-novel/constitution.yaml
 genre: fantasy
@@ -69,192 +69,192 @@ atmosphere: epic and mystical
 language_style: formal with archaic elements
 ```
 
-### 2. story - 故事梗概
+### 2. story - Синопсис истории
 
-生成故事的核心梗概和主要情节点。
+Генерирует основной синопсис истории и ключевые сюжетные точки.
 
 ```bash
 novel story <project-name> [options]
 ```
 
-**参数：**
-- `--plot`: 情节类型（adventure/mystery/romance/thriller）
-- `--conflict`: 冲突类型（person-vs-person/person-vs-nature/person-vs-self）
-- `--setting`: 故事背景
-- `--era`: 时代背景
+**Параметры:**
+- `--plot`: Тип сюжета (adventure/mystery/romance/thriller)
+- `--conflict`: Тип конфликта (person-vs-person/person-vs-nature/person-vs-self)
+- `--setting`: Место действия истории
+- `--era`: Эпоха действия
 
-**示例：**
+**Пример:**
 ```bash
 novel story my-fantasy-novel --plot adventure --conflict person-vs-evil --setting "magical kingdom" --era medieval
 ```
 
-**输出：**
+**Вывод:**
 ```markdown
 # specs/001-my-fantasy-novel/specify.md
 
-## 一句话梗概
-一个普通农家少年意外获得古老魔法，踏上拯救王国的冒险之旅。
+## Синопсис в одном предложении
+Обычный деревенский юноша случайно обретает древнюю магию и отправляется в приключение, чтобы спасти королевство.
 
-## 核心冲突
-主角必须在掌握强大力量和保持内心纯洁之间找到平衡。
+## Основной конфликт
+Главный герой должен найти баланс между овладением могущественной силой и сохранением чистоты своего сердца.
 
-## 故事主线
-1. 起因：村庄遭受神秘袭击
-2. 发展：发现自己的魔法天赋
-3. 转折：导师的背叛
-4. 高潮：最终对决
-5. 结局：新的平衡
+## Сюжетная линия
+1. Завязка: Таинственное нападение на деревню
+2. Развитие: Обнаружение своего магического дара
+3. Поворот: Предательство наставника
+4. Кульминация: Финальная битва
+5. Развязка: Новый баланс
 ```
 
-### 3. outline - 章节大纲
+### 3. outline - План глав
 
-生成详细的章节大纲。
+Генерирует подробный план глав.
 
 ```bash
 novel outline <project-name> [options]
 ```
 
-**参数：**
-- `--chapters`: 章节数量（默认 20）
-- `--words-per-chapter`: 每章字数（默认 3000）
-- `--structure`: 结构类型（linear/parallel/circular）
-- `--pov`: 视角（first/third-limited/third-omniscient）
+**Параметры:**
+- `--chapters`: Количество глав (по умолчанию 20)
+- `--words-per-chapter`: Количество слов в главе (по умолчанию 3000)
+- `--structure`: Тип структуры (linear/parallel/circular)
+- `--pov`: Точка зрения (first/third-limited/third-omniscient)
 
-**示例：**
+**Пример:**
 ```bash
 novel outline my-fantasy-novel --chapters 25 --words-per-chapter 4000 --pov third-limited
 ```
 
-**输出：**
+**Вывод:**
 ```markdown
 # specs/001-my-fantasy-novel/plan.md
 
-## 第一章：平静的清晨
-- 场景：小村庄的日常
-- 人物：介绍主角和家人
-- 事件：神秘的预兆
-- 字数：4000字
+## Глава 1: Спокойное утро
+- Сцена: Повседневная жизнь в маленькой деревне
+- Персонажи: Представление главного героя и его семьи
+- Событие: Таинственное предзнаменование
+- Количество слов: 4000
 
-## 第二章：不速之客
-- 场景：村庄广场
-- 人物：引入神秘旅者
-- 事件：第一次魔法觉醒
-- 字数：4000字
+## Глава 2: Незваные гости
+- Сцена: Площадь деревни
+- Персонажи: Введение таинственного путника
+- Событие: Первое пробуждение магии
+- Количество слов: 4000
 
 [...]
 ```
 
-### 4. characters - 人物设定
+### 4. characters - Описание персонажей
 
-创建详细的人物设定。
+Создает подробные описания персонажей.
 
 ```bash
 novel characters <project-name> [options]
 ```
 
-**参数：**
-- `--main`: 主要角色数量
-- `--supporting`: 配角数量
-- `--depth`: 设定深度（basic/detailed/comprehensive）
+**Параметры:**
+- `--main`: Количество главных персонажей
+- `--supporting`: Количество второстепенных персонажей
+- `--depth`: Глубина описания (basic/detailed/comprehensive)
 
-**示例：**
+**Пример:**
 ```bash
 novel characters my-fantasy-novel --main 3 --supporting 5 --depth detailed
 ```
 
-**输出：**
+**Вывод:**
 ```yaml
 # specs/001-my-fantasy-novel/characters.yaml
 main_characters:
-  - name: 艾登·黎明之子
+  - name: Эйден, Сын Рассвета
     age: 17
     appearance:
-      height: 中等身高
-      hair: 棕色卷发
-      eyes: 深蓝色，魔法觉醒时会发光
+      height: Средний рост
+      hair: Каштановые кудрявые волосы
+      eyes: Темно-синие, светятся при пробуждении магии
     personality:
-      traits: [勇敢, 善良, 冲动]
-      fears: [失去家人, 力量失控]
-      motivations: [保护村庄, 寻找真相]
+      traits: [храбрый, добрый, импульсивный]
+      fears: [потеря семьи, потеря контроля над силой]
+      motivations: [защитить деревню, найти правду]
     background:
-      family: 农民家庭，父母健在
-      education: 村庄私塾
-      skills: [剑术初级, 魔法天赋]
-    arc: 从懵懂少年成长为责任担当者
+      family: Крестьянская семья, родители живы
+      education: Деревенская школа
+      skills: [начальные навыки владения мечом, магический дар]
+    arc: От наивного юноши к ответственному герою
 ```
 
-### 5. write - 章节写作
+### 5. write - Написание главы
 
-生成具体的章节内容。
+Генерирует конкретное содержание главы.
 
 ```bash
 novel write <project-name> <chapter> [options]
 ```
 
-**参数：**
-- `chapter`: 章节标识（chapter-1, chapter-2...）
-- `--style-check`: 检查风格一致性
-- `--continue`: 从上次中断处继续
-- `--words`: 目标字数
+**Параметры:**
+- `chapter`: Идентификатор главы (chapter-1, chapter-2...)
+- `--style-check`: Проверить соответствие стилю
+- `--continue`: Продолжить с последнего места прерывания
+- `--words`: Целевое количество слов
 
-**示例：**
+**Пример:**
 ```bash
 novel write my-fantasy-novel chapter-1 --words 4000 --style-check
 ```
 
-**输出：**
+**Вывод:**
 ```markdown
-# 第一章：平静的清晨
+# Глава 1: Спокойное утро
 
-晨雾笼罩着艾尔村，如同一层薄纱轻柔地覆盖在这个宁静的山谷中。艾登站在自家农舍的门口，深吸一口带着青草香味的空气。今天本该是个平常的日子，他要去田里帮父亲收割最后一批麦子。
+Утренний туман окутывал деревню Эйр, словно легкая вуаль, мягко покрывающая эту тихую долину. Эйден стоял у двери своего фермерского дома, вдыхая воздух, наполненный запахом свежей травы. Сегодня должен был быть обычный день, он собирался помочь отцу собрать последнюю партию пшеницы.
 
-然而，天边那抹不寻常的红光让他心中涌起一丝不安...
+Однако необычное красное свечение на горизонте заставило его сердце забиться тревожно...
 
-[继续 4000 字内容]
+[Продолжение на 4000 слов]
 ```
 
 ## Python API
 
-### 基础用法
+### Базовое использование
 
 ```python
 from novel_writer import NovelWriter
 
-# 初始化
+# Инициализация
 writer = NovelWriter(
     ai_provider="claude",
     api_key="sk-ant-..."
 )
 
-# 创建项目
+# Создание проекта
 project = writer.create_project(
     name="my-novel",
     genre="fantasy",
     language="zh-CN"
 )
 
-# 生成风格
+# Определение стиля
 style = writer.define_style(
     project=project,
     tone="epic",
     themes=["heroism", "sacrifice"]
 )
 
-# 生成故事
+# Создание истории
 story = writer.create_story(
     project=project,
     plot_type="hero_journey",
     setting="medieval_fantasy"
 )
 
-# 生成大纲
+# Генерация плана
 outline = writer.generate_outline(
     project=project,
     chapters=20,
     words_per_chapter=3000
 )
 
-# 写作章节
+# Написание главы
 chapter = writer.write_chapter(
     project=project,
     chapter_number=1,
@@ -263,29 +263,29 @@ chapter = writer.write_chapter(
 )
 ```
 
-### 高级功能
+### Расширенные функции
 
 ```python
-# 批量生成
+# Пакетная генерация
 chapters = writer.batch_write(
     project=project,
     chapter_range=(1, 5),
     parallel=True
 )
 
-# 风格检查
+# Проверка стиля
 consistency = writer.check_consistency(
     chapters=chapters,
     style=style
 )
 
-# 修订建议
+# Предложения по доработке
 revisions = writer.suggest_revisions(
     chapter=chapter,
     focus=["dialogue", "pacing"]
 )
 
-# 导出
+# Экспорт
 writer.export(
     project=project,
     format="markdown",  # or "docx", "epub"
@@ -295,7 +295,7 @@ writer.export(
 
 ## REST API
 
-### 基础端点
+### Базовые конечные точки
 
 ```http
 POST /api/v1/projects
@@ -309,7 +309,7 @@ Authorization: Bearer {api_key}
 }
 ```
 
-### 生成风格
+### Генерация стиля
 
 ```http
 POST /api/v1/projects/{project_id}/constitution
@@ -322,7 +322,7 @@ Content-Type: application/json
 }
 ```
 
-### 写作章节
+### Написание главы
 
 ```http
 POST /api/v1/projects/{project_id}/tasks
@@ -335,7 +335,7 @@ Content-Type: application/json
 }
 ```
 
-### WebSocket 实时生成
+### WebSocket для потоковой генерации
 
 ```javascript
 const ws = new WebSocket('wss://api.novel-writer.com/v1/stream');
@@ -353,44 +353,44 @@ ws.onmessage = (event) => {
 };
 ```
 
-## 错误处理
+## Обработка ошибок
 
-### 错误代码
+### Коды ошибок
 
-| 代码 | 说明 | 处理建议 |
-|------|------|----------|
-| 400 | 参数错误 | 检查请求参数 |
-| 401 | 认证失败 | 验证 API Key |
-| 403 | 权限不足 | 检查账户权限 |
-| 404 | 资源不存在 | 验证项目 ID |
-| 429 | 速率限制 | 等待后重试 |
-| 500 | 服务器错误 | 联系支持 |
+| Код | Описание | Рекомендации по обработке |
+|------|----------|-------------------------|
+| 400 | Ошибка параметра | Проверьте параметры запроса |
+| 401 | Ошибка аутентификации | Проверьте API Key |
+| 403 | Недостаточно прав | Проверьте права доступа аккаунта |
+| 404 | Ресурс не найден | Проверьте ID проекта |
+| 429 | Ограничение скорости | Повторите попытку позже |
+| 500 | Ошибка сервера | Свяжитесь с поддержкой |
 
-### 错误响应格式
+### Формат ответа об ошибке
 
 ```json
 {
   "error": {
     "code": "invalid_parameter",
-    "message": "章节数量必须在 1-100 之间",
+    "message": "Количество глав должно быть от 1 до 100",
     "field": "chapters",
     "request_id": "req_123456"
   }
 }
 ```
 
-## 速率限制
+## Ограничения скорости запросов
 
-| 计划 | 请求/分钟 | 并发数 | 字符/月 |
-|------|-----------|--------|---------|
-| 免费 | 10 | 1 | 100,000 |
-| 基础 | 60 | 3 | 1,000,000 |
-| 专业 | 300 | 10 | 10,000,000 |
-| 企业 | 自定义 | 自定义 | 无限制 |
+| План | Запросов/минуту | Одновременных подключений | Символов/месяц |
+|------|-----------------|--------------------------|----------------|
+| Бесплатный | 10 | 1 | 100 000 |
+| Базовый | 60 | 3 | 1 000 000 |
+| Профессиональный | 300 | 10 | 10 000 000 |
+| Корпоративный | Индивидуально | Индивидуально | Без ограничений |
 
 ## Webhook
 
-### 配置 Webhook
+### Настройка Webhook
 
 ```json
 {
@@ -400,16 +400,16 @@ ws.onmessage = (event) => {
 }
 ```
 
-### 事件类型
+### Типы событий
 
-- `project.created` - 项目创建
-- `style.defined` - 风格定义完成
-- `outline.generated` - 大纲生成完成
-- `chapter.started` - 章节开始写作
-- `chapter.completed` - 章节完成
-- `project.finished` - 项目完成
+- `project.created` - Проект создан
+- `style.defined` - Стиль определен
+- `outline.generated` - План сгенерирован
+- `chapter.started` - Начато написание главы
+- `chapter.completed` - Глава завершена
+- `project.finished` - Проект завершен
 
-### 事件负载
+### Полезная нагрузка события
 
 ```json
 {
@@ -474,21 +474,21 @@ chapter = writer.write_chapter(project.id, 1)
 print(chapter.content)
 ```
 
-## 最佳实践
+## Лучшие практики
 
-### 1. 分阶段生成
+### 1. Поэтапная генерация
 
-不要一次性生成整部小说，按以下顺序逐步生成：
+Не генерируйте весь роман за один раз. Следуйте этому порядку:
 
-1. 风格定义
-2. 故事梗概
-3. 人物设定
-4. 章节大纲
-5. 逐章写作
+1. Определение стиля
+2. Синопсис истории
+3. Описание персонажей
+4. План глав
+5. Поглавное написание
 
-### 2. 使用缓存
+### 2. Использование кэширования
 
-利用项目 ID 和章节号进行缓存：
+Используйте ID проекта и номер главы для кэширования:
 
 ```python
 cache_key = f"{project_id}:chapter:{chapter_num}"
@@ -496,9 +496,9 @@ if cached := cache.get(cache_key):
     return cached
 ```
 
-### 3. 错误重试
+### 3. Повторные попытки при ошибках
 
-实现指数退避重试：
+Реализуйте повторные попытки с экспоненциальной задержкой:
 
 ```python
 import time
@@ -512,9 +512,9 @@ def retry_with_backoff(func, max_retries=3):
     raise Exception("Max retries exceeded")
 ```
 
-### 4. 批处理
+### 4. Пакетная обработка
 
-批量处理多个章节以提高效率：
+Обрабатывайте несколько глав пакетами для повышения эффективности:
 
 ```python
 chapters = writer.batch_write(
@@ -524,14 +524,14 @@ chapters = writer.batch_write(
 )
 ```
 
-## 相关资源
+## Связанные ресурсы
 
 - [API Playground](https://playground.novel-writer.com)
-- [SDK 文档](https://sdk-docs.novel-writer.com)
-- [示例项目](https://github.com/novel-writer/examples)
-- [社区论坛](https://community.novel-writer.com)
-- [状态页面](https://status.novel-writer.com)
+- [Документация SDK](https://sdk-docs.novel-writer.com)
+- [Примеры проектов](https://github.com/novel-writer/examples)
+- [Форум сообщества](https://community.novel-writer.com)
+- [Страница статуса](https://status.novel-writer.com)
 
 ---
 
-📚 **注意**：本 API 文档持续更新中。最新版本请访问 [在线文档](https://docs.novel-writer.com/api)。
+📚 **Примечание**: Эта документация API постоянно обновляется. Актуальную версию можно найти на [онлайн-документации](https://docs.novel-writer.com/api).

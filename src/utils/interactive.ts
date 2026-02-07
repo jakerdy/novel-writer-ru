@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Interactive selection utilities for Novel Writer
- * Provides arrow-key based selection interface similar to spec-kit
+ * Интерактивные утилиты выбора для Novel Writer
+ * Предоставляет интерфейс выбора на основе клавиш со стрелками, аналогичный spec-kit
  */
 
 import inquirer from 'inquirer';
@@ -16,18 +16,18 @@ export interface AIConfig {
 }
 
 /**
- * Display project banner
+ * Отобразить баннер проекта
  */
 export function displayProjectBanner(): void {
   console.log('');
   console.log(chalk.cyan.bold('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
-  console.log(chalk.cyan.bold('  Novel Writer - AI 驱动的中文小说创作工具'));
+  console.log(chalk.cyan.bold('  Novel Writer - Инструмент для создания китайских романов с помощью ИИ'));
   console.log(chalk.cyan.bold('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
   console.log('');
 }
 
 /**
- * Select AI assistant interactively
+ * Интерактивно выбрать ИИ-ассистента
  */
 export async function selectAIAssistant(aiConfigs: AIConfig[]): Promise<string> {
   const choices = aiConfigs.map(config => ({
@@ -40,7 +40,7 @@ export async function selectAIAssistant(aiConfigs: AIConfig[]): Promise<string> 
     {
       type: 'list',
       name: 'ai',
-      message: chalk.bold('选择你的 AI 助手:'),
+      message: chalk.bold('Выберите вашего ИИ-ассистента:'),
       choices,
       default: 'claude',
       pageSize: 15
@@ -51,37 +51,37 @@ export async function selectAIAssistant(aiConfigs: AIConfig[]): Promise<string> 
 }
 
 /**
- * Select writing method interactively
+ * Интерактивно выбрать метод написания
  */
 export async function selectWritingMethod(): Promise<string> {
   const methodChoices = [
     {
-      name: `${chalk.cyan('three-act'.padEnd(15))} ${chalk.dim('(三幕结构 - 经典故事结构)')}`,
+      name: `${chalk.cyan('three-act'.padEnd(15))} ${chalk.dim('(Трехактная структура - классическая структура истории)')}`,
       value: 'three-act',
       short: 'three-act'
     },
     {
-      name: `${chalk.cyan('hero-journey'.padEnd(15))} ${chalk.dim('(英雄之旅 - 12阶段成长)')}`,
+      name: `${chalk.cyan('hero-journey'.padEnd(15))} ${chalk.dim('(Путешествие героя - 12 этапов роста)')}`,
       value: 'hero-journey',
       short: 'hero-journey'
     },
     {
-      name: `${chalk.cyan('story-circle'.padEnd(15))} ${chalk.dim('(故事圈 - 8环节循环)')}`,
+      name: `${chalk.cyan('story-circle'.padEnd(15))} ${chalk.dim('(Круг истории - 8-шаговый цикл)')}`,
       value: 'story-circle',
       short: 'story-circle'
     },
     {
-      name: `${chalk.cyan('seven-point'.padEnd(15))} ${chalk.dim('(七点结构 - 紧凑情节)')}`,
+      name: `${chalk.cyan('seven-point'.padEnd(15))} ${chalk.dim('(Семиточечная структура - компактный сюжет)')}`,
       value: 'seven-point',
       short: 'seven-point'
     },
     {
-      name: `${chalk.cyan('pixar'.padEnd(15))} ${chalk.dim('(皮克斯公式 - 简单有力)')}`,
+      name: `${chalk.cyan('pixar'.padEnd(15))} ${chalk.dim('(Формула Pixar - просто и мощно)')}`,
       value: 'pixar',
       short: 'pixar'
     },
     {
-      name: `${chalk.cyan('snowflake'.padEnd(15))} ${chalk.dim('(雪花十步 - 系统化规划)')}`,
+      name: `${chalk.cyan('snowflake'.padEnd(15))} ${chalk.dim('(Снежинка - систематическое планирование)')}`,
       value: 'snowflake',
       short: 'snowflake'
     }
@@ -91,7 +91,7 @@ export async function selectWritingMethod(): Promise<string> {
     {
       type: 'list',
       name: 'method',
-      message: chalk.bold('选择写作方法:'),
+      message: chalk.bold('Выберите метод написания:'),
       choices: methodChoices,
       default: 'three-act'
     }
@@ -101,7 +101,7 @@ export async function selectWritingMethod(): Promise<string> {
 }
 
 /**
- * Select script type interactively
+ * Интерактивно выбрать тип скрипта
  */
 export async function selectScriptType(): Promise<string> {
   const scriptChoices = [
@@ -121,7 +121,7 @@ export async function selectScriptType(): Promise<string> {
     {
       type: 'list',
       name: 'scriptType',
-      message: chalk.bold('选择脚本类型:'),
+      message: chalk.bold('Выберите тип скрипта:'),
       choices: scriptChoices,
       default: 'sh'
     }
@@ -131,14 +131,14 @@ export async function selectScriptType(): Promise<string> {
 }
 
 /**
- * Confirm expert mode
+ * Подтвердить экспертный режим
  */
 export async function confirmExpertMode(): Promise<boolean> {
   const answer = await inquirer.prompt([
     {
       type: 'confirm',
       name: 'experts',
-      message: chalk.bold('是否启用专家模式？'),
+      message: chalk.bold('Включить экспертный режим?'),
       default: false
     }
   ]);
@@ -147,14 +147,14 @@ export async function confirmExpertMode(): Promise<boolean> {
 }
 
 /**
- * Display initialization step
+ * Отобразить шаг инициализации
  */
 export function displayStep(step: number, total: number, message: string): void {
   console.log(chalk.dim(`[${step}/${total}]`) + ' ' + message);
 }
 
 /**
- * Check if running in interactive terminal
+ * Проверить, запущен ли интерактивный терминал
  */
 export function isInteractive(): boolean {
   return process.stdin.isTTY === true && process.stdout.isTTY === true;

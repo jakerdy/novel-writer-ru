@@ -1,15 +1,16 @@
+```bash
 #!/bin/bash
 
-# 故事规格定义脚本
-# 用于 /specify 命令
+# Скрипт определения спецификаций истории
+# Используется для команды /specify
 
 set -e
 
-# Source common functions
+# Подключение общих функций
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
-# Parse arguments
+# Парсинг аргументов
 JSON_MODE=false
 
 while [[ $# -gt 0 ]]; do
@@ -25,13 +26,13 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Get project root
+# Получение корневого каталога проекта
 PROJECT_ROOT=$(get_project_root)
 cd "$PROJECT_ROOT"
 
-# 确定故事名称和路径
+# Определение имени и пути к истории
 if [ -z "$STORY_NAME" ]; then
-    # 查找最新的故事
+    # Поиск последней истории
     STORIES_DIR="stories"
     if [ -d "$STORIES_DIR" ] && [ "$(ls -A $STORIES_DIR 2>/dev/null)" ]; then
         STORY_DIR=$(find "$STORIES_DIR" -maxdepth 1 -type d ! -name "stories" | sort -r | head -n 1)
@@ -40,20 +41,20 @@ if [ -z "$STORY_NAME" ]; then
         fi
     fi
 
-    # 如果还是没有，生成默认名称
+    # Если всё ещё нет, генерация имени по умолчанию
     if [ -z "$STORY_NAME" ]; then
         STORY_NAME="story-$(date +%Y%m%d)"
     fi
 fi
 
-# 设置路径
+# Установка путей
 STORY_DIR="stories/$STORY_NAME"
 SPEC_FILE="$STORY_DIR/specification.md"
 
-# 创建目录
+# Создание каталога
 mkdir -p "$STORY_DIR"
 
-# 检查文件状态
+# Проверка состояния файла
 SPEC_EXISTS=false
 STATUS="new"
 
@@ -62,7 +63,7 @@ if [ -f "$SPEC_FILE" ]; then
     STATUS="exists"
 fi
 
-# 输出 JSON 格式
+# Вывод в формате JSON
 if [ "$JSON_MODE" = true ]; then
     cat <<EOF
 {
@@ -74,20 +75,21 @@ if [ "$JSON_MODE" = true ]; then
 }
 EOF
 else
-    echo "故事规格初始化"
-    echo "================"
-    echo "故事名称：$STORY_NAME"
-    echo "规格路径：$SPEC_FILE"
+    echo "Инициализация спецификации истории"
+    echo "=================================="
+    echo "Имя истории: $STORY_NAME"
+    echo "Путь к спецификации: $SPEC_FILE"
 
     if [ "$SPEC_EXISTS" = true ]; then
-        echo "状态：规格文件已存在，准备更新"
+        echo "Статус: Файл спецификации существует, подготовка к обновлению"
     else
-        echo "状态：准备创建新规格"
+        echo "Статус: Подготовка к созданию новой спецификации"
     fi
 
-    # 检查宪法
+    # Проверка конституции
     if [ -f "memory/constitution.md" ]; then
         echo ""
-        echo "✅ 检测到创作宪法，规格将遵循宪法原则"
+        echo "✅ Обнаружена конституция творчества, спецификация будет соответствовать принципам конституции"
     fi
 fi
+```

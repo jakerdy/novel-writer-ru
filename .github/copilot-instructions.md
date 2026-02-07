@@ -1,65 +1,67 @@
-## Quick context for AI coding agents
+```markdown
+## Краткий контекст для ИИ-агентов по написанию кода
 
-This repository is an AI-first CLI tool and template collection for creating Chinese novels using a Spec-Driven Development (SDD) workflow. Key components:
+Этот репозиторий представляет собой CLI-инструмент и набор шаблонов с фокусом на ИИ для создания китайских романов с использованием рабочего процесса Spec-Driven Development (SDD). Ключевые компоненты:
 
-- `src/cli.ts` — primary CLI entry (commands: `init`, `upgrade`, etc.). Look here for how projects are bootstrapped and how AI agent types map to filesystem layout.
-- `package.json` — build/dev scripts. `npm run build` compiles TypeScript; `npm run build:commands` generates per-agent command files from templates.
-- `dist/*` — build artifacts containing pre-generated agent command sets (copied into user projects by `init`).
-- `.specify/`, `spec/`, `stories/` — runtime project layout produced by `novel init`.
-- `other/spec-kit/AGENTS.md` — long-form guidance and agent conventions; use it as authoritative reference when adding new agents.
+- `src/cli.ts` — основной CLI-вход (команды: `init`, `upgrade` и т. д.). Посмотрите здесь, как инициализируются проекты и как типы ИИ-агентов соотносятся с файловой структурой.
+- `package.json` — скрипты сборки/разработки. `npm run build` компилирует TypeScript; `npm run build:commands` генерирует файлы команд для каждого агента из шаблонов.
+- `dist/*` — артефакты сборки, содержащие предварительно сгенерированные наборы команд агентов (копируются в проекты пользователей с помощью `init`).
+- `.specify/`, `spec/`, `stories/` — структура проекта во время выполнения, создаваемая `novel init`.
+- `other/spec-kit/AGENTS.md` — подробное руководство и соглашения для агентов; используйте его как авторитетный источник при добавлении новых агентов.
 
-Keep instructions short and concrete: reference the exact file and function you changed and prefer small, self-contained edits.
+Сохраняйте инструкции короткими и конкретными: ссылайтесь на точный файл и функцию, которые вы изменили, и предпочитайте небольшие, самодостаточные правки.
 
-## High-level architecture notes
+## Заметки по высокоуровневой архитектуре
 
-- The CLI bootstraps a project by copying built artifacts from the package root (`dist/<agent>`) into the target project and creating `.specify/*` scaffolding (`src/cli.ts`, copy logic around `sourceMap`).
-- Agent configuration is agent-centric: directories like `.claude/commands`, `.gemini/commands`, `.cursor/commands` are created and populated during `novel init`.
-- Agent metadata and behavioral decisions are centered in the Spec Kit patterns documented in `other/spec-kit/AGENTS.md`. When adding agents, prefer updating `AGENT_CONFIG` (in the spec-kit implementation) and the `scripts/*` update tooling.
+- CLI инициализирует проект, копируя собранные артефакты из корневого каталога пакета (`dist/<agent>`) в целевой проект и создавая структуру `.specify/*` (логика копирования в `src/cli.ts` вокруг `sourceMap`).
+- Конфигурация агента является центрированной: создаются и заполняются такие каталоги, как `.claude/commands`, `.gemini/commands`, `.cursor/commands` во время `novel init`.
+- Метаданные агента и решения о его поведении сосредоточены в шаблонах Spec Kit, описанных в `other/spec-kit/AGENTS.md`. При добавлении агентов отдавайте предпочтение обновлению `AGENT_CONFIG` (в реализации spec-kit) и инструментам обновления `scripts/*`.
 
-## Common developer workflows (how to run / build / test)
+## Распространенные рабочие процессы разработчика (как запускать / собирать / тестировать)
 
-- Local development: `npm run dev` (runs `tsx src/cli.ts`) — fast way to iterate on CLI behavior without building.
-- Build: `npm run build` (TypeScript -> `dist/`), then `npm run build:commands` to regenerate per-agent command files. `prepare` and `prepublishOnly` call both.
-- If an `init` action warns that a dist artifact is missing, run `npm run build:commands` and re-run the command.
+- Локальная разработка: `npm run dev` (запускает `tsx src/cli.ts`) — быстрый способ итерации поведения CLI без сборки.
+- Сборка: `npm run build` (TypeScript -> `dist/`), затем `npm run build:commands` для регенерации файлов команд для каждого агента. `prepare` и `prepublishOnly` вызывают обе команды.
+- Если действие `init` выдает предупреждение об отсутствии артефакта `dist`, выполните `npm run build:commands` и повторно выполните команду.
 
-Files to check when changes affect agent commands or templates:
-- `scripts/build/generate-commands.sh` — generator used by `npm run build:commands`.
-- `templates/` and `dist/<agent>/` — where generated templates and command files live.
+Файлы для проверки при изменении команд или шаблонов агентов:
+- `scripts/build/generate-commands.sh` — генератор, используемый `npm run build:commands`.
+- `templates/` и `dist/<agent>/` — места, где находятся сгенерированные шаблоны и файлы команд.
 
-## Project-specific conventions and gotchas (do not invent)
+## Соглашения и особенности, специфичные для проекта (не изобретайте)
 
-- Use the actual CLI executable name as the agent key (e.g., `cursor-agent`, not `cursor`). This is enforced across scripts and the tool-checking logic (`other/spec-kit/AGENTS.md`).
-- Command formats differ per agent:
-  - Markdown prompts (Claude, Cursor, opencode): `$ARGUMENTS`, `{SCRIPT}` placeholders.
-  - TOML prompts (Gemini, Qwen): `{{args}}` placeholders and `prompt` keys.
-  See `other/spec-kit/AGENTS.md` for exact examples and `src/cli.ts` helpers `generateMarkdownCommand` / `generateTomlCommand`.
-- When adding files to `dist/` for an agent, update `scripts/*/update-agent-context.(sh|ps1)` and `.github/workflows/scripts/create-release-packages.sh` to include the agent packaging case.
+- Используйте фактическое имя исполняемого файла CLI в качестве ключа агента (например, `cursor-agent`, а не `cursor`). Это обеспечивается во всех скриптах и логике проверки инструментов (`other/spec-kit/AGENTS.md`).
+- Форматы команд различаются для каждого агента:
+  - Markdown-промпты (Claude, Cursor, opencode): плейсхолдеры `$ARGUMENTS`, `{SCRIPT}`.
+  - TOML-промпты (Gemini, Qwen): плейсхолдеры `{{args}}` и ключи `prompt`.
+  См. `other/spec-kit/AGENTS.md` для точных примеров и вспомогательных функций `generateMarkdownCommand` / `generateTomlCommand` в `src/cli.ts`.
+- При добавлении файлов в `dist/` для агента обновите `scripts/*/update-agent-context.(sh|ps1)` и `.github/workflows/scripts/create-release-packages.sh`, чтобы включить случай упаковки агента.
 
-## What to change when adding or updating an agent
+## Что менять при добавлении или обновлении агента
 
-1. Update agent metadata in the single source of truth (AGENT_CONFIG in spec-kit implementation).
-2. Update `src/cli.ts` help text (the `--ai` option) and any `switch` that creates AI directories.
-3. Add generation support in `scripts/build/generate-commands.sh` (and release packaging scripts).
-4. Add or update templates in `templates/` and run `npm run build:commands`.
-5. Update `other/spec-kit/scripts/*` (bash + PowerShell) that collect agent context files for README/CLAUDE/Copilot docs.
+1. Обновите метаданные агента в едином источнике истины (AGENT_CONFIG в реализации spec-kit).
+2. Обновите справочный текст `src/cli.ts` (опция `--ai`) и любой `switch`, который создает каталоги ИИ.
+3. Добавьте поддержку генерации в `scripts/build/generate-commands.sh` (и скрипты упаковки релизов).
+4. Добавьте или обновите шаблоны в `templates/` и запустите `npm run build:commands`.
+5. Обновите `other/spec-kit/scripts/*` (bash + PowerShell), которые собирают файлы контекста агента для документации README/CLAUDE/Copilot.
 
-## Examples (explicit references)
+## Примеры (явные ссылки)
 
-- To regenerate commands after editing a template: run `npm run build:commands`. If a CLI `init` cannot find `dist/<agent>`, this is usually the fix.
-- If you change how an agent is referenced, search `src/cli.ts` for the `sourceMap` and the `switch(options.ai)` branch that maps `--ai` values to directories.
-- If adding CLI detection or validation for a new agent, follow the `requires_cli` pattern described in `other/spec-kit/AGENTS.md` and update the scripts `scripts/bash/update-agent-context.sh` and `scripts/powershell/update-agent-context.ps1`.
+- Для регенерации команд после редактирования шаблона: выполните `npm run build:commands`. Если CLI `init` не может найти `dist/<agent>`, это обычно является решением.
+- Если вы измените способ ссылки на агента, найдите в `src/cli.ts` `sourceMap` и ветку `switch(options.ai)`, которая сопоставляет значения `--ai` с каталогами.
+- При добавлении обнаружения или проверки CLI для нового агента следуйте шаблону `requires_cli`, описанному в `other/spec-kit/AGENTS.md`, и обновите скрипты `scripts/bash/update-agent-context.sh` и `scripts/powershell/update-agent-context.ps1`.
 
-## Safety and style
+## Безопасность и стиль
 
-- Small, focused patches are preferred. When editing templates, preserve frontmatter and `{SCRIPT}` placeholders used by the generators.
-- Prefer modifying `templates/` and running the generator instead of hand-editing `dist/` files.
+- Предпочтительны небольшие, сфокусированные исправления. При редактировании шаблонов сохраняйте фронтматер и плейсхолдеры `{SCRIPT}`, используемые генераторами.
+- Предпочитайте модификацию `templates/` и запуск генератора вместо ручного редактирования файлов `dist/`.
 
-## Quick file map (start here)
+## Краткая карта файлов (начните здесь)
 
-- `src/cli.ts` — CLI behavior and project bootstrap
-- `src/ai-interface.ts` — AI-facing APIs and method-selection logic
-- `scripts/build/generate-commands.sh` — command generator used in CI and local builds
-- `other/spec-kit/AGENTS.md` — agent conventions and integration steps (authoritative)
-- `package.json` — build/dev scripts (`dev`, `build`, `build:commands`, `prepare`)
+- `src/cli.ts` — поведение CLI и инициализация проекта
+- `src/ai-interface.ts` — API для ИИ и логика выбора методов
+- `scripts/build/generate-commands.sh` — генератор команд, используемый в CI и локальных сборках
+- `other/spec-kit/AGENTS.md` — соглашения для агентов и шаги интеграции (авторитетный источник)
+- `package.json` — скрипты сборки/разработки (`dev`, `build`, `build:commands`, `prepare`)
 
-If anything in this instruction page is unclear or you want more examples (for example: a sample TOML command converted from a Markdown command in this codebase), tell me which area to expand and I will iterate. 
+Если что-либо в этой странице инструкций неясно или вы хотите получить больше примеров (например, образец команды TOML, преобразованной из команды Markdown в этой кодовой базе), сообщите мне, какую область расширить, и я буду итерировать.
+```

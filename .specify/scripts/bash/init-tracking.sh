@@ -1,41 +1,42 @@
+```bash
 #!/bin/bash
 
-echo "🚀 初始化追踪系统..."
+echo "🚀 Инициализация системы отслеживания..."
 
-# 检查前置条件
+# Проверка предварительных условий
 story_exists=false
 outline_exists=false
 
-# 查找 specification 文件
+# Поиск файла спецификации
 if ls stories/*/specification.md 1> /dev/null 2>&1; then
     story_exists=true
     story_file=$(ls stories/*/specification.md | head -1)
 fi
 
-# 查找 outline 文件
+# Поиск файла плана
 if ls stories/*/outline.md 1> /dev/null 2>&1; then
     outline_exists=true
     outline_file=$(ls stories/*/outline.md | head -1)
 fi
 
 if [ "$story_exists" = false ] || [ "$outline_exists" = false ]; then
-    echo "❌ 请先完成 /specify 和 /plan 命令"
-    echo "   缺少: ${story_exists:+}${story_exists:-specification.md} ${outline_exists:+}${outline_exists:-outline.md}"
+    echo "❌ Пожалуйста, сначала выполните команды /specify и /plan"
+    echo "   Отсутствует: ${story_exists:+}${story_exists:-specification.md} ${outline_exists:+}${outline_exists:-outline.md}"
     exit 1
 fi
 
-# 创建追踪目录
+# Создание каталога отслеживания
 mkdir -p spec/tracking
 
-# 获取故事名称
+# Получение названия истории
 story_dir=$(dirname "$story_file")
 story_name=$(basename "$story_dir")
 
-echo "📖 为《${story_name}》初始化追踪系统..."
+echo "📖 Инициализация системы отслеживания для «${story_name}»..."
 
-# 初始化 plot-tracker.json
+# Инициализация plot-tracker.json
 if [ ! -f "spec/tracking/plot-tracker.json" ]; then
-    echo "📝 创建 plot-tracker.json..."
+    echo "📝 Создание plot-tracker.json..."
     cat > spec/tracking/plot-tracker.json <<EOF
 {
   "novel": "${story_name}",
@@ -43,21 +44,21 @@ if [ ! -f "spec/tracking/plot-tracker.json" ]; then
   "currentState": {
     "chapter": 0,
     "volume": 1,
-    "mainPlotStage": "准备阶段",
-    "location": "待定",
-    "timepoint": "故事开始前"
+    "mainPlotStage": "Подготовительный этап",
+    "location": "Не определено",
+    "timepoint": "До начала истории"
   },
   "plotlines": {
     "main": {
-      "name": "主线剧情",
-      "description": "待从大纲提取",
-      "status": "待开始",
-      "currentNode": "起点",
+      "name": "Основная сюжетная линия",
+      "description": "Извлечь из плана",
+      "status": "Не начато",
+      "currentNode": "Старт",
       "completedNodes": [],
       "upcomingNodes": [],
       "plannedClimax": {
         "chapter": null,
-        "description": "待规划"
+        "description": "Планируется"
       }
     },
     "subplots": []
@@ -75,50 +76,50 @@ if [ ! -f "spec/tracking/plot-tracker.json" ]; then
   "notes": {
     "plotHoles": [],
     "inconsistencies": [],
-    "reminders": ["请根据实际故事内容更新追踪数据"]
+    "reminders": ["Обновляйте данные отслеживания в соответствии с фактическим содержанием истории"]
   }
 }
 EOF
 fi
 
-# 初始化 timeline.json
+# Инициализация timeline.json
 if [ ! -f "spec/tracking/timeline.json" ]; then
-    echo "⏰ 创建 timeline.json..."
+    echo "⏰ Создание timeline.json..."
     cat > spec/tracking/timeline.json <<EOF
 {
   "novel": "${story_name}",
   "lastUpdated": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
-  "storyTimeUnit": "天",
+  "storyTimeUnit": "День",
   "realWorldReference": null,
   "timeline": [
     {
       "chapter": 0,
-      "storyTime": "第0天",
-      "description": "故事开始前",
-      "events": ["待添加"],
-      "location": "待定"
+      "storyTime": "День 0",
+      "description": "До начала истории",
+      "events": ["Добавить"],
+      "location": "Не определено"
     }
   ],
   "parallelEvents": [],
   "timeSpan": {
-    "start": "第0天",
-    "current": "第0天",
-    "elapsed": "0天"
+    "start": "День 0",
+    "current": "День 0",
+    "elapsed": "0 дней"
   }
 }
 EOF
 fi
 
-# 初始化 relationships.json
+# Инициализация relationships.json
 if [ ! -f "spec/tracking/relationships.json" ]; then
-    echo "👥 创建 relationships.json..."
+    echo "👥 Создание relationships.json..."
     cat > spec/tracking/relationships.json <<EOF
 {
   "novel": "${story_name}",
   "lastUpdated": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
   "characters": {
     "主角": {
-      "name": "待设定",
+      "name": "Не определено",
       "relationships": {
         "allies": [],
         "enemies": [],
@@ -134,23 +135,23 @@ if [ ! -f "spec/tracking/relationships.json" ]; then
 EOF
 fi
 
-# 初始化 character-state.json
+# Инициализация character-state.json
 if [ ! -f "spec/tracking/character-state.json" ]; then
-    echo "📍 创建 character-state.json..."
+    echo "📍 Создание character-state.json..."
     cat > spec/tracking/character-state.json <<EOF
 {
   "novel": "${story_name}",
   "lastUpdated": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
   "characters": {
     "主角": {
-      "name": "待设定",
-      "status": "健康",
-      "location": "待定",
+      "name": "Не определено",
+      "status": "Здоров",
+      "location": "Не определено",
       "possessions": [],
       "skills": [],
       "lastSeen": {
         "chapter": 0,
-        "description": "尚未出场"
+        "description": "Еще не появился"
       },
       "development": {
         "physical": 0,
@@ -167,17 +168,18 @@ EOF
 fi
 
 echo ""
-echo "✅ 追踪系统初始化完成！"
+echo "✅ Система отслеживания успешно инициализирована!"
 echo ""
-echo "📊 已创建以下追踪文件："
-echo "   • spec/tracking/plot-tracker.json - 情节追踪"
-echo "   • spec/tracking/timeline.json - 时间线管理"
-echo "   • spec/tracking/relationships.json - 关系网络"
-echo "   • spec/tracking/character-state.json - 角色状态"
+echo "📊 Созданы следующие файлы отслеживания:"
+echo "   • spec/tracking/plot-tracker.json - Отслеживание сюжета"
+echo "   • spec/tracking/timeline.json - Управление временной шкалой"
+echo "   • spec/tracking/relationships.json - Сеть взаимоотношений"
+echo "   • spec/tracking/character-state.json - Состояние персонажей"
 echo ""
-echo "💡 下一步："
-echo "   1. 使用 /write 开始创作（会自动更新追踪数据）"
-echo "   2. 定期使用 /track 查看综合报告"
-echo "   3. 使用 /plot-check 等命令进行一致性检查"
+echo "💡 Следующие шаги:"
+echo "   1. Начните писать с помощью /write (данные отслеживания будут обновлены автоматически)"
+echo "   2. Регулярно используйте /track для просмотра сводного отчета"
+echo "   3. Используйте команды, такие как /plot-check, для проверки согласованности"
 echo ""
-echo "📝 提示：追踪文件已预填充基础结构，会在写作过程中自动更新"
+echo "📝 Примечание: Файлы отслеживания предварительно заполнены базовой структурой и будут автоматически обновляться в процессе написания."
+```

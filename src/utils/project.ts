@@ -1,3 +1,4 @@
+```typescript
 import fs from 'fs-extra';
 import path from 'path';
 
@@ -8,8 +9,8 @@ export interface ProjectInfo {
 }
 
 /**
- * 向上查找项目根目录
- * 通过查找 .specify/config.json 来识别项目根目录
+ * Ищет корневой каталог проекта, поднимаясь вверх по иерархии каталогов.
+ * Корневой каталог проекта определяется наличием файла .specify/config.json.
  */
 export async function findProjectRoot(startDir: string = process.cwd()): Promise<string | null> {
   let currentDir = path.resolve(startDir);
@@ -27,7 +28,7 @@ export async function findProjectRoot(startDir: string = process.cwd()): Promise
 }
 
 /**
- * 验证是否是有效的 novel-writer 项目
+ * Проверяет, является ли указанный каталог действительным проектом novel-writer.
  */
 export async function validateProject(projectPath: string): Promise<boolean> {
   const configPath = path.join(projectPath, '.specify', 'config.json');
@@ -35,7 +36,7 @@ export async function validateProject(projectPath: string): Promise<boolean> {
 }
 
 /**
- * 检测项目安装了哪些 AI 配置
+ * Определяет, какие конфигурации AI установлены в проекте.
  */
 export async function detectInstalledAI(projectPath: string): Promise<string[]> {
   const aiConfigs = [
@@ -58,7 +59,7 @@ export async function detectInstalledAI(projectPath: string): Promise<string[]> 
 }
 
 /**
- * 获取项目信息
+ * Получает информацию о проекте.
  */
 export async function getProjectInfo(projectPath: string): Promise<ProjectInfo | null> {
   const configPath = path.join(projectPath, '.specify', 'config.json');
@@ -74,7 +75,7 @@ export async function getProjectInfo(projectPath: string): Promise<ProjectInfo |
 
     return {
       root: projectPath,
-      version: config.version || '未知',
+      version: config.version || 'unknown',
       installedAI
     };
   } catch (error) {
@@ -83,7 +84,7 @@ export async function getProjectInfo(projectPath: string): Promise<ProjectInfo |
 }
 
 /**
- * 确保在有效的项目目录中，否则抛出错误
+ * Гарантирует, что текущий каталог является действительным каталогом проекта, иначе выбрасывает ошибку.
  */
 export async function ensureProjectRoot(): Promise<string> {
   const projectRoot = await findProjectRoot();
@@ -94,3 +95,4 @@ export async function ensureProjectRoot(): Promise<string> {
 
   return projectRoot;
 }
+```
