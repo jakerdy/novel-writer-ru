@@ -4,7 +4,7 @@
 $STORIES_DIR = "stories"
 $MEMORY_DIR = "memory"
 
-# Поиск последней директории с историями
+# Поиск последней директории с историей
 function Get-LatestStory {
     $latest = Get-ChildItem -Path $STORIES_DIR -Directory |
               Sort-Object Name -Descending |
@@ -27,7 +27,7 @@ function Parse-VolumeInfo {
         $content = Get-Content $OutlineFile -Raw
         $volumeNum = 1
 
-        # Соответствие диапазонам томов и глав
+        # Сопоставление тома и диапазона глав
         $pattern = '###\s+第.*?卷.*?\n[\s\S]*?章节范围.*?第(\d+)-(\d+)章'
         $matches = [regex]::Matches($content, $pattern)
 
@@ -42,7 +42,7 @@ function Parse-VolumeInfo {
         }
     }
 
-    # Правило по умолчанию: 60 глав на том
+    # Правило по умолчанию: один том на каждые 60 глав
     $volume = [math]::Floor(($ChapterNum - 1) / 60) + 1
     return "volume-$volume"
 }
@@ -107,7 +107,7 @@ $volume = Get-Volume -ChapterNum $nextChapter
 $chapterNumFormatted = "{0:D3}" -f $nextChapter
 $volumeDir = "$chaptersDir/$volume"
 
-# Создание директории тома (если не существует)
+# Создание директории тома (если она не существует)
 if (!(Test-Path $volumeDir)) {
     New-Item -ItemType Directory -Path $volumeDir | Out-Null
 }
@@ -125,4 +125,4 @@ if (Test-Path $styleFile) {
 Write-Host "- План истории: $storyFile"
 Write-Host "- План глав: $outlineFile"
 Write-Host ""
-Write-Host "Начинаем писать главу $nextChapter..."
+Write-Host "Начинаем написание главы $nextChapter..."

@@ -1,239 +1,227 @@
-```markdown
----
-description: Create or update the novel writing constitution, defining uncompromising creative principles
-argument-hint: [Description of creative principles]
-allowed-tools: Write(//memory/constitution.md), Write(memory/constitution.md), Read(//memory/**), Read(memory/**), Bash(find:*), Bash(*)
-model: claude-sonnet-4-5-20250929
-scripts:
-  sh: .specify/scripts/bash/constitution.sh
-  ps: .specify/scripts/powershell/constitution.ps1
----
+用户输入：$ARGUMENTS
 
-User input: $ARGUMENTS
+## Цель
 
-## Goal
+Создать основополагающие принципы и ценности для написания романов, сформировав документ «Конституция творчества». Эти принципы будут направлять все последующие творческие решения.
 
-Establish the core principles and values for novel writing, forming a "constitution" document. These principles will guide all subsequent creative decisions.
+## Шаги выполнения
 
-## Execution Steps
+### 1. Проверка существующих документов
 
-### 1. Check Existing Documents
-
-**First, check if a style reference document exists** (from `/book-internalize`):
+**Сначала проверьте наличие документа со стилистическими ориентирами** (из `/book-internalize`):
 ```bash
 test -f .specify/memory/style-reference.md && echo "exists" || echo "not-found"
 ```
 
-- If it exists, use the Read tool to read `.specify/memory/style-reference.md`
-- Then inform the user: "Detected that you have completed the analysis of the benchmark work. I will use this style as a reference to draft the constitution for you."
+- Если он существует, используйте инструмент Read для чтения `.specify/memory/style-reference.md`.
+- Затем сообщите пользователю: «Обнаружено, что вы завершили анализ сравнительных работ. Я буду использовать этот стиль для составления конституции».
 
-**Next, check for an existing constitution**:
+**Затем проверьте существующую конституцию**:
 ```bash
 test -f .specify/memory/constitution.md && echo "exists" || echo "not-found"
 ```
 
-- If it exists (outputs "exists"), use the Read tool to read `.specify/memory/constitution.md` and prepare for an update.
-- If it does not exist (outputs "not-found"), skip the reading step and prepare to create a new constitution directly.
+- Если она существует (вывод «exists»), используйте инструмент Read для чтения `.specify/memory/constitution.md` и подготовьтесь к обновлению.
+- Если она не существует (вывод «not-found»), пропустите шаг чтения и подготовьтесь к созданию новой конституции.
 
-### 2. Collect Creative Principles
+### 2. Сбор принципов творчества
 
-Based on user input, collect principles for the following dimensions (if not provided, ask or infer):
+На основе ввода пользователя соберите принципы по следующим аспектам (если они не предоставлены, запросите или выведите предположение):
 
-#### Core Values
-- What core ideas should the work convey?
-- What are the absolute bottom lines that cannot be violated?
-- What is the fundamental purpose of creation?
+#### Основные ценности
+- Какие основные идеи должен донести произведение?
+- Каковы абсолютные недопустимые границы?
+- Какова фундаментальная цель творчества?
 
-#### Quality Standards
-- Logic consistency requirements
-- Text quality standards
-- Update frequency commitment
-- Completion guarantee
+#### Стандарты качества
+- Требования к логической последовательности
+- Стандарты качества текста
+- Обязательства по частоте обновлений
+- Гарантия завершенности
 
-#### Creative Style Principles
-- Narrative style (concise/ornate/plain/poetic)
-- Pacing control (fast/slow/well-paced)
-- Emotional tone (passionate/profound/lighthearted/serious)
-- Language characteristics (ancient/modern/colloquial/formal)
+#### Принципы творческого стиля
+- Стиль повествования (лаконичный/пышный/простой/поэтичный)
+- Контроль темпа (быстрый/медленный/сбалансированный)
+- Эмоциональный тон (захватывающий/глубокий/легкий/серьезный)
+- Языковые особенности (древний/современный/разговорный/книжный)
 
-#### Content Principles
-- Character development principles
-  - Every character must have a complete motivation
-  - Character growth must be logical
-  - Dialogue must be consistent with the character's identity
-- Plot design principles
-  - Conflict design principles
-  - Plot twist rationality requirements
-  - Foreshadowing resolution principles
-- World-building principles
-  - Setting consistency requirements
-  - Detail authenticity standards
-  - Cultural research requirements
+#### Принципы содержания
+- Принципы построения персонажей
+  - У каждого персонажа должна быть полная мотивация
+  - Рост персонажа должен быть логичным
+  - Диалоги должны соответствовать личности персонажа
+- Принципы построения сюжета
+  - Принципы создания конфликтов
+  - Обоснованность поворотов сюжета
+  - Принцип отслеживания и использования зацепок
+- Принципы мироустройства
+  - Требования к внутренней согласованности сеттинга
+  - Стандарты достоверности деталей
+  - Требования к культурным исследованиям
 
-#### Reader-Oriented Principles
-- Target audience definition
-- Reader experience guarantee
-- Interaction and feedback principles
+#### Принципы ориентации на читателя
+- Определение целевой аудитории
+- Гарантия читательского опыта
+- Принципы интерактивной обратной связи
 
-#### Creative Discipline
-- Daily writing standards
-- Revision and refinement process
-- Version control principles
+#### Дисциплина творчества
+- Правила повседневного письма
+- Процесс редактирования и доработки
+- Принципы управления версиями
 
-### 3. Draft the Constitution Document
+### 3. Составление документа конституции
 
-Use the following template structure:
+Используйте следующую структуру шаблона:
 
 ```markdown
-# Novel Writing Constitution
+# Конституция творчества романа
 
-## Metadata
-- Version: [Version number, e.g., 1.0.0]
-- Creation Date: [YYYY-MM-DD]
-- Last Revised: [YYYY-MM-DD]
-- Author: [Author's Name]
-- Work: [Work Title or "General"]
+## Метаданные
+- Версия: [Номер версии, например 1.0.0]
+- Дата создания: [ГГГГ-ММ-ДД]
+- Последнее изменение: [ГГГГ-ММ-ДД]
+- Автор: [Имя автора]
+- Произведение: [Название произведения или "Общее"]
 
-## Preamble
-[Explain why this constitution is needed and its binding force]
+## Предисловие
+[Объясните, почему эта конституция необходима и какова ее обязательная сила]
 
-## Chapter 1: Core Values
+## Глава 1: Основные ценности
 
-### Principle 1: [Principle Name]
-**Statement**: [Clear statement of the principle]
-**Rationale**: [Why this principle is important]
-**Execution**: [How to embody it in the creation process]
+### Принцип 1: [Название принципа]
+**Заявление**: [Четкая формулировка принципа]
+**Обоснование**: [Почему этот принцип важен]
+**Исполнение**: [Как он будет отражен в творчестве]
 
-### Principle 2: [Principle Name]
-[Same format as above]
+### Принцип 2: [Название принципа]
+[Тот же формат]
 
-## Chapter 2: Quality Standards
+## Глава 2: Стандарты качества
 
-### Standard 1: Logical Consistency
-**Requirement**: [Specific requirements]
-**Verification Method**: [How to verify]
-**Consequences of Violation**: [Must be corrected]
+### Стандарт 1: Логическая последовательность
+**Требования**: [Конкретные требования]
+**Метод проверки**: [Как проверять]
+**Последствия нарушения**: [Должно быть исправлено]
 
-[More standards...]
+[Больше стандартов...]
 
-## Chapter 3: Creative Style
+## Глава 3: Стиль творчества
 
-### Style Principle 1: [Name]
-**Definition**: [What this style is]
-**Example**: [Specific examples]
-**Taboo**: [What absolutely not to do]
+### Принцип стиля 1: [Название]
+**Определение**: [Что представляет собой этот стиль]
+**Пример**: [Конкретный пример]
+**Запрещено**: [Чего категорически нельзя делать]
 
-[More style principles...]
+[Больше принципов стиля...]
 
-## Chapter 4: Content Guidelines
+## Глава 4: Нормы содержания
 
-### Character Development Guidelines
-[Specific guideline content]
+### Нормы построения персонажей
+[Конкретное содержание норм]
 
-### Plot Design Guidelines
-[Specific guideline content]
+### Нормы построения сюжета
+[Конкретное содержание норм]
 
-### World-Building Guidelines
-[Specific guideline content]
+### Нормы построения мироустройства
+[Конкретное содержание норм]
 
-## Chapter 5: Reader's Contract
+## Глава 5: Договор с читателем
 
-### Promises to Readers
-- [Promise 1]
-- [Promise 2]
-- [Promise 3]
+### Обещания читателям
+- [Обещание 1]
+- [Обещание 2]
+- [Обещание 3]
 
-### Bottom Line Guarantees
-- [Guarantee 1]
-- [Guarantee 2]
+### Гарантия недопустимого
+- [Гарантия 1]
+- [Гарантия 2]
 
-## Chapter 6: Revision Procedures
+## Глава 6: Процедура пересмотра
 
-### Revision Trigger Conditions
-- Major changes in creative direction
-- Accumulation of reader feedback
-- Personal growth and evolving understanding
+### Условия инициирования пересмотра
+- Существенное изменение направления творчества
+- Накопление отзывов читателей
+- Личностный рост и изменение осознания
 
-### Revision Process
-1. Propose revision motion
-2. Assess impact
-3. Update version
-4. Record changes
+### Процесс пересмотра
+1. Внесение предложения о пересмотре
+2. Оценка влияния
+3. Обновление версии
+4. Регистрация изменений
 
-## Appendix: Version History
-- v1.0.0 (Date): Initial version
-- [Subsequent version records]
+## Приложение: История версий
+- v1.0.0 (Дата): Исходная версия
+- [Записи последующих версий]
 ```
 
-### 4. Version Management
+### 4. Управление версиями
 
-- **Major Version Number**: Significant principle changes or deletions
-- **Minor Version Number**: Addition of principles or chapters
-- **Revision Number**: Wording optimization, clarification of explanations
+- **Основной номер версии**: Существенные изменения или удаление принципов
+- **Дополнительный номер версии**: Добавление принципов или глав
+- **Номер исправления**: Оптимизация формулировок, уточняющие пояснения
 
-### 5. Consistency Propagation
+### 5. Распространение согласованности
 
-Check and update related documents to maintain consistency:
-- Reference constitution principles in subsequent commands
-- Suggest updating the creative philosophy section in README
+Проверьте и обновите связанные документы для поддержания согласованности:
+- Ссылайтесь на принципы конституции в последующих командах
+- Предложите обновить раздел творческих концепций в README
 
-### 6. Generate Impact Report
+### 6. Генерация отчета о влиянии
 
-Output the impact of constitution creation/update:
+Выведите влияние создания/обновления конституции:
 ```markdown
-## Constitution Impact Report
-- Version: [Old Version] → [New Version]
-- New Principles: [List]
-- Modified Principles: [List]
-- Scope of Impact:
-  ✅ Specifications must adhere to the constitution
-  ✅ Planning must comply with principles
-  ✅ Creative execution must follow guidelines
-  ✅ Verification must check compliance
+## Отчет о влиянии Конституции
+- Версия: [Старая версия] → [Новая версия]
+- Новые принципы: [Список]
+- Измененные принципы: [Список]
+- Область влияния:
+  ✅ Определение спецификаций должно соответствовать конституции
+  ✅ Планирование должно соответствовать принципам
+  ✅ Исполнение творчества должно соблюдать нормы
+  ✅ Проверка должна осуществлять контроль соответствия
 ```
 
-### 7. Output and Save
+### 7. Вывод и сохранение
 
-- Save the constitution to `.specify/memory/constitution.md`
-- Output a success message for creation/update
-- Prompt for the next step: `/specify` to define story specifications
+- Сохраните конституцию в `.specify/memory/constitution.md`
+- Выведите сообщение об успешном создании/обновлении
+- Предложите следующий шаг: `/specify` для определения спецификаций истории
 
-## Execution Principles
+## Принципы исполнения
 
-### Must Adhere To
-- Principles must be verifiable, not too abstract
-- Use clear terms like "must," "prohibit," etc.
-- Each principle must have a clear rationale
+### Обязательно соблюдать
+- Принципы должны быть проверяемыми, а не слишком абстрактными
+- Используйте четкие слова, такие как «должен», «запрещено»
+- Каждый принцип должен иметь четкое обоснование
 
-### Should Include
-- At least 3-5 core values
-- Clear quality bottom lines
-- Actionable creative guidelines
+### Следует включать
+- Минимум 3-5 основных ценностей
+- Четкие базовые стандарты качества
+- Оперативные творческие нормы
 
-### Avoid
-- Vague slogans (e.g., "pursue excellence")
-- Unverifiable requirements
-- Overly restrictive clauses that stifle creativity
+### Избегать
+- Пустых лозунгов (например, «стремиться к совершенству»)
+- Непроверяемых требований
+- Чрезмерно ограничивающих творчество положений
 
-## Example Principles
+## Пример принципа
 
-**Good Principles**:
-- "The actions of main characters must have a clear chain of motivation; actions occurring 'because the plot requires it' are forbidden."
-- "Every foreshadowing element must be resolved or explained within a reasonable timeframe (maximum 10 chapters)."
-- "Never use modern internet slang that breaks the immersion of an ancient setting."
+**Отличный принцип**:
+- «Действия главных героев должны иметь четкую цепочку мотиваций, недопустимы действия «потому что так нужно для сюжета»»
+- «Каждая зацепка должна быть раскрыта или объяснена в разумные сроки (не более 10 глав)»
+- «Никогда не использовать современные интернет-сленги, разрушающие погружение в древний сеттинг»
 
-**Bad Principles**:
-- "Write well" (Too vague)
-- "Pursue artistry" (Unverifiable)
-- "Satisfy the readers" (Unclear standard)
+**Плохой принцип**:
+- «Писать хорошо» (слишком расплывчато)
+- «Стремиться к художественности» (непроверяемо)
+- «Удовлетворить читателя» (неясный стандарт)
 
-## Subsequent Process
+## Последующий процесс
 
-After the constitution is established, all subsequent creative steps must adhere to it:
-1. `/specify` - Specifications must align with constitutional values
-2. `/plan` - Plans must follow constitutional principles
-3. `/write` - Creation must comply with constitutional guidelines
-4. `/analyze` - Verification must check constitutional compliance
+После установления конституции все последующие творческие шаги должны ей следовать:
+1. `/specify` - Спецификации должны соответствовать ценностям конституции
+2. `/plan` - План должен соответствовать принципам конституции
+3. `/write` - Творчество должно соблюдать нормы конституции
+4. `/analyze` - Проверка должна осуществлять контроль соответствия конституции
 
-Remember: **The constitution is the supreme guideline, but it can also be revised progressively.**
-```
+Помните: **Конституция является высшим руководством, но ее также можно пересматривать по мере развития.**

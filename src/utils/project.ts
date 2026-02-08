@@ -1,4 +1,3 @@
-```typescript
 import fs from 'fs-extra';
 import path from 'path';
 
@@ -9,7 +8,7 @@ export interface ProjectInfo {
 }
 
 /**
- * Ищет корневой каталог проекта, поднимаясь вверх по иерархии каталогов.
+ * Ищет корневой каталог проекта, двигаясь вверх по иерархии каталогов.
  * Корневой каталог проекта определяется наличием файла .specify/config.json.
  */
 export async function findProjectRoot(startDir: string = process.cwd()): Promise<string | null> {
@@ -36,7 +35,7 @@ export async function validateProject(projectPath: string): Promise<boolean> {
 }
 
 /**
- * Определяет, какие конфигурации AI установлены в проекте.
+ * Определяет, какие AI-конфигурации установлены в проекте.
  */
 export async function detectInstalledAI(projectPath: string): Promise<string[]> {
   const aiConfigs = [
@@ -75,7 +74,7 @@ export async function getProjectInfo(projectPath: string): Promise<ProjectInfo |
 
     return {
       root: projectPath,
-      version: config.version || 'unknown',
+      version: config.version || '未知',
       installedAI
     };
   } catch (error) {
@@ -84,7 +83,7 @@ export async function getProjectInfo(projectPath: string): Promise<ProjectInfo |
 }
 
 /**
- * Гарантирует, что текущий каталог является действительным каталогом проекта, иначе выбрасывает ошибку.
+ * Гарантирует, что выполнение происходит в действительном каталоге проекта, иначе выбрасывает ошибку.
  */
 export async function ensureProjectRoot(): Promise<string> {
   const projectRoot = await findProjectRoot();
@@ -95,4 +94,3 @@ export async function ensureProjectRoot(): Promise<string> {
 
   return projectRoot;
 }
-```

@@ -1,4 +1,3 @@
-```json
 {
   "novel": "[Название романа]",
   "lastUpdated": "",
@@ -29,7 +28,7 @@
   "foreshadowing": [
     {
       "id": "foreshadow-001",
-      "content": "[Содержание затравки]",
+      "content": "[Содержание намёка]",
       "planted": {
         "chapter": null,
         "description": ""
@@ -61,4 +60,3 @@
     "reminders": []
   }
 }
-```

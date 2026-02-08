@@ -1,4 +1,3 @@
-```bash
 #!/bin/bash
 
 # Скрипт декомпозиции задач
@@ -10,13 +9,13 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
-# Парсинг аргументов
+# Разбор аргументов
 STORY_NAME=""
 if [ $# -gt 0 ]; then
     STORY_NAME="$1"
 fi
 
-# Получение корневой директории проекта
+# Получение корневого каталога проекта
 PROJECT_ROOT=$(get_project_root)
 cd "$PROJECT_ROOT"
 
@@ -31,7 +30,7 @@ PLAN_FILE="$STORY_DIR/creative-plan.md"
 TASKS_FILE="$STORY_DIR/tasks.md"
 
 echo "Декомпозиция задач"
-echo "========"
+echo "=========="
 echo "История: $STORY_NAME"
 echo ""
 
@@ -51,12 +50,12 @@ if [ ! -f "$PLAN_FILE" ]; then
 fi
 
 if [ ${#missing[@]} -gt 0 ]; then
-    echo "⚠️ Отсутствуют следующие необходимые документы:"
+    echo "⚠️ Отсутствуют следующие предварительные документы:"
     for doc in "${missing[@]}"; do
         echo "  - $doc"
     done
     echo ""
-    echo "Пожалуйста, сначала завершите:"
+    echo "Пожалуйста, сначала выполните:"
     if [ ! -f "memory/writing-constitution.md" ] && [ ! -f ".specify/memory/writing-constitution.md" ]; then
         echo "  1. /constitution - Создание конституции письма"
     fi
@@ -91,8 +90,7 @@ echo "Готово к декомпозиции задач"
 echo ""
 echo "Декомпозиция задач будет включать:"
 echo "  - Задачи по написанию глав (на основе плана)"
-echo "  - Уточнение профилей персонажей"
-echo "  - Дополнение документов по мировоззрению"
-echo "  - Узлы контроля качества"
+echo "  - Улучшение профилей персонажей"
+echo "  - Дополнение документации по миру"
+echo "  - Этапы контроля качества"
 echo "  - Задачи по проверке и доработке"
-```

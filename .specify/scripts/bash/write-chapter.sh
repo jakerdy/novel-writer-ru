@@ -1,4 +1,3 @@
-```sh
 #!/usr/bin/env bash
 # Написание главы
 
@@ -22,7 +21,7 @@ if [ ! -f "$STORY_DIR/outline.md" ]; then
     exit 1
 fi
 
-# Определение главы для написания (можно передать как параметр или автоматически найти следующую)
+# Определение главы для написания (можно передать параметром или автоматически найти следующую)
 CHAPTER_NUM="${1:-}"
 
 # Парсинг информации о томе из outline.md
@@ -69,7 +68,7 @@ determine_volume() {
     local outline_file="$STORY_DIR/outline.md"
 
     if [ -f "$outline_file" ]; then
-        # Попытка парсинга
+        # Попытка парсинга из outline.md
         parse_volume_info "$outline_file" "$chapter"
     else
         # Правило по умолчанию: один том на 60 глав
@@ -82,7 +81,7 @@ if [ -z "$CHAPTER_NUM" ]; then
     # Автоматический поиск следующей ненаписанной главы
     CHAPTER_NUM=1
     found=false
-    # Получение общего количества глав из outline.md, если не найдено, по умолчанию ищем до 500 глав
+    # Получение общего количества глав из outline.md, по умолчанию поиск до 500 глав
     MAX_CHAPTERS=500
     if [ -f "$STORY_DIR/outline.md" ]; then
         # Попытка парсинга общего количества глав из outline.md
@@ -109,7 +108,7 @@ CHAPTER_NUM_FMT=$(printf "%03d" "$CHAPTER_NUM")
 VOLUME_DIR=$(determine_volume "$CHAPTER_NUM")
 CHAPTER_FILE="$STORY_DIR/chapters/$VOLUME_DIR/chapter-${CHAPTER_NUM_FMT}.md"
 
-# Создание файла главы (включая каталог тома)
+# Создание файла главы (включая директорию тома)
 mkdir -p "$(dirname "$CHAPTER_FILE")"
 touch "$CHAPTER_FILE"
 
@@ -125,4 +124,3 @@ echo "CHAPTER_FILE: $CHAPTER_FILE"
 echo "CHAPTER_NUM: $CHAPTER_NUM"
 echo "VOLUME: $VOLUME_DIR"
 echo "STATUS: ready"
-```

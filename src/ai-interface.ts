@@ -1,8 +1,7 @@
-```typescript
 /**
- * AI 接口层
- * 为 AI 助手提供简化的功能调用接口
- * 支持自然语言参数和引导式交互
+ * AI Interface Layer
+ * Provides a simplified functional call interface for AI assistants
+ * Supports natural language parameters and guided interaction
  */
 
 import { MethodAdvisor } from './method-advisor.js';
@@ -12,7 +11,7 @@ import fs from 'fs-extra';
 import path from 'path';
 
 /**
- * AI 友好的参数接口
+ * AI-friendly parameter interface
  */
 interface StoryContext {
   genre?: string;
@@ -24,7 +23,7 @@ interface StoryContext {
 }
 
 /**
- * 方法选择结果
+ * Method selection result
  */
 interface MethodSelection {
   method: string;
@@ -34,7 +33,7 @@ interface MethodSelection {
 }
 
 /**
- * AI 接口主类
+ * Main class for AI Interface
  */
 export class AIInterface {
   private advisor: MethodAdvisor;
@@ -48,18 +47,18 @@ export class AIInterface {
   }
 
   /**
-   * 智能引导选择写作方法
-   * AI 通过对话收集信息后调用
+   * Intelligently guides method selection
+   * Called by AI after collecting information through dialogue
    */
   async guideMethodSelection(context: StoryContext): Promise<MethodSelection> {
-    // 解析自然语言参数
+    // Parse natural language parameters
     const features = this.parseContext(context);
 
-    // 获取推荐
+    // Get recommendations
     const scores = this.advisor.recommend(features);
     const top = scores[0];
 
-    // 加载对应模板
+    // Load corresponding template
     const templatePath = await this.getMethodTemplate(top.method);
 
     return {
@@ -71,37 +70,37 @@ export class AIInterface {
   }
 
   /**
-   * 引导式问答收集信息
-   * 返回需要询问用户的问题
+   * Guided Q&A for information gathering
+   * Returns questions to ask the user
    */
   getGuidingQuestions(): string[] {
     return [
-      "这是一个什么类型的故事？（奇幻/科幻/爱情/悬疑/现实/其他）",
-      "预计写多少字？（短篇3万字以内/中篇10万字左右/长篇20万字以上）",
-      "目标读者是谁？（儿童/青少年/成人/大众）",
-      "你希望故事的节奏如何？（紧凑刺激/平稳推进/缓慢深入）",
-      "你更注重什么？（精彩的情节/丰富的人物/深刻的主题）"
+      "What genre is this story? (Fantasy/Sci-Fi/Romance/Mystery/Realistic/Other)",
+      "What is the estimated length? (Short story under 30k words / Novella around 100k words / Novel over 200k words)",
+      "Who is the target audience? (Children/Teens/Adults/General)",
+      "What kind of pacing do you want for the story? (Fast-paced and exciting / Steady progression / Slow and in-depth)",
+      "What do you prioritize most? (Exciting plot / Rich characters / Profound themes)"
     ];
   }
 
   /**
-   * 解析上下文为特征参数
+   * Parses context into feature parameters
    */
   private parseContext(context: StoryContext): any {
-    // 智能解析长度
-    let length = 100000; // 默认10万字
+    // Intelligent length parsing
+    let length = 100000; // Default 100k words
     if (context.estimatedLength) {
-      if (context.estimatedLength.includes('短')) length = 30000;
-      else if (context.estimatedLength.includes('长')) length = 200000;
-      else if (context.estimatedLength.includes('超长')) length = 500000;
+      if (context.estimatedLength.includes('short')) length = 30000;
+      else if (context.estimatedLength.includes('long')) length = 200000;
+      else if (context.estimatedLength.includes('very long')) length = 500000;
 
-      // 提取数字
+      // Extract numbers
       const match = context.estimatedLength.match(/(\d+)/);
       if (match) {
         const num = parseInt(match[1]);
-        if (context.estimatedLength.includes('万')) {
+        if (context.estimatedLength.includes('万')) { // Ten thousand
           length = num * 10000;
-        } else if (context.estimatedLength.includes('千')) {
+        } else if (context.estimatedLength.includes('千')) { // Thousand
           length = num * 1000;
         } else {
           length = num;
@@ -109,24 +108,24 @@ export class AIInterface {
       }
     }
 
-    // 智能解析节奏
-    let pace = '中';
-    if (context.tone?.includes('紧') || context.tone?.includes('刺激')) pace = '快';
-    else if (context.tone?.includes('缓') || context.tone?.includes('深')) pace = '慢';
+    // Intelligent pace parsing
+    let pace = 'medium';
+    if (context.tone?.includes('fast') || context.tone?.includes('exciting')) pace = 'fast';
+    else if (context.tone?.includes('slow') || context.tone?.includes('deep')) pace = 'slow';
 
-    // 智能解析复杂度
-    let complexity = '中等';
-    if (length > 200000 || context.description?.includes('复杂')) complexity = '复杂';
-    else if (length < 50000 || context.description?.includes('简单')) complexity = '简单';
+    // Intelligent complexity parsing
+    let complexity = 'medium';
+    if (length > 200000 || context.description?.includes('complex')) complexity = 'complex';
+    else if (length < 50000 || context.description?.includes('simple')) complexity = 'simple';
 
-    // 智能解析经验（根据描述推测）
-    let experience = '初级';
-    if (context.description?.includes('系列') || complexity === '复杂') experience = '中级';
+    // Intelligent experience parsing (inferred from description)
+    let experience = 'beginner';
+    if (context.description?.includes('series') || complexity === 'complex') experience = 'intermediate';
 
     return {
-      genre: context.genre || '通用',
+      genre: context.genre || 'general',
       length,
-      audience: context.targetAudience || '大众',
+      audience: context.targetAudience || 'general',
       experience,
       focus: this.parseFocus(context),
       pace,
@@ -135,23 +134,23 @@ export class AIInterface {
   }
 
   /**
-   * 解析创作重点
+   * Parses the creative focus
    */
   private parseFocus(context: StoryContext): string {
-    if (context.description?.includes('人物') || context.description?.includes('角色')) {
-      return '角色';
+    if (context.description?.includes('character') || context.description?.includes('characters')) {
+      return 'character';
     }
-    if (context.description?.includes('情节') || context.description?.includes('剧情')) {
-      return '情节';
+    if (context.description?.includes('plot') || context.description?.includes('storyline')) {
+      return 'plot';
     }
     if (context.themes && context.themes.length > 0) {
-      return '主题';
+      return 'theme';
     }
-    return '平衡';
+    return 'balanced';
   }
 
   /**
-   * 获取方法对应的模板路径
+   * Gets the template path for a given method
    */
   private async getMethodTemplate(method: string): Promise<string> {
     const methodMap: Record<string, string> = {
@@ -167,69 +166,69 @@ export class AIInterface {
   }
 
   /**
-   * 获取方法使用提示
+   * Gets usage tips for a method
    */
   private getMethodTips(method: string): string[] {
     const tips: Record<string, string[]> = {
       'three-act': [
-        '第一幕要快速建立冲突',
-        '第二幕可设置多个小高潮避免拖沓',
-        '第三幕要紧凑有力'
+        'Act 1 should quickly establish conflict',
+        'Act 2 can feature multiple mini-climaxes to avoid dragging',
+        'Act 3 should be concise and impactful'
       ],
       'hero-journey': [
-        '不必严格遵循所有12个阶段',
-        '重点关注角色的内在转变',
-        '导师角色可以多样化'
+        'Not all 12 stages need to be strictly followed',
+        'Focus on the character\'s internal transformation',
+        'The mentor figure can be diverse'
       ],
       'story-circle': [
-        '角色的需求必须足够强烈',
-        '每个步骤都要推进内在变化',
-        '可以嵌套小循环增加深度'
+        'The character\'s need must be strong enough',
+        'Each step should drive internal change',
+        'Nested loops can add depth'
       ],
       'seven-point': [
-        '确保每个节点都推进故事',
-        '中点必须是真正的转折',
-        '收紧点很重要，不要省略'
+        'Ensure each point advances the story',
+        'The midpoint must be a true turning point',
+        'The tight ending is crucial, do not omit it'
       ],
       'pixar-formula': [
-        '保持简洁，不要过度描写',
-        '强调因果关系的清晰连接',
-        '结局要满意但可留有思考空间'
+        'Keep it simple, avoid excessive description',
+        'Emphasize clear connections in causality',
+        'The ending should be satisfying but leave room for thought'
       ]
     };
 
-    return tips[method] || ['遵循方法的基本结构', '保持故事的连贯性'];
+    return tips[method] || ['Follow the basic structure of the method', 'Maintain story coherence'];
   }
 
   /**
-   * 智能转换建议
-   * 分析当前项目并建议是否需要转换
+   * Suggests intelligent conversion
+   * Analyzes the current project and suggests whether conversion is needed
    */
   async suggestConversion(currentMethod: string, storyProgress: any): Promise<any> {
-    // 分析进度
+    // Analyze progress
     const hasContent = storyProgress.chapters && storyProgress.chapters.length > 0;
 
     if (!hasContent) {
       return {
         needConversion: false,
-        reason: '项目刚开始，可以直接切换方法'
+        reason: 'The project is just starting, you can switch methods directly'
       };
     }
 
-    // 分析内容特征
+    // Analyze content features
     const contentFeatures = this.analyzeContent(storyProgress);
 
-    // 获取推荐方法
+    // Get recommended method
     const recommended = this.advisor.recommend(contentFeatures)[0];
 
     if (recommended.method === currentMethod) {
       return {
         needConversion: false,
-        reason: '当前方法已经最适合'
+        reason: 'The current method is already the most suitable'
       };
     }
 
-    // 生成转换方案
+    // Generate conversion plan
     const conversionMap = this.converter.convert(storyProgress, recommended.method);
 
     return {
@@ -242,55 +241,55 @@ export class AIInterface {
   }
 
   /**
-   * 分析内容特征
+   * Analyzes content features
    */
   private analyzeContent(progress: any): any {
-    // 基于实际内容分析
+    // Analyze based on actual content
     return {
-      genre: progress.genre || '通用',
+      genre: progress.genre || 'general',
       length: progress.plannedLength || 100000,
-      audience: progress.audience || '大众',
-      experience: '中级',
-      focus: progress.focus || '平衡',
-      pace: progress.pace || '中',
-      complexity: progress.complexity || '中等'
+      audience: progress.audience || 'general',
+      experience: 'intermediate',
+      focus: progress.focus || 'balanced',
+      pace: progress.pace || 'medium',
+      complexity: progress.complexity || 'medium'
     };
   }
 
   /**
-   * 评估转换影响
+   * Assesses conversion impact
    */
   private assessConversionImpact(progress: any, conversionMap: any): string {
     const chaptersWritten = progress.chapters?.filter((c: any) => c.written).length || 0;
 
     if (chaptersWritten === 0) {
-      return '无影响，还未开始写作';
+      return 'No impact, writing has not started yet';
     } else if (chaptersWritten < 5) {
-      return '影响较小，只需调整少量章节';
+      return 'Minor impact, only a few chapters need adjustment';
     } else if (chaptersWritten < 20) {
-      return '影响中等，需要重新组织部分内容';
+      return 'Moderate impact, some content needs reorganization';
     } else {
-      return '影响较大，建议保持当前方法完成作品';
+      return 'Significant impact, it is recommended to complete the work with the current method';
     }
   }
 
   /**
-   * 智能混合方案生成
-   * 根据故事特点自动设计混合方案
+   * Intelligent hybrid scheme generation
+   * Automatically designs a hybrid scheme based on story characteristics
    */
   async designHybridScheme(context: StoryContext): Promise<any> {
     const features = this.parseContext(context);
 
-    // 判断是否需要混合
-    if (features.complexity === '简单' || features.length < 50000) {
+    // Determine if hybrid is needed
+    if (features.complexity === 'simple' || features.length < 50000) {
       return {
         needHybrid: false,
-        reason: '简单故事使用单一方法即可',
+        reason: 'Simple stories can be handled with a single method',
         recommendation: this.advisor.recommend(features)[0].method
       };
     }
 
-    // 推荐混合方案
+    // Recommend hybrid scheme
     const hybrid = this.hybridManager.recommendHybrid(
       features.genre,
       features.length,
@@ -300,16 +299,16 @@ export class AIInterface {
     if (!hybrid) {
       return {
         needHybrid: false,
-        reason: '此类型故事适合单一方法',
+        reason: 'This type of story is suitable for a single method',
         recommendation: this.advisor.recommend(features)[0].method
       };
     }
 
-    // 生成详细方案
+    // Generate detailed scheme
     const structure = this.hybridManager.createHybridStructure(hybrid, {
       ...features,
-      subPlots: context.description?.includes('支线') ? ['支线1'] : [],
-      characters: context.description?.includes('群像') ? ['角色1', '角色2'] : []
+      subPlots: context.description?.includes('subplots') ? ['subplot1'] : [],
+      characters: context.description?.includes('ensemble') ? ['character1', 'character2'] : []
     });
 
     return {
@@ -322,23 +321,23 @@ export class AIInterface {
   }
 
   /**
-   * 获取使用混合方法的理由
+   * Gets the reason for using a hybrid method
    */
   private getHybridReason(features: any): string {
-    if (features.genre === '奇幻' && features.length > 200000) {
-      return '长篇奇幻适合用英雄之旅构建主线，故事圈追踪角色成长';
+    if (features.genre === 'fantasy' && features.length > 200000) {
+      return 'Long fantasy stories benefit from the Hero\'s Journey for the main plot and the Story Circle for character development.';
     }
-    if (features.genre === '悬疑' && features.complexity === '复杂') {
-      return '复杂悬疑适合七点结构控制节奏，章节用三幕组织';
+    if (features.genre === 'mystery' && features.complexity === 'complex') {
+      return 'Complex mysteries are well-suited for the Seven-Point Structure to control pacing, with chapters organized using the Three-Act Structure.';
     }
-    if (features.focus === '角色' && features.length > 150000) {
-      return '角色驱动的长篇适合混合方法，主线和角色线分别处理';
+    if (features.focus === 'character' && features.length > 150000) {
+      return 'Character-driven novels benefit from hybrid methods, handling the main plot and character arcs separately.';
     }
-    return '故事较复杂，混合方法能更好地组织结构';
+    return 'The story is relatively complex, and a hybrid approach can better organize the structure.';
   }
 
   /**
-   * 获取当前项目配置
+   * Gets the current project configuration
    */
   async getCurrentConfig(): Promise<any> {
     const configPath = path.join(process.cwd(), '.specify', 'config.json');
@@ -349,7 +348,7 @@ export class AIInterface {
   }
 
   /**
-   * 更新项目方法配置
+   * Updates the project method configuration
    */
   async updateProjectMethod(method: string | any): Promise<void> {
     const configPath = path.join(process.cwd(), '.specify', 'config.json');
@@ -359,7 +358,7 @@ export class AIInterface {
       if (typeof method === 'string') {
         config.method = method;
       } else {
-        // 混合方法配置
+        // Hybrid method configuration
         config.method = 'hybrid';
         config.hybridScheme = method;
       }
@@ -370,7 +369,7 @@ export class AIInterface {
   }
 
   /**
-   * 获取方法的中文名称
+   * Gets the Chinese name of a method
    */
   getMethodDisplayName(method: string): string {
     const names: Record<string, string> = {
@@ -386,7 +385,6 @@ export class AIInterface {
 }
 
 /**
- * 导出单例实例供 AI 直接使用
+ * Export a singleton instance for direct use by AI
  */
 export const aiInterface = new AIInterface();
-```

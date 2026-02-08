@@ -1,6 +1,5 @@
-```bash
 #!/usr/bin/env bash
-# Генерация задач для написания
+# Создание задач
 
 set -e
 
@@ -8,7 +7,7 @@ set -e
 SCRIPT_DIR=$(dirname "$0")
 source "$SCRIPT_DIR/common.sh"
 
-# Получение текущей директории истории
+# Получение текущего каталога истории
 STORY_DIR=$(get_current_story)
 
 if [ -z "$STORY_DIR" ]; then
@@ -18,12 +17,12 @@ fi
 
 # Проверка предварительных условий
 if [ ! -f "$STORY_DIR/specification.md" ]; then
-    echo "Ошибка: Спецификация истории не найдена, пожалуйста, используйте команду /specify" >&2
+    echo "Ошибка: Файл спецификации истории не найден, пожалуйста, сначала используйте команду /specify" >&2
     exit 1
 fi
 
 if [ ! -f "$STORY_DIR/outline.md" ]; then
-    echo "Ошибка: План глав не найден, пожалуйста, используйте команду /outline" >&2
+    echo "Ошибка: Файл плана глав не найден, пожалуйста, сначала используйте команду /outline" >&2
     exit 1
 fi
 
@@ -31,15 +30,15 @@ fi
 CURRENT_DATE=$(date '+%Y-%m-%d')
 CURRENT_DATETIME=$(date '+%Y-%m-%d %H:%M:%S')
 
-# Создание файла задач с предварительным заполнением основной информации
+# Создание файла задач с предварительно заполненной основной информацией
 TASKS_FILE="$STORY_DIR/tasks.md"
 cat > "$TASKS_FILE" << EOF
-# Список задач для написания
+# Список задач по написанию
 
 ## Обзор задач
-- **Дата создания**：${CURRENT_DATE}
-- **Последнее обновление**：${CURRENT_DATE}
-- **Статус задач**：Ожидает генерации
+- **Дата создания**: ${CURRENT_DATE}
+- **Последнее обновление**: ${CURRENT_DATE}
+- **Статус задач**: Ожидается генерация
 
 ---
 EOF
@@ -64,4 +63,3 @@ echo "TASKS_FILE: $TASKS_FILE"
 echo "PROGRESS_FILE: $PROGRESS_FILE"
 echo "CURRENT_DATE: $CURRENT_DATE"
 echo "STATUS: ready"
-```

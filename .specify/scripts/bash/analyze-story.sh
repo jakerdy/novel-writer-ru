@@ -1,4 +1,3 @@
-```bash
 #!/bin/bash
 
 # Скрипт анализа истории
@@ -6,11 +5,11 @@
 
 set -e
 
-# Импорт общих функций
+# Подключение общих функций
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
-# Парсинг аргументов
+# Разбор аргументов
 STORY_NAME="$1"
 ANALYSIS_TYPE="${2:-full}"  # full, compliance, quality, progress
 
@@ -31,8 +30,8 @@ check_story_files() {
 
     # Проверка базовых документов
     [ ! -f "memory/writing-constitution.md" ] && [ ! -f ".specify/memory/writing-constitution.md" ] && missing_files+=("конституционный документ")
-    [ ! -f "$STORY_DIR/specification.md" ] && missing_files+=("документ спецификации")
-    [ ! -f "$STORY_DIR/creative-plan.md" ] && missing_files+=("творческий план")
+    [ ! -f "$STORY_DIR/specification.md" ] && missing_files+=("файл спецификации")
+    [ ! -f "$STORY_DIR/creative-plan.md" ] && missing_files+=("файл творческого плана")
 
     if [ ${#missing_files[@]} -gt 0 ]; then
         echo "⚠️ Отсутствуют следующие базовые документы:"
@@ -57,22 +56,22 @@ analyze_content() {
         for file in "$content_dir"/*.md; do
             if [ -f "$file" ]; then
                 ((chapter_count++))
-                # Используем точный подсчет китайских слов
+                # Используем точный подсчет китайских иероглифов
                 local words=$(count_chinese_words "$file")
                 ((total_words += words))
                 local filename=$(basename "$file")
-                echo "  $filename: $words слов"
+                echo "  $filename: $words иероглифов"
             fi
         done
         echo ""
-        echo "  Всего слов: $total_words"
+        echo "  Общее количество иероглифов: $total_words"
         echo "  Количество глав: $chapter_count"
         if [ $chapter_count -gt 0 ]; then
-            echo "  Средняя длина главы: $((total_words / chapter_count)) слов"
+            echo "  Средняя длина главы: $((total_words / chapter_count)) иероглифов"
         fi
     else
         echo "Статистика контента:"
-        echo "  Писательство еще не началось"
+        echo "  Письмо еще не начато"
     fi
 }
 
@@ -89,15 +88,15 @@ check_task_completion() {
     local in_progress=$(grep -c "^- \[~\]" "$tasks_file" 2>/dev/null || echo 0)
     local pending=$((total_tasks - completed_tasks - in_progress))
 
-    echo "Прогресс задач:"
+    echo "Прогресс выполнения задач:"
     echo "  Всего задач: $total_tasks"
-    echo "  Завершено: $completed_tasks"
+    echo "  Выполнено: $completed_tasks"
     echo "  В процессе: $in_progress"
     echo "  Ожидается: $pending"
 
     if [ $total_tasks -gt 0 ]; then
         local completion_rate=$((completed_tasks * 100 / total_tasks))
-        echo "  Коэффициент завершения: $completion_rate%"
+        echo "  Процент выполнения: $completion_rate%"
     fi
 }
 
@@ -110,10 +109,10 @@ check_specification_compliance() {
     # Проверка требований P0 (упрощенная версия)
     local p0_count=$(grep -c "^### 必须包含（P0）" "$spec_file" 2>/dev/null || echo 0)
     if [ $p0_count -gt 0 ]; then
-        echo "  Требования P0: обнаружены, требуется ручная проверка"
+        echo "  Требования P0: обнаружено, требуется ручная проверка"
     fi
 
-    # Проверка наличия маркеров [需要澄清]
+    # Проверка наличия маркера [需要澄清]
     local unclear=$(grep -c "\[需要澄清\]" "$spec_file" 2>/dev/null || echo 0)
     if [ $unclear -gt 0 ]; then
         echo "  ⚠️ Осталось $unclear пунктов, требующих уточнения"
@@ -137,7 +136,7 @@ main() {
         exit 1
     fi
 
-    echo "✅ Базовые документы полные"
+    echo "✅ Базовые документы в полном порядке"
     echo ""
 
     # Выполнение в зависимости от типа анализа
@@ -169,4 +168,3 @@ main() {
 }
 
 main
-```

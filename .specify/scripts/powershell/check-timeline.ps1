@@ -1,4 +1,3 @@
-```powershell
 #!/usr/bin/env pwsh
 # Управление и проверка временной шкалы (PowerShell)
 
@@ -23,9 +22,9 @@ if (-not (Test-Path $timelinePath)) { $timelinePath = Join-Path $root "spec/trac
 
 function Init-Timeline {
   if (-not (Test-Path $timelinePath)) {
-    Write-Host "⚠️  Файл временной шкалы не найден, создаётся..."
+    Write-Host "⚠️  Файл временной шкалы не найден, создается..."
     $tpl = Join-Path $root "templates/tracking/timeline.json"
-    if (-not (Test-Path $tpl)) { throw "Невозможно найти файл шаблона" }
+    if (-not (Test-Path $tpl)) { throw "Не удалось найти файл шаблона" }
     New-Item -ItemType Directory -Path (Split-Path $timelinePath -Parent) -Force | Out-Null
     Copy-Item $tpl $timelinePath -Force
     Write-Host "✅ Файл временной шкалы создан"
@@ -93,7 +92,7 @@ function Check-Continuity {
 }
 
 function Sync-Parallel([string]$timepoint, [string]$eventsCsv) {
-  if (-not $timepoint -or -not $eventsCsv) { throw "Использование: check-timeline.ps1 sync <временная точка> <список событий, разделённых запятыми>" }
+  if (-not $timepoint -or -not $eventsCsv) { throw "Использование: check-timeline.ps1 sync <временная точка> <список событий, разделенных запятыми>" }
   Init-Timeline
   $j = Get-Content -LiteralPath $timelinePath -Raw -Encoding UTF8 | ConvertFrom-Json
   if (-not $j.parallelEvents) { $j | Add-Member -NotePropertyName parallelEvents -NotePropertyValue @{ timepoints=@{} } }
@@ -110,4 +109,3 @@ switch ($Command) {
   'check' { Check-Continuity }
   'sync'  { Sync-Parallel -timepoint $Param1 -eventsCsv $Param2 }
 }
-```

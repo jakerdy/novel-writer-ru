@@ -1,32 +1,31 @@
-```powershell
 param(
     [switch]$Json,
     [switch]$PathsOnly
 )
 
-# Вспомогательный скрипт для уточнения структуры истории
+# Скрипт для уточнения структуры истории
 # Используется для команды /clarify, сканирует и возвращает текущие пути к истории
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-# Получить каталог скрипта
+# Получить директорию скрипта
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 
-# Загрузить общие функции
+# Подключить общие функции
 . "$ScriptDir\common.ps1"
 
-# Получить корневой каталог проекта
+# Получить корневую директорию проекта
 $ProjectRoot = Get-ProjectRoot
 Set-Location $ProjectRoot
 
-# Найти текущий каталог истории
+# Найти текущую директорию истории
 $StoriesDir = "stories"
 if (-not (Test-Path $StoriesDir -PathType Container)) {
     if ($Json) {
-        Write-Output '{"error": "Каталог stories не найден"}'
+        Write-Output '{"error": "No stories directory found"}'
     } else {
-        Write-Error "Ошибка: каталог stories не найден. Пожалуйста, сначала запустите /story для создания структуры истории."
+        Write-Error "Ошибка: директория stories не найдена. Пожалуйста, сначала запустите /story для создания структуры истории."
     }
     exit 1
 }
@@ -35,7 +34,7 @@ if (-not (Test-Path $StoriesDir -PathType Container)) {
 $StoryDirs = Get-ChildItem -Path $StoriesDir -Directory | Sort-Object Name -Descending
 if ($StoryDirs.Count -eq 0) {
     if ($Json) {
-        Write-Output '{"error": "История не найдена"}'
+        Write-Output '{"error": "No story found"}'
     } else {
         Write-Error "Ошибка: история не найдена. Пожалуйста, сначала запустите /story для создания структуры истории."
     }
@@ -50,21 +49,21 @@ $StoryFile = Join-Path $StoryDir.FullName "specification.md"
 
 if (-not (Test-Path $StoryFile -PathType Leaf)) {
     if ($Json) {
-        Write-Output '{"error": "Файл истории не найден (требуется specification.md)"}'
+        Write-Output '{"error": "Story file not found (specification.md required)"}'
     } else {
         Write-Error "Ошибка: файл истории specification.md не найден."
     }
     exit 1
 }
 
-# Проверить, существует ли уже запись об уточнении
+# Проверить, существует ли уже уточнение
 $ClarificationExists = $false
 $StoryContent = Get-Content $StoryFile -Raw
-if ($StoryContent -match "## 记录澄清") {
+if ($StoryContent -match "## 澄清记录") {
     $ClarificationExists = $true
 }
 
-# Подсчитать существующие сеансы уточнения
+# Подсчитать существующие сессии уточнения
 $ClarificationCount = 0
 if ($ClarificationExists) {
     $matches = [regex]::Matches($StoryContent, "### 澄清会话")
@@ -101,9 +100,8 @@ if ($Json) {
     Write-Output "Найдена история: $StoryName"
     Write-Output "Путь к файлу: $StoryFile"
     if ($ClarificationExists) {
-        Write-Output "Проведено сеансов уточнения: $ClarificationCount"
+        Write-Output "Существующие сессии уточнения: $ClarificationCount"
     } else {
         Write-Output "Уточнение еще не проводилось"
     }
 }
-```

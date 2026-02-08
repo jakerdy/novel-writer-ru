@@ -1,4 +1,3 @@
-```powershell
 #!/usr/bin/env pwsh
 # Создание нового проекта истории
 
@@ -15,7 +14,7 @@ if (!(Test-Path $STORIES_DIR)) {
 
 # Парсинг JSON параметров
 $storyData = @{
-    name = "Безымянная история"
+    name = "Без названия"
     genre = "Общий"
     description = ""
 }
@@ -45,7 +44,7 @@ function Get-NextNumber {
     return $maxNum + 1
 }
 
-# Создание каталога с номером (по аналогии со spec-kit)
+# Создание каталога с номером (по аналогии с spec-kit)
 $storyNum = Get-NextNumber -Dir $STORIES_DIR -Prefix "story"
 $storyNumFormatted = "{0:D3}" -f $storyNum
 
@@ -58,7 +57,7 @@ if ($safeName) {
     $safeName = $words -join '-'
 }
 
-# Если имя пустое (например, только китайские иероглифы), используется имя по умолчанию
+# Если имя пустое (например, только китайские иероглифы), использовать имя по умолчанию
 if (-not $safeName) {
     $safeName = "story"
 }
@@ -80,4 +79,3 @@ $result = @{
 } | ConvertTo-Json -Compress
 
 Write-Host $result
-```

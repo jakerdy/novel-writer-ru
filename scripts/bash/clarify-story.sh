@@ -1,7 +1,6 @@
-```bash
 #!/bin/bash
 
-# Скрипт для уточнения плана истории
+# Вспомогательный скрипт для уточнения структуры истории
 # Используется для команды /clarify, сканирует и возвращает текущий путь к истории
 
 set -e
@@ -40,19 +39,19 @@ if [ ! -d "$STORIES_DIR" ]; then
     if [ "$JSON_MODE" = true ]; then
         echo '{"error": "No stories directory found"}'
     else
-        echo "Ошибка: Директория stories не найдена. Пожалуйста, сначала запустите /story для создания плана истории."
+        echo "Ошибка: каталог stories не найден. Пожалуйста, сначала выполните команду /story для создания структуры истории."
     fi
     exit 1
 fi
 
-# Получение последней истории (пока предполагается одна история, может быть расширено)
+# Получение последней истории (в настоящее время предполагается одна история, может быть расширено)
 STORY_DIR=$(find "$STORIES_DIR" -maxdepth 1 -type d ! -name "stories" | sort -r | head -n 1)
 
 if [ -z "$STORY_DIR" ]; then
     if [ "$JSON_MODE" = true ]; then
         echo '{"error": "No story found"}'
     else
-        echo "Ошибка: История не найдена. Пожалуйста, сначала запустите /story для создания плана истории."
+        echo "Ошибка: история не найдена. Пожалуйста, сначала выполните команду /story для создания структуры истории."
     fi
     exit 1
 fi
@@ -66,7 +65,7 @@ if [ ! -f "$STORY_FILE" ]; then
     if [ "$JSON_MODE" = true ]; then
         echo '{"error": "Story file not found (specification.md required)"}'
     else
-        echo "Ошибка: Файл истории specification.md не найден."
+        echo "Ошибка: файл истории specification.md не найден."
     fi
     exit 1
 fi
@@ -83,7 +82,7 @@ if [ "$CLARIFICATION_EXISTS" = true ]; then
     CLARIFICATION_COUNT=$(grep -c "### 澄清会话" "$STORY_FILE" 2>/dev/null || echo "0")
 fi
 
-# Вывод в формате JSON, если запрошено
+# Вывод в формате JSON при запросе
 if [ "$JSON_MODE" = true ]; then
     if [ "$PATHS_ONLY" = true ]; then
         # Минимальный вывод для шаблона команды
@@ -111,9 +110,8 @@ else
     echo "Найдена история: $STORY_NAME"
     echo "Путь к файлу: $STORY_FILE"
     if [ "$CLARIFICATION_EXISTS" = true ]; then
-        echo "Проведено сессий уточнения: $CLARIFICATION_COUNT"
+        echo "Проведено уточнений: $CLARIFICATION_COUNT раз"
     else
-        echo "Уточнение еще не проводилось"
+        echo "Уточнения еще не проводились"
     fi
 fi
-```

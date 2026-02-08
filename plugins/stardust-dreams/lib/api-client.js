@@ -1,7 +1,6 @@
-```javascript
 /**
  * Клиент API Stardust Dreams
- * Отвечает за взаимодействие с API сервера для получения зашифрованных Prompt и данных сеанса
+ * Отвечает за взаимодействие с API сервера для получения зашифрованных Prompt и данных сессии
  */
 
 import fetch from 'node-fetch';
@@ -15,16 +14,16 @@ export class StardustAPIClient {
   }
 
   /**
-   * Установить API Key
+   * Установка API Key
    */
   setApiKey(apiKey) {
     this.apiKey = apiKey;
   }
 
   /**
-   * Получить информацию о сеансе
-   * @param {string} sessionId - ID сеанса
-   * @returns {Object} Данные сеанса
+   * Получение информации о сессии
+   * @param {string} sessionId - ID сессии
+   * @returns {Object} Данные сессии
    */
   async getSession(sessionId) {
     const response = await this.request('/api/trpc/form.getSession', {
@@ -35,16 +34,16 @@ export class StardustAPIClient {
     });
 
     if (!response?.result?.data?.success) {
-      throw new Error(`Сеанс ${sessionId} не существует или истек`);
+      throw new Error(`Сессия ${sessionId} не существует или устарела`);
     }
 
     return response.result.data.data;
   }
 
   /**
-   * Получить зашифрованный Prompt (основная функция)
-   * @param {string} sessionId - ID сеанса
-   * @returns {Object} Объект, содержащий зашифрованный Prompt и ключ для расшифровки
+   * Получение зашифрованного Prompt (основная функция)
+   * @param {string} sessionId - ID сессии
+   * @returns {Object} Объект, содержащий зашифрованный Prompt и ключ для его расшифровки
    */
   async getEncryptedPrompt(sessionId) {
     const response = await this.request('/api/trpc/form.getPrompt', {
@@ -58,12 +57,12 @@ export class StardustAPIClient {
     });
 
     if (!response?.result?.data?.success) {
-      throw new Error(`Не удалось получить зашифрованный Prompt для сеанса ${sessionId}`);
+      throw new Error(`Не удалось получить зашифрованный Prompt для сессии ${sessionId}`);
     }
 
     const data = response.result.data.data;
 
-    // Возвращаем зашифрованные данные в стандартном формате
+    // Возврат зашифрованных данных в стандартном формате
     return {
       sessionId: data.sessionId,
       formId: data.formId,
@@ -79,7 +78,7 @@ export class StardustAPIClient {
 
 
   /**
-   * Отправить запрос к API
+   * Отправка запроса к API
    */
   async request(endpoint, options = {}) {
     const url = endpoint.startsWith('http') ? endpoint : `${this.baseUrl}${endpoint}`;
@@ -104,7 +103,7 @@ export class StardustAPIClient {
       // Обработка ограничения скорости запросов
       if (response.status === 429) {
         const retryAfter = response.headers.get('Retry-After');
-        throw new Error(`Слишком частые запросы, повторите попытку через ${retryAfter || '60'} секунд`);
+        throw new Error(`Слишком частые запросы, попробуйте снова через ${retryAfter || '60'} секунд`);
       }
 
       return data;
@@ -119,4 +118,3 @@ export class StardustAPIClient {
 
 // Экспорт синглтона
 export const apiClient = new StardustAPIClient();
-```

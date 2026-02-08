@@ -1,7 +1,7 @@
 /**
  * Шаблонный движок
- * Отвечает за заполнение пользовательскими параметрами шаблонов Prompt
- * Поддерживает замену переменных, условный рендеринг и циклы и т. д.
+ * Отвечает за заполнение параметров пользователя в шаблоне Prompt.
+ * Поддерживает замену переменных, условное отображение и циклы.
  */
 
 export class TemplateEngine {
@@ -19,7 +19,7 @@ export class TemplateEngine {
   /**
    * Заполнение шаблона
    * @param {string} template - Шаблон Prompt
-   * @param {object} parameters - Пользовательские параметры
+   * @param {object} parameters - Параметры пользователя
    * @returns {string} Заполненный Prompt
    */
   fill(template, parameters) {
@@ -43,7 +43,7 @@ export class TemplateEngine {
       // 3. Обработка блоков with
       result = this.processWithBlocks(result, parameters);
 
-      // 4. Обработка замены переменных (помещается в конце)
+      // 4. Обработка замены переменных (в конце)
       result = this.processVariables(result, parameters);
 
       // 5. Очистка неиспользуемых заполнителей
@@ -51,7 +51,7 @@ export class TemplateEngine {
 
       return result;
     } catch (error) {
-      throw new Error(`Ошибка заполнения шаблона: ${error.message}`);
+      throw new Error(`Не удалось заполнить шаблон: ${error.message}`);
     }
   }
 
@@ -71,7 +71,7 @@ export class TemplateEngine {
       }
 
       if (typeof value === 'object') {
-        // Объекты преобразуются в JSON-строку
+        // Объекты преобразуются в строку JSON
         return JSON.stringify(value, null, 2);
       }
 
@@ -126,7 +126,7 @@ export class TemplateEngine {
           '@last': index === array.length - 1
         };
 
-        // Замена переменных внутри контента цикла
+        // Замена переменных в контенте цикла
         return content.replace(this.syntax.variable, (m, path) => {
           const p = path.trim();
 
@@ -148,7 +148,7 @@ export class TemplateEngine {
   }
 
   /**
-   * Обработка блока with
+   * Обработка блоков with
    */
   processWithBlocks(template, parameters) {
     return template.replace(this.syntax.with, (match, objectPath, content) => {
@@ -195,7 +195,7 @@ export class TemplateEngine {
     }
 
     // Сложное условие (включает операторы)
-    // Здесь упрощенная обработка, в реальности может потребоваться более сложный парсинг выражений
+    // Здесь упрощенная обработка, в реальных условиях может потребоваться более сложный разбор выражений
     for (const [op, fn] of Object.entries(operators)) {
       if (condition.includes(op)) {
         const parts = condition.split(op).map(p => p.trim());
@@ -251,7 +251,7 @@ export class TemplateEngine {
       return undefined;
     }
 
-    // Обработка литералов
+    // Обработка литералов строк
     if (path.startsWith('"') && path.endsWith('"')) {
       return path.slice(1, -1);
     }
@@ -260,7 +260,7 @@ export class TemplateEngine {
       return path.slice(1, -1);
     }
 
-    // Числовые литералы
+    // Цифровые литералы
     if (/^\d+$/.test(path)) {
       return parseInt(path, 10);
     }
@@ -299,7 +299,7 @@ export class TemplateEngine {
    * Очистка неиспользуемых тегов шаблона
    */
   cleanupTemplate(template) {
-    // Удаление несовпавших заполнителей переменных
+    // Удаление неотмеченных заполнителей переменных
     template = template.replace(/\{\{[^}]*\}\}/g, '');
 
     // Удаление лишних пустых строк
@@ -313,7 +313,7 @@ export class TemplateEngine {
 
   /**
    * Проверка синтаксиса шаблона
-   * Проверка шаблона на наличие синтаксических ошибок перед заполнением
+   * Проверяет шаблон на наличие синтаксических ошибок перед заполнением
    */
   validateTemplate(template) {
     const errors = [];

@@ -16,18 +16,18 @@ export interface AIConfig {
 }
 
 /**
- * Отобразить баннер проекта
+ * Отображение баннера проекта
  */
 export function displayProjectBanner(): void {
   console.log('');
   console.log(chalk.cyan.bold('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
-  console.log(chalk.cyan.bold('  Novel Writer - Инструмент для создания китайских романов с помощью ИИ'));
+  console.log(chalk.cyan.bold('  Novel Writer - Инструмент для создания китайских романов на базе ИИ'));
   console.log(chalk.cyan.bold('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
   console.log('');
 }
 
 /**
- * Интерактивно выбрать ИИ-ассистента
+ * Интерактивный выбор ИИ-ассистента
  */
 export async function selectAIAssistant(aiConfigs: AIConfig[]): Promise<string> {
   const choices = aiConfigs.map(config => ({
@@ -51,12 +51,12 @@ export async function selectAIAssistant(aiConfigs: AIConfig[]): Promise<string> 
 }
 
 /**
- * Интерактивно выбрать метод написания
+ * Интерактивный выбор метода написания
  */
 export async function selectWritingMethod(): Promise<string> {
   const methodChoices = [
     {
-      name: `${chalk.cyan('three-act'.padEnd(15))} ${chalk.dim('(Трехактная структура - классическая структура истории)')}`,
+      name: `${chalk.cyan('three-act'.padEnd(15))} ${chalk.dim('(Трёхактная структура - классическая структура сюжета)')}`,
       value: 'three-act',
       short: 'three-act'
     },
@@ -66,7 +66,7 @@ export async function selectWritingMethod(): Promise<string> {
       short: 'hero-journey'
     },
     {
-      name: `${chalk.cyan('story-circle'.padEnd(15))} ${chalk.dim('(Круг истории - 8-шаговый цикл)')}`,
+      name: `${chalk.cyan('story-circle'.padEnd(15))} ${chalk.dim('(Круг истории - 8-этапный цикл)')}`,
       value: 'story-circle',
       short: 'story-circle'
     },
@@ -76,7 +76,7 @@ export async function selectWritingMethod(): Promise<string> {
       short: 'seven-point'
     },
     {
-      name: `${chalk.cyan('pixar'.padEnd(15))} ${chalk.dim('(Формула Pixar - просто и мощно)')}`,
+      name: `${chalk.cyan('pixar'.padEnd(15))} ${chalk.dim('(Формула Pixar - простая и сильная)')}`,
       value: 'pixar',
       short: 'pixar'
     },
@@ -101,7 +101,7 @@ export async function selectWritingMethod(): Promise<string> {
 }
 
 /**
- * Интерактивно выбрать тип скрипта
+ * Интерактивный выбор типа скрипта
  */
 export async function selectScriptType(): Promise<string> {
   const scriptChoices = [
@@ -131,14 +131,14 @@ export async function selectScriptType(): Promise<string> {
 }
 
 /**
- * Подтвердить экспертный режим
+ * Подтверждение экспертного режима
  */
 export async function confirmExpertMode(): Promise<boolean> {
   const answer = await inquirer.prompt([
     {
       type: 'confirm',
       name: 'experts',
-      message: chalk.bold('Включить экспертный режим?'),
+      message: chalk.bold('Вы хотите включить экспертный режим?'),
       default: false
     }
   ]);
@@ -147,14 +147,14 @@ export async function confirmExpertMode(): Promise<boolean> {
 }
 
 /**
- * Отобразить шаг инициализации
+ * Отображение шага инициализации
  */
 export function displayStep(step: number, total: number, message: string): void {
   console.log(chalk.dim(`[${step}/${total}]`) + ' ' + message);
 }
 
 /**
- * Проверить, запущен ли интерактивный терминал
+ * Проверка, запущен ли интерактивный терминал
  */
 export function isInteractive(): boolean {
   return process.stdin.isTTY === true && process.stdout.isTTY === true;

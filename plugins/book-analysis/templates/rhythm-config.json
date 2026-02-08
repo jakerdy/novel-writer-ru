@@ -1,7 +1,6 @@
-```json
 {
   "metadata": {
-    "reference_work": "《Название книги》",
+    "reference_work": "«Название книги»",
     "analysis_date": "YYYY-MM-DD",
     "generated_by": "book-internalize"
   },
@@ -24,4 +23,3 @@
   },
   "notes": "Эта конфигурация сгенерирована на основе анализа эталонного произведения и предназначена для справки."
 }
-```

@@ -1,6 +1,5 @@
-```powershell
 #!/usr/bin/env pwsh
-# Менеджер стилей (PowerShell) — полная реализация, основанная на версии Bash
+# Менеджер стилей (PowerShell) — полная реализация по мотивам Bash версии
 
 param(
   [string]$Mode = "init"
@@ -10,7 +9,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 function Get-ProjectRoot {
-  # Ищет корневой каталог проекта, содержащий .specify/config.json, поднимаясь от текущего каталога
+  # Ищет вверх от текущего каталога каталог, содержащий .specify/config.json
   $current = (Get-Location).Path
   while ($true) {
     $cfg = Join-Path $current ".specify/config.json"
@@ -19,7 +18,7 @@ function Get-ProjectRoot {
     if (-not $parent -or $parent -eq $current) { break }
     $current = $parent
   }
-  throw "Не удалось найти корневой каталог проекта (отсутствует .specify/config.json)"
+  throw "Корневой каталог проекта романа не найден (отсутствует .specify/config.json)"
 }
 
 function Ensure-Dir($path) {
@@ -57,7 +56,7 @@ function Integrate-PersonalVoice([string]$constitutionFile) {
   $out += "Источник: .specify/memory/personal-voice.md"
   $out += ""
 
-  # Имитация версии Bash: берём первые 2 элемента из нескольких заголовков H2
+  # Имитация Bash версии: взять первые 2 элемента списка из нескольких H2
   $countSections = 0
   $take = 2
   $inSection = $false
@@ -94,9 +93,9 @@ function Sync-PersonalBaseline([string]$constitutionFile) {
 
   $sections = @(
     @{ title='Коронные фразы и часто используемые выражения'; label='Коронные фразы и выражения'; take=6 },
-    @{ title='Стандартные фразы и предпочтения в ритме'; label='Стандартные фразы и ритм'; take=6 },
-    @{ title='Отраслевая/региональная лексика (акцент, сленг, терминология)'; label='Отраслевая/региональная лексика'; take=6 },
-    @{ title='Предпочтения в метафорах и библиотека образов'; label='Метафоры и образы'; take=8 },
+    @{ title='Фиксированные конструкции и предпочтения в ритме'; label='Фиксированные конструкции и ритм'; take=6 },
+    @{ title='Отраслевая/региональная лексика (акцент, сленг, термины)'; label='Отраслевая/региональная лексика'; take=6 },
+    @{ title='Предпочтения в метафорах и банк образов'; label='Метафоры и образы'; take=8 },
     @{ title='Писательские табу и ограничения'; label='Писательские табу'; take=6 }
   )
 
@@ -115,8 +114,8 @@ function Sync-PersonalBaseline([string]$constitutionFile) {
 
   $block = @()
   $block += "<!-- BEGIN: PERSONAL_BASELINE_AUTO -->"
-  $block += "## Линейка личного стиля (автоматическая синхронизация)"
-  $block += "Источник: .specify/memory/personal-voice.md (только для чтения, редактируйте исходный файл)"
+  $block += "## Базовая линия личного стиля (автоматическая синхронизация)"
+  $block += "Источник: .specify/memory/personal-voice.md (только для чтения, для внесения изменений используйте исходный файл)"
   $block += ""
   foreach ($sec in $sections) {
     $block += "### $($sec.label)"
@@ -134,7 +133,7 @@ function Sync-PersonalBaseline([string]$constitutionFile) {
     $constText += $blockText
   }
   Set-Content -LiteralPath $constitutionFile -Value $constText -Encoding UTF8
-  Write-Host "    ✅ Линейка личного стиля синхронизирована"
+  Write-Host "    ✅ Базовая линия личного стиля синхронизирована"
 }
 
 function Init-Style {
@@ -164,18 +163,18 @@ function Process-StyleSuggestions($data) {
   $hdr = @()
   $date = (Get-Date -Format 'yyyy-MM-dd')
   $hdr += ""
-  $hdr += "## Оптимизация стиля от внешних источников ($date)"
+  $hdr += "## Оптимизация внешними предложениями ($date)"
   $hdr += ""
   $body = @()
   foreach ($it in $items) {
     $body += "### $($it.type ?? 'Без категории')"
-    $body += "- **Проблема**：$($it.current)"
-    $body += "- **Предложение**：$($it.suggestion)"
-    $body += "- **Ожидаемый эффект**：$($it.impact)"
+    $body += "- **Проблема**: $($it.current)"
+    $body += "- **Предложение**: $($it.suggestion)"
+    $body += "- **Ожидаемый эффект**: $($it.impact)"
     $body += ""
   }
   Append-Lines $constitution ($hdr + $body)
-  Write-Host "    ✅ Руководство по стилю обновлено"
+  Write-Host "    ✅ Редакционные правила обновлены"
 }
 
 function Process-CharacterSuggestions($data) {
@@ -189,11 +188,11 @@ function Process-CharacterSuggestions($data) {
   $lines = @("", "## Предложения по оптимизации персонажей ($date)", "")
   foreach ($it in $items) {
     $lines += "### $($it.character ?? 'Неизвестный персонаж')"
-    $lines += "- **Проблема**：$($it.issue)"
-    $lines += "- **Предложение**：$($it.suggestion)"
-    $lines += "- **Кривая развития**：$($it.development_curve)"
+    $lines += "- **Проблема**: $($it.issue)"
+    $lines += "- **Предложение**: $($it.suggestion)"
+    $lines += "- **Кривая развития**: $($it.development_curve)"
     if ($it.chapters_affected) {
-      $lines += "- **Затронутые главы**：$((@($it.chapters_affected) -join ', '))"
+      $lines += "- **Затронутые главы**: $((@($it.chapters_affected) -join ', '))"
     }
     $lines += ""
   }
@@ -234,10 +233,10 @@ function Process-WorldSuggestions($data) {
   $lines = @("", "## Предложения по улучшению мироустройства ($date)", "")
   foreach ($it in $items) {
     $lines += "### $($it.aspect ?? 'Без категории')"
-    $lines += "- **Проблема**：$($it.issue)"
-    $lines += "- **Предложение**：$($it.suggestion)"
+    $lines += "- **Проблема**: $($it.issue)"
+    $lines += "- **Предложение**: $($it.suggestion)"
     if ($it.reference_chapters) {
-      $lines += "- **参考章节**：$((@($it.reference_chapters) -join ', '))"
+      $lines += "- **Рекомендуемые главы**: $((@($it.reference_chapters) -join ', '))"
     }
     $lines += ""
   }
@@ -258,8 +257,8 @@ function Process-DialogueSuggestions($data) {
   $lines = @("", "## Предложения по улучшению диалогов ($date)", "")
   foreach ($it in $items) {
     $lines += "### $($it.character ?? 'Общее')"
-    $lines += "- **Проблема**：$($it.issue)"
-    $lines += "- **Предложение**：$($it.suggestion)"
+    $lines += "- **Проблема**: $($it.issue)"
+    $lines += "- **Предложение**: $($it.suggestion)"
     if ($it.examples -and $it.alternatives) {
       $lines += "- **Примеры замены:"
       for ($i=0; $i -lt $it.examples.Count; $i++) {
@@ -288,18 +287,18 @@ function Parse-JsonSuggestions([string]$jsonText) {
 
 function Parse-MarkdownSuggestions([string]$md) {
   Write-Host "📊 Анализ предложений в формате Markdown..."
-  # Упрощенно: извлекаем блоки "Предложения по стилю письма" и "Предложения по оптимизации персонажей"
+  # Упрощено: извлекаются два блока "Предложения по стилю письма" и "Предложения по оптимизации персонажей"
   $constitution = Join-Path $MemoryDir "writing-constitution.md"
   $profiles = Join-Path $KnowledgeDir "character-profiles.md"
   $date = (Get-Date -Format 'yyyy-MM-dd')
 
   if ($md -match "## 写作风格建议") {
-    $lines = @("", "## Оптимизация стиля от внешних источников ($date)", "")
+    $lines = @("", "## Оптимизация внешними предложениями ($date)", "")
     $segment = ($md -split "## 写作风格建议")[1]
     if ($segment) { $segment = ($segment -split "\n## ")[0] }
     if ($segment) { $lines += ($segment.TrimEnd()).Split("`n") }
     Append-Lines $constitution $lines
-    Write-Host "    ✅ Руководство по стилю обновлено"
+    Write-Host "    ✅ Редакционные правила обновлены"
   }
 
   if ((Test-Path $profiles) -and ($md -match "## 角色优化建议")) {
@@ -315,21 +314,19 @@ function Parse-MarkdownSuggestions([string]$md) {
 function Update-ImprovementLog([string]$source, [string]$summary) {
   $log = Join-Path $KnowledgeDir "improvement-log.md"
   if (-not (Test-Path $log)) {
-    Set-Content -LiteralPath $log -Value "# Журнал улучшений`n`nЗаписывает все внешние предложения ИИ и информацию об их принятии.`n" -Encoding UTF8
+    Set-Content -LiteralPath $log -Value "# История предложений по улучшению`n`nЗаписывает все внешние предложения ИИ и принятые изменения. `n" -Encoding UTF8
   }
   $lines = @()
   $lines += ""
-```
-```powershell
-  $lines += "$(Get-Date -Format 'yyyy-MM-dd') - $source"
+  $lines += "## $(Get-Date -Format 'yyyy-MM-dd') - $source"
   $lines += ""
-  $lines += "### Сводка предложений"
+  $lines += "### Краткий обзор предложений"
   $lines += $summary
   $lines += ""
   $lines += "### Статус принятия"
   $lines += "- [x] Автоматически интегрировано в файл спецификаций"
   $lines += "- [ ] Ожидает ручной проверки"
-  $lines += "- [ ] Ожидает внедрения исправлений"
+  $lines += "- [ ] Ожидает внедрения изменений"
   $lines += ""
   $lines += "### Затронутые файлы"
   $lines += "- writing-constitution.md"
@@ -345,7 +342,7 @@ function Update-ImprovementLog([string]$source, [string]$summary) {
 function Refine-Style {
   Write-Host "🔄 Начинаем интеграцию внешних предложений..."
   $text = $null
-  # Чтение из конвейера или параметров
+  # Читаем из конвейера или параметров
   if ($MyInvocation.ExpectingInput) {
     $text = ($input | Out-String)
   } elseif ($args.Count -gt 0) {
@@ -357,13 +354,13 @@ function Refine-Style {
   if ($isJson) {
     Write-Host "Обнаружен формат JSON"
     Parse-JsonSuggestions $text
-    Update-ImprovementLog "Внешний ИИ" "Обработаны предложения в формате JSON"
+    Update-ImprovementLog "Внешний ИИ" "Предложения в формате JSON обработаны"
   } elseif ($text -match '# 小说创作建议报告') {
     Write-Host "Обнаружен формат Markdown"
     Parse-MarkdownSuggestions $text
-    Update-ImprovementLog "Внешний ИИ" "Обработаны предложения в формате Markdown"
+    Update-ImprovementLog "Внешний ИИ" "Предложения в формате Markdown обработаны"
   } else {
-    throw "Не удалось распознать формат предложений. Пожалуйста, используйте стандартный JSON или Markdown (см. docs/ai-suggestion-prompt-template.md)"
+    throw "Не удалось распознать формат предложений. Пожалуйста, используйте стандартный формат JSON или Markdown (см. docs/ai-suggestion-prompt-template.md)"
   }
 
   Write-Host ""
@@ -373,8 +370,8 @@ function Refine-Style {
   # Упрощенная статистика: количество файлов, измененных за последние 2 минуты
   $changed = Get-ChildItem $MemoryDir, $KnowledgeDir, $TrackingDir -Recurse -ErrorAction SilentlyContinue |
     Where-Object { $_.LastWriteTime -gt (Get-Date).AddMinutes(-2) }
-  Write-Host "  - Обновлено файлов: $($changed.Count) шт."
-  Write-Host "  - Источник предложений: Анализ внешнего ИИ"
+  Write-Host "  - Обновлено файлов: $($changed.Count)"
+  Write-Host "  - Источник предложений: Внешний анализ ИИ"
   Write-Host "  - Время обработки: $(Get-Date -Format 'HH:mm:ss')"
   Write-Host ""
 }
@@ -384,4 +381,3 @@ switch ($Mode.ToLower()) {
   'refine' { Refine-Style }
   default  { throw "Неизвестный режим: $Mode (доступные: init, refine)" }
 }
-```

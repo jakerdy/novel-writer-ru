@@ -1,6 +1,5 @@
-```powershell
 #!/usr/bin/env pwsh
-# Управление отношениями персонажей (PowerShell)
+# Управление отношениями между персонажами (PowerShell)
 
 param(
   [ValidateSet('show','update','history','check')]
@@ -32,10 +31,10 @@ if ($storyDir -and (Test-Path (Join-Path $storyDir 'spec/tracking/relationships.
   New-Item -ItemType Directory -Path (Split-Path $dest -Parent) -Force | Out-Null
   if (Test-Path $tpl1) { Copy-Item $tpl1 $dest -Force; $relPath = $dest }
   elseif (Test-Path $tpl2) { Copy-Item $tpl2 $dest -Force; $relPath = $dest }
-  else { throw 'Не найден relationships.json, и невозможно создать из шаблона' }
+  else { throw 'Не найден relationships.json, и не удалось создать из шаблона' }
 }
 
-function Show-Header { Write-Host "👥 Управление отношениями персонажей"; Write-Host "━━━━━━━━━━━━━━━━━━━━" }
+function Show-Header { Write-Host "👥 Управление отношениями"; Write-Host "━━━━━━━━━━━━━━━━━━━━" }
 
 function Show-Relations {
   Show-Header
@@ -47,7 +46,7 @@ function Show-Relations {
   $c = $j.characters.$main
   $r = if ($c.relationships) { $c.relationships } else { $c }
   $map = @{
-    romantic = '💕 Любовные'; allies='🤝 Союзники'; mentors='📚 Наставники'; enemies='⚔️ Враги'; family='👪 Семья'; neutral='・ Нейтральные'
+    romantic = '💕 Любовь'; allies='🤝 Союзники'; mentors='📚 Наставники'; enemies='⚔️ Враги'; family='👪 Семья'; neutral='・ Отношения'
   }
   foreach ($k in 'romantic','allies','mentors','enemies','family','neutral') {
     $lst = @($r.$k)
@@ -89,7 +88,7 @@ function Update-Relation([string]$a, [string]$rel, [string]$b) {
     $j | Add-Member -NotePropertyName history -NotePropertyValue @()
   }
   $j | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $relPath -Encoding UTF8
-  Write-Host "✅ Отношения обновлены: $a [$rel] $b"
+  Write-Host "✅ Отношение обновлено: $a [$rel] $b"
 }
 
 function Show-History {
@@ -99,7 +98,7 @@ function Show-History {
     foreach ($h in $j.history) {
       $chap = if ($h.chapter) { $h.chapter } else { 0 }
       $desc = ($h.changes | ForEach-Object { ($_.characters -join '↔') + '→' + ($_.relation ?? $_.type) }) -join '；'
-      Write-Host ("Глава {0}：{1}" -f $chap, $desc)
+      Write-Host ("Глава {0}: {1}" -f $chap, $desc)
     }
   } elseif ($j.relationshipChanges) {
     foreach ($h in $j.relationshipChanges) { Write-Host ((($h.date ?? '') + ' ' + ($h.type ?? '') + ': ' + ($h.characters -join '↔') + '→' + ($h.relation ?? ''))) }
@@ -121,7 +120,7 @@ function Check-Relations {
   $refs = $refs | Where-Object { $_ } | Select-Object -Unique
   $missing = @($refs | Where-Object { $names -notcontains $_ })
   if ($missing.Count -gt 0) {
-    Write-Host "⚠ Обнаружены ссылки на персонажей без записей, рекомендуется добавить:"
+    Write-Host "⚠ Обнаружены ссылки на персонажей без профилей, рекомендуется добавить:"
     $missing | ForEach-Object { Write-Host "  - $_" }
   } else { Write-Host "✅ Проверка данных отношений пройдена" }
 }
@@ -132,4 +131,3 @@ switch ($Command) {
   'history'{ Show-History }
   'check'  { Check-Relations }
 }
-```

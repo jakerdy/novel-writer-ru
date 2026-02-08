@@ -10,7 +10,7 @@ Write-Host "🚀 Инициализация системы отслеживан�
 
 $root = Get-ProjectRoot
 $storyDir = Get-CurrentStoryDir
-if (-not $storyDir) { throw "Пожалуйста, сначала завершите /story и /outline, каталог stories/*/ не найден" }
+if (-not $storyDir) { throw "Пожалуйста, сначала завершите этапы /story и /outline, каталог stories/*/ не найден" }
 
 $storyName = Split-Path $storyDir -Leaf
 $specTrack = Join-Path $root "spec/tracking"
@@ -27,12 +27,12 @@ if (-not (Test-Path $plotPath)) {
   $plot = @{
     novel = $storyName
     lastUpdated = $utc
-    currentState = @{ chapter = 0; volume = 1; mainPlotStage = 'Этап подготовки'; location = 'Не определено'; timepoint = 'До начала истории' }
+    currentState = @{ chapter = 0; volume = 1; mainPlotStage = 'Подготовительный этап'; location = 'Не определено'; timepoint = 'До начала истории' }
     plotlines = @{ main = @{ name='Основная сюжетная линия'; description='Извлечь из плана'; status='Не начато'; currentNode='Стартовая точка'; completedNodes=@(); upcomingNodes=@(); plannedClimax=@{ chapter=$null; description='Планируется' } }; subplots=@() }
     foreshadowing = @()
     conflicts = @{ active=@(); resolved=@(); upcoming=@() }
     checkpoints = @{ volumeEnd=@(); majorEvents=@() }
-    notes = @{ plotHoles=@(); inconsistencies=@(); reminders=@('Пожалуйста, обновите данные отслеживания в соответствии с фактическим содержанием истории') }
+    notes = @{ plotHoles=@(); inconsistencies=@(); reminders=@('Пожалуйста, обновляйте данные отслеживания в соответствии с фактическим содержанием истории') }
   } | ConvertTo-Json -Depth 12
   Set-Content -LiteralPath $plotPath -Value $plot -Encoding UTF8
 }
@@ -44,7 +44,7 @@ if (-not (Test-Path $timelinePath)) {
   $timeline = @{
     novel = $storyName
     lastUpdated = $utc
-    storyTimeUnit = 'дней'
+    storyTimeUnit = 'день'
     realWorldReference = $null
     timeline = @(@{ chapter=0; storyTime='День 0'; description='До начала истории'; events=@('Добавить'); location='Не определено' })
     parallelEvents = @()
@@ -92,6 +92,6 @@ Write-Host "   • spec/tracking/relationships.json - Сеть взаимоот�
 Write-Host "   • spec/tracking/character-state.json - Состояние персонажей"
 Write-Host ""
 Write-Host "💡 Следующие шаги:"
-Write-Host "   1. Используйте /write для начала написания (данные отслеживания будут обновляться автоматически)"
+Write-Host "   1. Используйте /write для начала написания (данные отслеживания будут обновлены автоматически)"
 Write-Host "   2. Регулярно используйте /track для просмотра сводного отчета"
 Write-Host "   3. Используйте команды, такие как /plot-check, для проверки на согласованность"

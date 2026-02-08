@@ -1,10 +1,9 @@
-```bash
 #!/usr/bin/env bash
 set -euo pipefail
 
 # generate-commands.sh
-# На основе архитектуры spec-kit, генерирует команды для novel-writer для различных платформ
-# Поддерживает пространства имен для предотвращения конфликтов с spec-kit
+# На основе архитектуры spec-kit для генерации многоплатформенных команд для novel-writer
+# Поддерживает пространства имен для избежания конфликтов с spec-kit
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
@@ -16,7 +15,7 @@ echo "================================"
 rm -rf "$PROJECT_ROOT/dist"
 mkdir -p "$PROJECT_ROOT/dist"
 
-# Функция переписывания путей (преобразует относительные пути в пути .specify/)
+# Функция переписывания путей (преобразование относительных путей в пути .specify/)
 # Использует временные маркеры для защиты уже корректных путей .specify/, чтобы избежать повторного добавления префикса
 rewrite_paths() {
   sed -E \
@@ -39,7 +38,7 @@ generate_commands() {
   local output_dir=$4      # выходной каталог
   local script_variant=$5  # sh или ps
   local namespace=$6       # префикс пространства имен (например, "novel.")
-  local frontmatter_type=$7 # full, partial, minimal, none (тип frontmatter для Markdown)
+  local frontmatter_type=$7 # full, partial, minimal, none (тип Markdown frontmatter)
 
   mkdir -p "$output_dir"
 
@@ -51,7 +50,7 @@ generate_commands() {
     local name description argument_hint script_command body prompt_body
     name=$(basename "$template" .md)
 
-    # Нормализация окончания строк
+    # Нормализация конца строки
     file_content=$(tr -d '\r' < "$template")
 
     # Извлечение полей frontmatter
@@ -62,7 +61,7 @@ generate_commands() {
     script_command=$(printf '%s\n' "$file_content" | awk -v sv="$script_variant" '/^[[:space:]]*'"$script_variant"':[[:space:]]*/ {sub(/^[[:space:]]*'"$script_variant"':[[:space:]]*/, ""); print; exit}')
 
     if [[ -z $script_command ]]; then
-      echo "    ⚠️  Предупреждение: скрипт $script_variant не найден в $template" >&2
+      echo "    ⚠️  Предупреждение: команда скрипта $script_variant не найдена в $template" >&2
       script_command="echo 'Missing script command for $script_variant'"
     fi
 
@@ -139,7 +138,7 @@ generate_commands() {
     esac
   done
 
-  echo "    ✅ Завершено ($(ls "$output_dir" | wc -l | tr -d ' ') файлов)"
+  echo "    ✅ Готово ($(ls "$output_dir" | wc -l | tr -d ' ') файлов)"
 }
 
 # Копирование вспомогательных файлов в каталог сборки
@@ -156,7 +155,7 @@ copy_support_files() {
     echo "    📁 Копирование memory/ → .specify/"
   fi
 
-  # Копирование соответствующего каталога вариантов скриптов
+  # Копирование соответствующего каталога варианта скрипта
   if [[ -d "$PROJECT_ROOT/scripts" ]]; then
     mkdir -p "$spec_dir/scripts"
     case $script_variant in
@@ -196,7 +195,7 @@ copy_support_files() {
     echo "    📁 Копирование experts/ → .specify/experts/"
   fi
 
-  # Копирование каталога spec (включая presets, правила противодействия AI и т. д.)
+  # Копирование каталога spec (включая presets, правила против AI-детекции и т. д.)
   if [[ -d "$PROJECT_ROOT/spec" ]]; then
     local target_spec_dir="$base_dir/spec"
     mkdir -p "$target_spec_dir"
@@ -289,14 +288,14 @@ build_variant() {
       ;;
   esac
 
-  echo "  ✅ Сборка для $agent завершена"
+  echo "  ✅ Сборка $agent завершена"
 }
 
 # Поддерживаемые платформы и типы скриптов
 ALL_AGENTS=(claude gemini cursor windsurf roocode copilot qwen opencode codex kilocode auggie codebuddy q)
 ALL_SCRIPTS=(sh ps)
 
-# Парсинг аргументов командной строки
+# Разбор аргументов командной строки
 AGENTS=()
 SCRIPTS=()
 
@@ -314,16 +313,16 @@ while [[ $# -gt 0 ]]; do
       echo "Использование: $0 [опции]"
       echo
       echo "Опции:"
-      echo "  --agents=AGENT1,AGENT2   Указать платформы для сборки (по умолчанию: все)"
-      echo "                           Доступные: claude,gemini,cursor,windsurf,roocode,copilot,qwen,opencode,codex,kilocode,auggie,codebuddy,q"
-      echo "  --scripts=SCRIPT1,...    Указать тип скриптов (по умолчанию: все)"
-      echo "                           Доступные: sh,ps"
+      echo "  --agents=AGENT1,AGENT2   Укажите платформы для сборки (по умолчанию: все)"
+      echo "                           Доступно: claude,gemini,cursor,windsurf,roocode,copilot,qwen,opencode,codex,kilocode,auggie,codebuddy,q"
+      echo "  --scripts=SCRIPT1,...    Укажите тип скрипта (по умолчанию: все)"
+      echo "                           Доступно: sh,ps"
       echo "  --help                   Показать эту справку"
       echo
       echo "Примеры:"
-      echo "  $0                                    # Сборка всех платформ и скриптов"
-      echo "  $0 --agents=claude --scripts=sh       # Сборка только Claude (sh)"
-      echo "  $0 --agents=claude,gemini             # Сборка Claude и Gemini (все скрипты)"
+      echo "  $0                                    # Собрать все платформы и скрипты"
+      echo "  $0 --agents=claude --scripts=sh       # Собрать только Claude (sh)"
+      echo "  $0 --agents=claude,gemini             # Собрать Claude и Gemini (все скрипты)"
       exit 0
       ;;
     *)
@@ -333,7 +332,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Если агенты или скрипты не указаны, использовать все
+# Если агенты или скрипты не указаны, используем все доступные
 if [ ${#AGENTS[@]} -eq 0 ]; then
   AGENTS=("${ALL_AGENTS[@]}")
 fi
@@ -341,7 +340,7 @@ if [ ${#SCRIPTS[@]} -eq 0 ]; then
   SCRIPTS=("${ALL_SCRIPTS[@]}")
 fi
 
-# Выполнение сборки для выбранных агентов и скриптов
+# Запуск сборки для выбранных агентов и скриптов
 for script in "${SCRIPTS[@]}"; do
   for agent in "${AGENTS[@]}"; do
     build_variant "$agent" "$script"
@@ -350,16 +349,17 @@ done
 
 echo
 echo "================================"
-echo "🔨 Сборка завершена!"
+echo "🔨 Сборка завершена."
+echo "   Результаты находятся в каталоге: $PROJECT_ROOT/dist"
+echo "================================"
 ```
-```sh
-      echo "Используйте --help для получения справки"
+      echo "Используйте --help для справки"
       exit 1
       ;;
   esac
 done
 
-# Если не указано, используем все
+# Если не указано, использовать все
 [[ ${#AGENTS[@]} -eq 0 ]] && AGENTS=("${ALL_AGENTS[@]}")
 [[ ${#SCRIPTS[@]} -eq 0 ]] && SCRIPTS=("${ALL_SCRIPTS[@]}")
 
@@ -385,7 +385,6 @@ tree -L 3 "$PROJECT_ROOT/dist/" 2>/dev/null || find "$PROJECT_ROOT/dist/" -type 
 
 echo
 echo "💡 Подсказки:"
-echo "  - Пользователи Claude: используйте команды /novel.constitution, /novel.specify и т. д."
-echo "  - Пользователи Gemini: используйте команды /novel:constitution, /novel:specify и т. д."
-echo "  - Другие пользователи: используйте команды /constitution, /specify и т. д."
-```
+echo "  - Пользователям Claude: используйте команды /novel.constitution, /novel.specify и т. д."
+echo "  - Пользователям Gemini: используйте команды /novel:constitution, /novel:specify и т. д."
+echo "  - Другим пользователям: используйте команды /constitution, /specify и т. д."

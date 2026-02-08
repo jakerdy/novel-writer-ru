@@ -1,7 +1,6 @@
-```powershell
 #!/usr/bin/env pwsh
-# Определение этапа для команды analyze
-# Возвращает информацию об этапе в формате JSON
+# Определяет фазу, которую должна выполнить команда analyze
+# Возвращает информацию о фазе в формате JSON
 
 param(
     [switch]$Json
@@ -14,7 +13,7 @@ $ErrorActionPreference = 'Stop'
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 . (Join-Path $scriptDir "common.ps1")
 
-# Получение корневого каталога проекта и каталога истории
+# Получение корневой директории проекта и директории истории
 try {
     $projectRoot = Get-ProjectRoot
     $storyDir = Get-CurrentStoryDir
@@ -24,7 +23,7 @@ try {
 }
 
 if (-not $storyDir) {
-    Write-Error "Ошибка: Каталог истории не найден"
+    Write-Error "Ошибка: Директория истории не найдена"
     exit 1
 }
 
@@ -69,20 +68,20 @@ if (Test-Path $contentDir) {
 
 # Логика принятия решений
 if ($chapterCount -eq 0) {
-    # Отсутствие глав → анализ структуры
+    # Нет контента глав → анализ структуры
     $analyzeType = "framework"
-    $reason = "Отсутствуют главы, рекомендуется провести анализ согласованности структуры"
+    $reason = "Нет контента глав, рекомендуется провести анализ согласованности структуры"
 } elseif ($chapterCount -lt 3) {
-    # Недостаточно глав → анализ структуры (с подсказкой о возможности начать написание)
+    # Недостаточно глав → анализ структуры (с подсказкой о возможности начать писать)
     $analyzeType = "framework"
-    $reason = "Количество глав невелико ($chapterCount глав), рекомендуется продолжить написание или проверить структуру"
+    $reason = "Мало глав ($chapterCount), рекомендуется продолжить написание или провести проверку структуры"
 } else {
     # Достаточно глав → анализ контента
     $analyzeType = "content"
     $reason = "Завершено $chapterCount глав, возможен анализ качества контента"
 }
 
-# Вывод в формате JSON или для чтения человеком
+# Вывод в формате JSON или читаемом для человека
 if ($Json) {
     # Вывод в формате JSON
     $output = @{
@@ -97,10 +96,10 @@ if ($Json) {
 
     $output | ConvertTo-Json -Compress
 } else {
-    # Вывод для чтения человеком
-    Write-Host "Результаты определения этапа анализа"
+    # Вывод в читаемом для человека формате
+    Write-Host "Результаты определения фазы анализа"
     Write-Host "=================="
-    Write-Host "Каталог истории: $storyDir"
+    Write-Host "Директория истории: $storyDir"
     Write-Host "Количество глав: $chapterCount"
     Write-Host "Файл спецификации: $(if ($hasSpec) { '✅' } else { '❌' })"
     Write-Host "Файл плана: $(if ($hasPlan) { '✅' } else { '❌' })"
@@ -109,4 +108,3 @@ if ($Json) {
     Write-Host "Рекомендуемый режим: $analyzeType"
     Write-Host "Причина: $reason"
 }
-```

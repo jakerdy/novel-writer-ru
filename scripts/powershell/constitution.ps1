@@ -1,5 +1,4 @@
-```powershell
-# Конституция управления сценариями романа
+# Конституция управления сценариями для команды
 # Используется для команды /constitution
 
 param(
@@ -18,7 +17,7 @@ $ConstitutionFile = "memory\constitution.md"
 
 switch ($Command) {
     "check" {
-        # Проверка существования файла конституции
+        # Проверка наличия файла конституции
         if (Test-Path $ConstitutionFile) {
             Write-Host "✅ Файл конституции существует: $ConstitutionFile" -ForegroundColor Green
 
@@ -36,12 +35,12 @@ switch ($Command) {
                 $updated = "Неизвестно"
             }
 
-            Write-Host "  Версия：$version"
-            Write-Host "  Последнее изменение：$updated"
+            Write-Host "  Версия: $version"
+            Write-Host "  Последнее изменение: $updated"
             exit 0
         }
         else {
-            Write-Host "❌ Файл конституции ещё не создан" -ForegroundColor Red
+            Write-Host "❌ Файл конституции еще не создан" -ForegroundColor Red
             Write-Host "  Рекомендация: выполните /constitution для создания конституции творчества"
             exit 1
         }
@@ -72,7 +71,7 @@ switch ($Command) {
         Write-Host "Проверка файла конституции..."
 
         # Проверка необходимых разделов
-        $requiredSections = @("Основные ценности", "Стандарты качества", "Стиль письма", "Нормы содержания", "Договор с читателем")
+        $requiredSections = @("Основные ценности", "Стандарты качества", "Стиль творчества", "Нормы содержания", "Договор с читателем")
         $content = Get-Content $ConstitutionFile -Raw
         $missingSections = @()
 
@@ -132,7 +131,7 @@ switch ($Command) {
         }
 
         Write-Host ""
-        Write-Host "Подробное содержание см. по адресу: $ConstitutionFile"
+        Write-Host "Подробности см. по адресу: $ConstitutionFile"
     }
 
     default {
@@ -141,4 +140,3 @@ switch ($Command) {
         exit 1
     }
 }
-```

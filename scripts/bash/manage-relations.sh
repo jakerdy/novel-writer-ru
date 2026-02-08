@@ -1,6 +1,5 @@
-```bash
 #!/usr/bin/env bash
-# Управление отношениями между персонажами (Bash)
+# Управление отношениями персонажей (Bash)
 
 set -e
 
@@ -16,7 +15,7 @@ if [ -n "$STORY_DIR" ] && [ -f "$STORY_DIR/spec/tracking/relationships.json" ]; 
 elif [ -f "$PROJECT_ROOT/spec/tracking/relationships.json" ]; then
   REL_FILE="$PROJECT_ROOT/spec/tracking/relationships.json"
 else
-  # Попытка инициализации из шаблона
+  # Попытка инициализировать из шаблона
   mkdir -p "$PROJECT_ROOT/spec/tracking"
   if [ -f "$PROJECT_ROOT/.specify/templates/tracking/relationships.json" ]; then
     cp "$PROJECT_ROOT/.specify/templates/tracking/relationships.json" "$PROJECT_ROOT/spec/tracking/relationships.json"
@@ -25,7 +24,7 @@ else
     cp "$SCRIPT_DIR/../../templates/tracking/relationships.json" "$PROJECT_ROOT/spec/tracking/relationships.json"
     REL_FILE="$PROJECT_ROOT/spec/tracking/relationships.json"
   else
-    echo "❌ Файл relationships.json не найден и не удалось создать из шаблона" >&2
+    echo "❌ relationships.json не найден и не может быть создан из шаблона" >&2
     exit 1
   fi
 fi
@@ -34,7 +33,7 @@ CMD=${1:-show}
 shift || true
 
 print_header() {
-  echo "👥 Управление отношениями между персонажами"
+  echo "👥 Управление отношениями персонажей"
   echo "━━━━━━━━━━━━━━━━━━━━"
 }
 
@@ -106,7 +105,7 @@ cmd_update() {
     fi
   done
 
-  # Запись отношения
+  # Запись отношений
   tmp=$(mktemp)
   jq --arg a "$a" --arg b "$b" --arg rel "$rel" '
     .characters[$a].relationships[$rel] = ((.characters[$a].relationships[$rel] // []) + [$b] | unique) |
@@ -130,7 +129,7 @@ cmd_update() {
     jq --arg a "$a" --arg b "$b" --arg rel "$rel" '.relationshipChanges += [{type:"update", characters:[$a,$b], relation:$rel}]' "$REL_FILE" > "$tmp" && mv "$tmp" "$REL_FILE"
   fi
 
-  echo "✅ Отношение обновлено: $a [$rel] $b"
+  echo "✅ Отношения обновлены: $a [$rel] $b"
 }
 
 cmd_history() {
@@ -140,14 +139,14 @@ cmd_history() {
   elif jq -e '.relationshipChanges' "$REL_FILE" >/dev/null 2>&1; then
     jq -r '.relationshipChanges[] | (.date // "") + " " + (.type // "") + ": " + (.characters|join("↔")) + "→" + (.relation // "")' "$REL_FILE"
   else
-    echo "Нет истории записей"
+    echo "Нет истории изменений"
   fi
 }
 
 cmd_check() {
   print_header
   local issues=0
-  # Проверка всех ссылок на персонажей на наличие в characters
+  # Проверка всех ссылочных персонажей на наличие в characters
   missing=$(jq -r '
     .characters as $c |
     [
@@ -156,12 +155,12 @@ cmd_check() {
     ] | flatten | unique | map(select(has(.) | not))
   ' "$REL_FILE" 2>/dev/null || true)
   if [ -n "$missing" ]; then
-    echo "⚠️  Обнаружены ссылки на неуказанных персонажей, рекомендуется добавить:"
+    echo "⚠️  Обнаружены ссылки на персонажей без карточек, рекомендуется добавить:"
     echo "$missing"
     issues=1
   fi
   if [ "$issues" -eq 0 ]; then
-    echo "✅ Проверка данных отношений пройдена"
+    echo "✅ Проверка данных отношений прошла успешно"
   fi
 }
 
@@ -172,4 +171,3 @@ case "$CMD" in
   check) cmd_check ;;
   *) echo "Использование: $0 [show|update|history|check]" >&2; exit 1;;
 esac
-```

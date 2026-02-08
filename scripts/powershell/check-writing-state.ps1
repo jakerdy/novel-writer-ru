@@ -1,5 +1,4 @@
-```powershell
-# Проверка статуса написания
+# Проверка состояния написания скрипта
 # Используется для команды /write
 
 # Импорт общих функций
@@ -13,12 +12,12 @@ Set-Location $ProjectRoot
 $StoryName = Get-ActiveStory
 $StoryDir = "stories\$StoryName"
 
-Write-Host "Проверка статуса написания"
+Write-Host "Проверка состояния написания"
 Write-Host "============"
 Write-Host "Текущая история: $StoryName"
 Write-Host ""
 
-# Проверка документов методологии
+# Проверка методологии документов
 function Test-MethodologyDocs {
     $missing = @()
 
@@ -45,7 +44,7 @@ function Test-MethodologyDocs {
         Write-Host "1. /constitution - Создать конституцию творчества"
         Write-Host "2. /specify - Определить спецификацию истории"
         Write-Host "3. /clarify - Уточнить ключевые решения"
-        Write-Host "4. /plan - Составить план творчества"
+        Write-Host "4. /plan - Разработать творческий план"
         Write-Host "5. /tasks - Сгенерировать список задач"
         return $false
     }
@@ -59,7 +58,7 @@ function Test-PendingTasks {
     $tasksFile = "$StoryDir\tasks.md"
 
     if (-not (Test-Path $tasksFile)) {
-        Write-Host "❌ Файл задач не существует" -ForegroundColor Red
+        Write-Host "❌ Файл задач отсутствует" -ForegroundColor Red
         return $false
     }
 
@@ -71,14 +70,14 @@ function Test-PendingTasks {
 
     Write-Host ""
     Write-Host "Статус задач:"
-    Write-Host "  К выполнению: $pending"
-    Write-Host "  В процессе: $inProgress"
+    Write-Host "  Ожидают: $pending"
+    Write-Host "  В работе: $inProgress"
     Write-Host "  Завершено: $completed"
 
     if ($pending -eq 0 -and $inProgress -eq 0) {
         Write-Host ""
         Write-Host "🎉 Все задачи выполнены!" -ForegroundColor Green
-        Write-Host "Рекомендуется выполнить /analyze для комплексной проверки"
+        Write-Host "Рекомендуется запустить /analyze для комплексной проверки"
         return $true
     }
 
@@ -106,7 +105,7 @@ function Test-CompletedContent {
 
         if ($chapterCount -gt 0) {
             Write-Host ""
-            Write-Host "Завершенные главы: $chapterCount"
+            Write-Host "Завершено глав: $chapterCount"
             Write-Host "Последнее написанное:"
 
             $recentFiles = $mdFiles |
@@ -124,7 +123,7 @@ function Test-CompletedContent {
     }
 }
 
-# Основной процесс
+# Основной поток
 if (-not (Test-MethodologyDocs)) {
     exit 1
 }
@@ -134,4 +133,3 @@ Test-CompletedContent
 
 Write-Host ""
 Write-Host "Готово к написанию"
-```

@@ -1,10 +1,9 @@
-```powershell
 #!/usr/bin/env pwsh
 # Генерация задач для написания
 
 $STORIES_DIR = "stories"
 
-# Поиск последнего каталога с историями
+# Поиск последней директории с историей
 function Get-LatestStory {
     $latest = Get-ChildItem -Path $STORIES_DIR -Directory |
               Sort-Object Name -Descending |
@@ -19,8 +18,8 @@ function Get-LatestStory {
 $storyDir = Get-LatestStory
 
 if (!$storyDir) {
-    Write-Host "Ошибка: Не найден проект истории"
-    Write-Host "Пожалуйста, сначала создайте проект истории с помощью команды /story"
+    Write-Host "Ошибка: Проект истории не найден"
+    Write-Host "Пожалуйста, сначала создайте историю с помощью команды /story"
     exit 1
 }
 
@@ -29,7 +28,7 @@ $tasksFile = "$storyDir/tasks.md"
 $progressFile = "$storyDir/progress.json"
 
 if (!(Test-Path $outlineFile)) {
-    Write-Host "Ошибка: Не найден план глав"
+    Write-Host "Ошибка: План глав не найден"
     Write-Host "Пожалуйста, сначала создайте план глав с помощью команды /outline"
     exit 1
 }
@@ -38,7 +37,7 @@ if (!(Test-Path $outlineFile)) {
 $currentDate = Get-Date -Format "yyyy-MM-dd"
 $currentDateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 
-# Создание файла задач с предварительно заполненной основной информацией
+# Создание файла задач с предварительно заполненной базовой информацией
 $tasksContent = @"
 # Список задач для написания
 
@@ -64,7 +63,7 @@ if (!(Test-Path $progressFile)) {
     $progressContent | Out-File -FilePath $progressFile -Encoding UTF8
 }
 
-Write-Host "Каталог истории: $storyDir"
+Write-Host "Директория истории: $storyDir"
 Write-Host "Файл плана: $outlineFile"
 Write-Host "Файл задач: $tasksFile"
 Write-Host "Текущая дата: $currentDate"
@@ -72,6 +71,5 @@ Write-Host ""
 Write-Host "Генерация задач на основе плана глав:"
 Write-Host "- Задачи по написанию глав"
 Write-Host "- Задачи по доработке персонажей"
-Write-Host "- Задачи по дополнению мира"
+Write-Host "- Дополнение мира"
 Write-Host "- Задачи по редактированию"
-```

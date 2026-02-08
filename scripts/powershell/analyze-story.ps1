@@ -1,4 +1,3 @@
-```xml
 # Скрипт проверки анализа истории
 # Используется для команды /analyze
 
@@ -58,7 +57,7 @@ function Get-ContentAnalysis {
 
         foreach ($file in $mdFiles) {
             $chapterCount++
-            # Простая статистика слов (для китайского языка считается по символам)
+            # Простая статистика количества слов (для китайского языка считается по символам)
             $content = Get-Content $file.FullName -Raw
             $words = ($content -replace '\s', '').Length
             $totalWords += $words
@@ -94,7 +93,7 @@ function Test-TaskCompletion {
     Write-Host "  Всего задач: $totalTasks"
     Write-Host "  Выполнено: $completedTasks"
     Write-Host "  В процессе: $inProgress"
-    Write-Host "  Ожидают: $pending"
+    Write-Host "  Ожидается: $pending"
 
     if ($totalTasks -gt 0) {
         $completionRate = [math]::Round(($completedTasks * 100) / $totalTasks)
@@ -116,7 +115,7 @@ function Test-SpecificationCompliance {
             Write-Host "  Требования P0: обнаружены, требуется ручная проверка"
         }
 
-        # Проверка наличия маркеров [需要澄清] (требуется уточнение)
+        # Проверка наличия маркеров [требуется уточнение]
         $unclearCount = ([regex]::Matches($content, '\[需要澄清\]')).Count
         if ($unclearCount -gt 0) {
             Write-Host "  ⚠️ Осталось $unclearCount пунктов, требующих уточнения" -ForegroundColor Yellow
@@ -137,11 +136,11 @@ Write-Host ""
 # Проверка базовых документов
 if (-not (Test-StoryFiles)) {
     Write-Host ""
-    Write-Host "❌ Невозможно выполнить полный анализ, пожалуйста, сначала завершите базовые документы" -ForegroundColor Red
+    Write-Host "❌ Полный анализ невозможен, пожалуйста, сначала завершите базовые документы" -ForegroundColor Red
     exit 1
 }
 
-Write-Host "✅ Базовые документы полные" -ForegroundColor Green
+Write-Host "✅ Базовые документы в полном порядке" -ForegroundColor Green
 Write-Host ""
 
 # Выполнение в зависимости от типа анализа
@@ -170,4 +169,3 @@ switch ($AnalysisType) {
 
 Write-Host ""
 Write-Host "Анализ завершен. Подробный отчет сохранен в: $StoryDir\analysis-report.md"
-```

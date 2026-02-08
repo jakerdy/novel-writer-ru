@@ -1,4 +1,3 @@
-```javascript
 /**
  * Менеджер промптов
  * Основной компонент безопасности: отвечает за получение зашифрованных промптов с сервера, их расшифровку в памяти и обеспечение отсутствия их сохранения
@@ -13,16 +12,16 @@ export class PromptManager {
     this.decryptor = new Decryptor();
     this.templateEngine = new TemplateEngine();
 
-    // Не используется кэширование с сохранением, только временное хранение в памяти
+    // Не используем постоянное кэширование, только временное хранение в памяти
     this.memoryCache = new Map();
 
-    // Запуск таймера очистки памяти
+    // Запускаем таймер очистки памяти
     this.startMemoryCleaner();
   }
 
   /**
    * Генерация контента с использованием шаблона промпта
-   * Весь процесс обеспечивает, что промпт находится только в памяти и очищается после использования
+   * Весь процесс гарантирует, что промпт находится только в памяти и очищается сразу после использования
    */
   async usePrompt(sessionId, apiKey = null) {
     let decryptedPrompt = null;
@@ -70,7 +69,7 @@ export class PromptManager {
         encryptedData.parameters
       );
 
-      // Шаг 5: Запись использования (без конфиденциального содержимого)
+      // Шаг 5: Запись использования (без конфиденциальных данных)
       const startTime = Date.now();
 
       // Шаг 6: Возврат заполненного промпта (для использования ИИ)
@@ -91,7 +90,7 @@ export class PromptManager {
       this.clearSensitiveData(filledPrompt);
       this.clearSensitiveData(encryptedData);
 
-      // Запуск сборщика мусора (если доступен)
+      // Запуск сборки мусора (если доступно)
       if (global.gc) {
         global.gc();
       }
@@ -100,10 +99,10 @@ export class PromptManager {
 
   /**
    * Расшифровка промпта в памяти
-   * Не записывает в файлы или логи
+   * Не записывает данные в файлы или логи
    */
   async decryptInMemory(encryptedPrompt, sessionKey) {
-    // Использование временных переменных для обеспечения отсутствия сохранения
+    // Использование временных переменных для гарантии отсутствия сохранения
     let decrypted = null;
 
     try {
@@ -115,14 +114,14 @@ export class PromptManager {
 
       // Проверка результата расшифровки
       if (!decrypted || typeof decrypted !== 'string') {
-        throw new Error('Ошибка расшифровки: неверный результат');
+        throw new Error('Ошибка расшифровки: недействительный результат');
       }
 
       // Немедленный возврат, без сохранения
       return decrypted;
 
     } catch (error) {
-      // Очистка при ошибке также необходима
+      // Очистка данных также при возникновении ошибки
       this.clearSensitiveData(decrypted);
       throw new Error(`Ошибка расшифровки: ${error.message}`);
     }
@@ -137,11 +136,11 @@ export class PromptManager {
 
     try {
       if (typeof data === 'string') {
-        // Для строк: создание новой пустой строки и освобождение старой ссылки
+        // Для строк создаем новую пустую строку и освобождаем исходную ссылку
         data = '';
         data = null;
       } else if (typeof data === 'object') {
-        // Для объектов: очистка всех свойств
+        // Для объектов очищаем все свойства
         Object.keys(data).forEach(key => {
           if (typeof data[key] === 'string') {
             data[key] = '';
@@ -152,7 +151,7 @@ export class PromptManager {
         data = null;
       }
     } catch (e) {
-      // Игнорирование ошибок очистки
+      // Игнорируем ошибки при очистке
     }
   }
 
@@ -164,14 +163,14 @@ export class PromptManager {
     const usage = process.memoryUsage();
     const heapUsedMB = usage.heapUsed / 1024 / 1024;
 
-    // Если использование кучи превышает 100 МБ, выдать предупреждение
+    // Если объем памяти превышает 100 МБ, выдаем предупреждение
     if (heapUsedMB > 100) {
-      console.warn(`⚠️ Высокое использование памяти: ${heapUsedMB.toFixed(2)} МБ`);
+      console.warn(`⚠️ Высокое использование памяти: ${heapUsedMB.toFixed(2)} MB`);
 
       // Очистка кэша памяти
       this.clearMemoryCache();
 
-      // Принудительный сбор мусора
+      // Принудительная сборка мусора
       if (global.gc) {
         global.gc();
       }
@@ -198,7 +197,7 @@ export class PromptManager {
     setInterval(() => {
       const now = Date.now();
 
-      // Очистка кэша, которому более 5 минут
+      // Очистка кэша, срок хранения которого превышает 5 минут
       for (const [key, value] of this.memoryCache) {
         if (value.timestamp && now - value.timestamp > 5 * 60 * 1000) {
           this.clearSensitiveData(value);
@@ -212,11 +211,11 @@ export class PromptManager {
   }
 
   /**
-   * Проверка доступа к сессии
+   * Проверка прав доступа к сессии
    * Гарантия того, что пользователь может получить доступ только к своим сессиям
    */
   async validateAccess(sessionId, userId) {
-    // Здесь можно добавить дополнительную логику проверки разрешений
+    // Здесь можно добавить дополнительную логику проверки прав доступа
     const session = await apiClient.getSession(sessionId);
 
     if (!session) {
@@ -225,7 +224,7 @@ export class PromptManager {
 
     // Проверка владельца сессии
     if (session.userId && session.userId !== userId) {
-      throw new Error('Нет доступа к этой сессии');
+      throw new Error('Нет прав доступа к данной сессии');
     }
 
     return true;
@@ -236,7 +235,7 @@ export class PromptManager {
    * Для отображения информации о шаблоне
    */
   async getPromptMetadata(templateId) {
-    // Возвращаются только метаданные, фактическое содержимое промпта не возвращается
+    // Возвращаем только метаданные, без фактического содержимого промпта
     const templates = await apiClient.getTemplates();
     const template = templates.find(t => t.id === templateId);
 
@@ -250,7 +249,7 @@ export class PromptManager {
       description: template.description,
       category: template.category,
       parameters: template.parameters,
-      // фактическое содержимое промпта не включено
+      // Фактическое содержимое промпта не включается
     };
   }
 
@@ -279,7 +278,7 @@ export class PromptManager {
       checks.memory = usage.heapUsed < 200 * 1024 * 1024; // < 200 МБ
 
       // Проверка сети
-      checks.network = true; // Уже проверено при получении сессии
+      checks.network = true; // Проверено при получении сессии
 
       return checks;
     } catch (error) {
@@ -316,6 +315,5 @@ export class PromptManager {
   }
 }
 
-// Экспорт синглтона
+// Экспорт одиночного экземпляра
 export const promptManager = new PromptManager();
-```

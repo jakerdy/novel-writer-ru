@@ -1,6 +1,5 @@
-```bash
 #!/usr/bin/env bash
-# Управление отношениями персонажей (Bash)
+# Управление отношениями между персонажами (Bash)
 
 set -e
 
@@ -16,7 +15,7 @@ if [ -n "$STORY_DIR" ] && [ -f "$STORY_DIR/spec/tracking/relationships.json" ]; 
 elif [ -f "$PROJECT_ROOT/spec/tracking/relationships.json" ]; then
   REL_FILE="$PROJECT_ROOT/spec/tracking/relationships.json"
 else
-  # Попытка инициализировать из шаблона
+  # Попытка инициализации из шаблона
   mkdir -p "$PROJECT_ROOT/spec/tracking"
   if [ -f "$PROJECT_ROOT/.specify/templates/tracking/relationships.json" ]; then
     cp "$PROJECT_ROOT/.specify/templates/tracking/relationships.json" "$PROJECT_ROOT/spec/tracking/relationships.json"
@@ -34,14 +33,14 @@ CMD=${1:-show}
 shift || true
 
 print_header() {
-  echo "👥 Управление отношениями персонажей"
+  echo "👥 Управление отношениями между персонажами"
   echo "━━━━━━━━━━━━━━━━━━━━"
 }
 
 cmd_show() {
   print_header
   if ! jq empty "$REL_FILE" >/dev/null 2>&1; then
-    echo "❌ Неверный формат relationships.json" >&2; exit 1
+    echo "❌ Некорректный формат relationships.json" >&2; exit 1
   fi
 
   echo "Файл: $REL_FILE"
@@ -73,11 +72,11 @@ cmd_show() {
   if jq -e '.history' "$REL_FILE" >/dev/null 2>&1; then
     local recent=$(jq -r '.history[-1] // empty' "$REL_FILE")
     if [ -n "$recent" ]; then
-      echo "Последние изменения:"
+      echo "Последние изменения："
       jq -r '.history[-1].changes[]? | "- " + (.characters|join("↔")) + "：" + (.relation // .type // "изменение")' "$REL_FILE"
     fi
   elif jq -e '.relationshipChanges' "$REL_FILE" >/dev/null 2>&1; then
-    echo "Последние изменения:"
+    echo "Последние изменения："
     jq -r '.relationshipChanges[-5:][]? | "- " + (.type // "изменение") + ": " + (.characters|join("↔"))' "$REL_FILE" 2>/dev/null || true
   fi
 }
@@ -93,7 +92,7 @@ cmd_update() {
     esac
   done
   if [ -z "$a" ] || [ -z "$rel" ] || [ -z "$b" ]; then
-    echo "Использование: manage-relations.sh update <Персонаж A> <allies|enemies|romantic|neutral|family|mentors> <Персонаж B> [--chapter N] [--note Описание]" >&2
+    echo "Использование: manage-relations.sh update <ПерсонажA> <allies|enemies|romantic|neutral|family|mentors> <ПерсонажB> [--chapter N] [--note Описание]" >&2
     exit 1
   fi
 
@@ -106,7 +105,7 @@ cmd_update() {
     fi
   done
 
-  # Запись отношения
+  # Запись отношений
   tmp=$(mktemp)
   jq --arg a "$a" --arg b "$b" --arg rel "$rel" '
     .characters[$a].relationships[$rel] = ((.characters[$a].relationships[$rel] // []) + [$b] | unique) |
@@ -114,7 +113,7 @@ cmd_update() {
   ' "$REL_FILE" > "$tmp"
   mv "$tmp" "$REL_FILE"
 
-  # Запись истории (предпочтительно history, иначе relationshipChanges)
+  # Запись истории (history имеет приоритет, иначе relationshipChanges)
   local now=$(date -Iseconds)
   if jq -e '.history' "$REL_FILE" >/dev/null 2>&1; then
     tmp=$(mktemp)
@@ -130,7 +129,7 @@ cmd_update() {
     jq --arg a "$a" --arg b "$b" --arg rel "$rel" '.relationshipChanges += [{type:"update", characters:[$a,$b], relation:$rel}]' "$REL_FILE" > "$tmp" && mv "$tmp" "$REL_FILE"
   fi
 
-  echo "✅ Отношение обновлено: $a [$rel] $b"
+  echo "✅ Отношения обновлены: $a [$rel] $b"
 }
 
 cmd_history() {
@@ -156,12 +155,12 @@ cmd_check() {
     ] | flatten | unique | map(select(has(.) | not))
   ' "$REL_FILE" 2>/dev/null || true)
   if [ -n "$missing" ]; then
-    echo "⚠️  Обнаружены ссылки на неуказанных персонажей, рекомендуется добавить:"
+    echo "⚠️  Обнаружены ссылки на персонажей без профилей, рекомендуется добавить:"
     echo "$missing"
     issues=1
   fi
   if [ "$issues" -eq 0 ]; then
-    echo "✅ Проверка данных отношений пройдена"
+    echo "✅ Проверка данных отношений прошла успешно"
   fi
 }
 
@@ -172,4 +171,3 @@ case "$CMD" in
   check) cmd_check ;;
   *) echo "Использование: $0 [show|update|history|check]" >&2; exit 1;;
 esac
-```

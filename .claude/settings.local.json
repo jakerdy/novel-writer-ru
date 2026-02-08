@@ -1,4 +1,3 @@
-```json
 {
   "permissions": {
     "allow": [
@@ -30,4 +29,3 @@
     "ask": []
   }
 }
-```

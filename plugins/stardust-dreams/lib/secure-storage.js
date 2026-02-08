@@ -1,8 +1,7 @@
-```javascript
 /**
  * Безопасное хранилище
- * Отвечает за безопасное хранение учетных данных (зашифрованное сохранение)
- * Примечание: хранит только учетные данные, не Prompt
+ * Отвечает за безопасное хранение аутентификационных данных (шифрованное сохранение)
+ * Примечание: хранятся только аутентификационные данные, Prompt не сохраняется
  */
 
 import crypto from 'crypto';
@@ -12,7 +11,7 @@ import os from 'os';
 
 export class SecureStorage {
   constructor() {
-    // Путь к хранилищу
+    // Путь для хранения
     this.storageDir = path.join(os.homedir(), '.novel', 'stardust');
     this.authFile = path.join(this.storageDir, 'auth.enc');
     this.configFile = path.join(this.storageDir, 'config.json');
@@ -20,12 +19,12 @@ export class SecureStorage {
     // Конфигурация шифрования
     this.algorithm = 'aes-256-gcm';
 
-    // Убедиться, что каталог хранилища существует
+    // Убедиться, что каталог хранения существует
     this.ensureStorageDir();
   }
 
   /**
-   * Убедиться, что каталог хранилища существует
+   * Убедиться, что каталог хранения существует
    */
   async ensureStorageDir() {
     try {
@@ -33,16 +32,16 @@ export class SecureStorage {
       // Установить права доступа к каталогу (только чтение и запись для пользователя)
       await fs.chmod(this.storageDir, 0o700);
     } catch (error) {
-      console.error('Не удалось создать каталог хранилища:', error.message);
+      console.error('Не удалось создать каталог хранения:', error.message);
     }
   }
 
   /**
-   * Сохранить учетные данные
+   * Сохранить аутентификационные данные
    */
   async saveAuth(authData) {
     try {
-      // Зашифровать учетные данные
+      // Зашифровать аутентификационные данные
       const encrypted = await this.encrypt(JSON.stringify(authData));
 
       // Сохранить в файл
@@ -53,17 +52,17 @@ export class SecureStorage {
 
       return true;
     } catch (error) {
-      console.error('Не удалось сохранить учетные данные:', error.message);
+      console.error('Не удалось сохранить аутентификационные данные:', error.message);
       return false;
     }
   }
 
   /**
-   * Получить учетные данные
+   * Получить аутентификационные данные
    */
   async getAuth() {
     try {
-      // Проверить существование файла
+      // Проверить, существует ли файл
       if (!await fs.pathExists(this.authFile)) {
         return null;
       }
@@ -77,9 +76,9 @@ export class SecureStorage {
       // Распарсить JSON
       const authData = JSON.parse(decrypted);
 
-      // Проверить на истечение срока действия
+      // Проверить, не истёк ли срок действия
       if (authData.expiresAt && Date.now() > authData.expiresAt) {
-        // Токен истек, но refreshToken сохранен
+        // Токен истёк, но refreshToken сохраняется
         return {
           ...authData,
           token: null,
@@ -89,13 +88,13 @@ export class SecureStorage {
 
       return authData;
     } catch (error) {
-      console.error('Не удалось прочитать учетные данные:', error.message);
+      console.error('Не удалось прочитать аутентификационные данные:', error.message);
       return null;
     }
   }
 
   /**
-   * Обновить учетные данные
+   * Обновить аутентификационные данные
    */
   async updateAuth(updates) {
     try {
@@ -103,13 +102,13 @@ export class SecureStorage {
       const updated = { ...current, ...updates };
       return await this.saveAuth(updated);
     } catch (error) {
-      console.error('Не удалось обновить учетные данные:', error.message);
+      console.error('Не удалось обновить аутентификационные данные:', error.message);
       return false;
     }
   }
 
   /**
-   * Очистить учетные данные
+   * Очистить аутентификационные данные
    */
   async clearAuth() {
     try {
@@ -123,7 +122,7 @@ export class SecureStorage {
       }
       return true;
     } catch (error) {
-      console.error('Не удалось очистить учетные данные:', error.message);
+      console.error('Не удалось очистить аутентификационные данные:', error.message);
       return false;
     }
   }
@@ -176,7 +175,7 @@ export class SecureStorage {
     // Получить тег аутентификации
     const authTag = cipher.getAuthTag();
 
-    // Скомбинировать результат: iv:authTag:encrypted
+    // Объединить результат: iv:authTag:encrypted
     return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted}`;
   }
 
@@ -222,7 +221,7 @@ export class SecureStorage {
       'stardust-dreams-2024'  // Фиксированная соль
     ].join(':');
 
-    // Сгенерировать 256-битный ключ
+    // Сгенерировать ключ длиной 256 бит
     return crypto.createHash('sha256').update(deviceInfo).digest();
   }
 
@@ -258,7 +257,7 @@ export class SecureStorage {
   }
 
   /**
-   * Экспортировать учетные данные (для отладки)
+   * Экспортировать аутентификационные данные (для отладки)
    * Примечание: экспортируются зашифрованные данные
    */
   async exportAuth() {
@@ -281,13 +280,13 @@ export class SecureStorage {
   }
 
   /**
-   * Импортировать учетные данные
+   * Импортировать аутентификационные данные
    * Примечание: расшифровка возможна только на том же устройстве
    */
   async importAuth(exportedData) {
     try {
       if (!exportedData || !exportedData.encrypted) {
-        throw new Error('Неверные данные для импорта');
+        throw new Error('Неверные импортируемые данные');
       }
 
       // Проверить возможность расшифровки (тестовая расшифровка)
@@ -299,7 +298,7 @@ export class SecureStorage {
 
       return true;
     } catch (error) {
-      console.error('Не удалось импортировать учетные данные:', error.message);
+      console.error('Не удалось импортировать аутентификационные данные:', error.message);
       return false;
     }
   }
@@ -309,7 +308,7 @@ export class SecureStorage {
    */
   async cleanup() {
     try {
-      // Очистить устаревшие учетные данные
+      // Очистить устаревшие аутентификационные данные
       const auth = await this.getAuth();
       if (auth && auth.expired) {
         await this.clearAuth();
@@ -330,6 +329,5 @@ export class SecureStorage {
   }
 }
 
-// Экспортировать одиночный экземпляр
+// Экспортировать единственный экземпляр
 export const secureStorage = new SecureStorage();
-```

@@ -1,9 +1,8 @@
-```json
 {
   "name": "novel-writer-cn",
   "version": "0.20.0",
   "type": "module",
-  "description": "Инструмент для создания китайских романов на базе ИИ — интеллектуальный помощник по написанию, основанный на структурированном рабочем процессе",
+  "description": "Инструмент для создания китайских романов на базе ИИ — умный помощник по написанию, основанный на структурированном рабочем процессе",
   "keywords": [
     "novel",
     "writer",
@@ -28,7 +27,8 @@
     "start": "node dist/cli.js",
     "clean": "rm -rf dist",
     "prepare": "npm run build:commands && npm run build",
-    "prepublishOnly": "npm run clean && npm run build:commands && npm run build"
+    "prepublishOnly": "npm run clean && npm run build:commands && npm run build",
+    "rename-chinese": "node scripts/rename-chinese-files.js"
   },
   "dependencies": {
     "@commander-js/extra-typings": "^12.0.0",
@@ -62,4 +62,3 @@
     "url": "https://github.com/wordflowlab/novel-writer/issues"
   }
 }
-```

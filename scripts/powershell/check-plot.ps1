@@ -1,4 +1,3 @@
-```powershell
 #!/usr/bin/env pwsh
 # Проверка согласованности и связности развития сюжета (PowerShell)
 
@@ -24,7 +23,7 @@ function Ensure-PlotTracker {
     New-Item -ItemType Directory -Path (Split-Path $plotPath -Parent) -Force | Out-Null
     Copy-Item $tpl $plotPath -Force
   }
-  if (-not (Test-Path $outlinePath)) { throw "Структура главы outline.md не найдена, используйте /outline" }
+  if (-not (Test-Path $outlinePath)) { throw "Файл главы outline.md не найден, используйте /outline" }
 }
 
 function Get-CurrentProgress {
@@ -69,7 +68,7 @@ function Analyze-PlotAlignment {
 
 function Check-Foreshadowing($state) {
   Write-Host ""
-  Write-Host "🎯 Отслеживание намеков"
+  Write-Host "🎯 Отслеживание зацепок"
   Write-Host "───────────"
   $j = $state.json
   $curCh = [int]$state.cur.chapter
@@ -77,11 +76,11 @@ function Check-Foreshadowing($state) {
   $total = $fs.Count
   $active = @($fs | Where-Object { $_.status -eq 'active' }).Count
   $resolved = @($fs | Where-Object { $_.status -eq 'resolved' }).Count
-  Write-Host "Статистика: всего ${total} шт., активно ${active} шт., разрешено ${resolved} шт."
+  Write-Host "Статистика: всего ${total}, активно ${active}, разрешено ${resolved}"
 
   if ($active -gt 0) {
     Write-Host ""
-    Write-Host "⚠️ Активные намеки:"
+    Write-Host "⚠️ Незавершенные зацепки:"
     $fs | Where-Object { $_.status -eq 'active' } | ForEach-Object {
       $ch = $_.planted.chapter
       Write-Host "  • $($_.content) (заложено в главе $ch)"
@@ -89,7 +88,7 @@ function Check-Foreshadowing($state) {
   }
 
   $overdue = @($fs | Where-Object { $_.status -eq 'active' -and $_.planted.chapter -and ($curCh - [int]$_.planted.chapter) -gt 30 }).Count
-  if ($overdue -gt 0) { Write-Host ""; Write-Host "⚠️ Предупреждение: ${overdue} намеков не обрабатывались более 30 глав" }
+  if ($overdue -gt 0) { Write-Host ""; Write-Host "⚠️ Внимание: ${overdue} зацепок не разрешены более 30 глав" }
 }
 
 function Check-Conflicts($state) {
@@ -99,7 +98,7 @@ function Check-Conflicts($state) {
   $active = @($state.json.conflicts.active)
   $count = $active.Count
   if ($count -gt 0) {
-    Write-Host "Активных конфликтов: ${count} шт."
+    Write-Host "Текущие активные конфликты: ${count} шт."
     $active | ForEach-Object { Write-Host ("  • " + $_.name + " [" + $_.intensity + "]") }
   } else { Write-Host "Активных конфликтов нет" }
 }
@@ -111,12 +110,12 @@ function Generate-Suggestions($state) {
   $ch = [int]$state.cur.chapter
   if ($ch -lt 10) { Write-Host "• Первые 10 глав — ключевые, убедитесь, что есть достаточно крючков для привлечения читателя" }
   elseif ($ch -lt 30) { Write-Host "• Приближается первый кульминационный момент, проверьте, достаточно ли напряжены конфликты" }
-  elseif (($ch % 60) -gt 50) { Write-Host "• Близится конец тома, подготовьте кульминацию и завязку для следующего" }
+  elseif (($ch % 60) -gt 50) { Write-Host "• Близок конец тома, подготовьте кульминацию и завязку для следующего" }
 
   $activeFo = @($state.json.foreshadowing | Where-Object { $_.status -eq 'active' }).Count
-  if ($activeFo -gt 5) { Write-Host "• Слишком много активных намеков, рассмотрите возможность разрешения некоторых в ближайших главах" }
+  if ($activeFo -gt 5) { Write-Host "• Много активных зацепок, рассмотрите возможность разрешения некоторых в ближайших главах" }
   $activeConf = @($state.json.conflicts.active).Count
-  if ($activeConf -eq 0 -and $ch -gt 5) { Write-Host "• Нет активных конфликтов, рассмотрите возможность введения новых точек напряжения" }
+  if ($activeConf -eq 0 -and $ch -gt 5) { Write-Host "• Текущих активных конфликтов нет, рассмотрите возможность введения новых точек напряжения" }
 }
 
 Write-Host "🔍 Начинается проверка согласованности сюжета..."
@@ -137,4 +136,3 @@ if (Test-Path $plotPath) {
   $json.lastUpdated = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
   $json | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $plotPath -Encoding UTF8
 }
-```

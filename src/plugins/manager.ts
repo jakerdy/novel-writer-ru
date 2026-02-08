@@ -1,4 +1,3 @@
-```typescript
 import fs from 'fs-extra';
 import path from 'path';
 import yaml from 'js-yaml';
@@ -61,10 +60,10 @@ export class PluginManager {
    */
   async loadPlugins(): Promise<void> {
     try {
-      // Убедиться, что каталог плагинов существует
+      // Убедиться, что директория плагинов существует
       await fs.ensureDir(this.pluginsDir)
 
-      // Сканировать каталог плагинов
+      // Сканировать директорию плагинов
       const plugins = await this.scanPlugins()
 
       if (plugins.length === 0) {
@@ -86,18 +85,18 @@ export class PluginManager {
   }
 
   /**
-   * Сканирует каталог плагинов, возвращает имена всех плагинов
+   * Сканирует директорию плагинов, возвращает имена всех плагинов
    */
   private async scanPlugins(): Promise<string[]> {
     try {
-      // Проверить, существует ли каталог плагинов
+      // Проверить, существует ли директория плагинов
       if (!await fs.pathExists(this.pluginsDir)) {
         return []
       }
 
       const entries = await fs.promises.readdir(this.pluginsDir, { withFileTypes: true })
 
-      // Отфильтровать только каталоги, содержащие config.yaml
+      // Отфильтровать директории, содержащие config.yaml
       const plugins = []
       for (const entry of entries) {
         if (entry.isDirectory()) {
@@ -110,7 +109,7 @@ export class PluginManager {
 
       return plugins
     } catch (error) {
-      logger.error('Ошибка сканирования каталога плагинов:', error)
+      logger.error('Ошибка сканирования директории плагинов:', error)
       return []
     }
   }
@@ -127,13 +126,13 @@ export class PluginManager {
       const config = await this.loadConfig(configPath)
 
       if (!config) {
-        logger.warn(`Недопустимая конфигурация плагина ${pluginName}`)
+        logger.warn(`Недействительная конфигурация плагина ${pluginName}`)
         return
       }
 
       // Проверить зависимости
       if (!this.checkDependencies(config)) {
-        logger.warn(`Зависимости плагина ${pluginName} не удовлетворены`)
+        logger.warn(`Не выполнены зависимости плагина ${pluginName}`)
         return
       }
 
@@ -188,7 +187,7 @@ export class PluginManager {
 
     // Проверить зависимость версии ядра
     if (config.dependencies.core) {
-      // Здесь упрощенная обработка, на самом деле нужно сравнивать номера версий
+      // Здесь упрощенная обработка, в реальности следует сравнивать номера версий
       // Можно использовать библиотеку semver для сравнения версий
       const requiredVersion = config.dependencies.core
       logger.debug(`Требуется версия ядра: ${requiredVersion}`)
@@ -218,7 +217,7 @@ export class PluginManager {
   }
 
   /**
-   * Внедряет команды плагина в соответствующие каталоги ИИ
+   * Внедряет команды плагина в соответствующие директории ИИ
    */
   private async injectCommands(
     pluginName: string,
@@ -238,33 +237,33 @@ export class PluginManager {
           const destPath = path.join(this.commandsDirs.claude, `${cmd.id}.md`)
           await fs.ensureDir(this.commandsDirs.claude)
           await fs.copy(sourcePath, destPath)
-          logger.debug(`Внедрение команды в Claude: /${cmd.id}`)
+          logger.debug(`Внедрена команда в Claude: /${cmd.id}`)
         }
 
         if (supportedAIs.cursor) {
           const destPath = path.join(this.commandsDirs.cursor, `${cmd.id}.md`)
           await fs.ensureDir(this.commandsDirs.cursor)
           await fs.copy(sourcePath, destPath)
-          logger.debug(`Внедрение команды в Cursor: /${cmd.id}`)
+          logger.debug(`Внедрена команда в Cursor: /${cmd.id}`)
         }
 
         if (supportedAIs.windsurf) {
           const destPath = path.join(this.commandsDirs.windsurf, `${cmd.id}.md`)
           await fs.ensureDir(this.commandsDirs.windsurf)
           await fs.copy(sourcePath, destPath)
-          logger.debug(`Внедрение команды в Windsurf: /${cmd.id}`)
+          logger.debug(`Внедрена команда в Windsurf: /${cmd.id}`)
         }
 
         if (supportedAIs.roocode) {
           const destPath = path.join(this.commandsDirs.roocode, `${cmd.id}.md`)
           await fs.ensureDir(this.commandsDirs.roocode)
           await fs.copy(sourcePath, destPath)
-          logger.debug(`Внедрение команды в Roo Code: /${cmd.id}`)
+          logger.debug(`Внедрена команда в Roo Code: /${cmd.id}`)
         }
 
         // Обработка формата TOML (Gemini)
         if (supportedAIs.gemini) {
-          // Проверить, есть ли предопределенная версия TOML
+          // Проверить наличие предопределенной версии TOML
           const cmdId = path.basename(cmd.id, path.extname(cmd.id))
           const tomlSourcePath = path.join(this.pluginsDir, pluginName, 'commands-gemini', `${cmdId}.toml`)
 
@@ -272,9 +271,9 @@ export class PluginManager {
             const destPath = path.join(this.commandsDirs.gemini, `${cmdId}.toml`)
             await fs.ensureDir(this.commandsDirs.gemini)
             await fs.copy(tomlSourcePath, destPath)
-            logger.debug(`Внедрение команды в Gemini: /${cmdId} (TOML)`)
+            logger.debug(`Внедрена команда в Gemini: /${cmdId} (TOML)`)
           } else {
-            // Если TOML не предопределен, попытаться преобразовать из Markdown
+            // Если предопределенный TOML отсутствует, попытаться преобразовать из Markdown
             try {
               const mdContent = await fs.readFile(sourcePath, 'utf-8')
               const tomlContent = this.convertMarkdownToToml(mdContent, cmd)
@@ -282,12 +281,12 @@ export class PluginManager {
                 const destPath = path.join(this.commandsDirs.gemini, `${cmdId}.toml`)
                 await fs.ensureDir(this.commandsDirs.gemini)
                 await fs.writeFile(destPath, tomlContent)
-                logger.debug(`Автоматическое преобразование и внедрение команды в Gemini: /${cmdId}`)
+                logger.debug(`Автоматически преобразована и внедрена команда в Gemini: /${cmdId}`)
               } else {
                 logger.debug(`Команда ${cmdId} плагина ${pluginName} не может быть преобразована в TOML`)
               }
             } catch (err) {
-              logger.debug(`Ошибка преобразования команды ${cmdId} плагина ${pluginName}: ${err}`)
+              logger.debug(`Ошибка преобразования команды ${cmdId} плагина ${pluginName} в TOML: ${err}`)
             }
           }
         }
@@ -316,7 +315,7 @@ export class PluginManager {
 
         // Копировать файл эксперта
         await fs.copy(sourcePath, destPath)
-        logger.debug(`Регистрация эксперта: ${expert.title} (${expert.id})`)
+        logger.debug(`Зарегистрирован эксперт: ${expert.title} (${expert.id})`)
       } catch (error) {
         logger.error(`Ошибка регистрации эксперта ${expert.id}:`, error)
       }
@@ -324,7 +323,7 @@ export class PluginManager {
   }
 
   /**
-   * Перечисляет все установленные плагины
+   * Выводит список всех установленных плагинов
    */
   async listPlugins(): Promise<PluginConfig[]> {
     const plugins = await this.scanPlugins()
@@ -373,11 +372,11 @@ export class PluginManager {
     try {
       logger.info(`Удаление плагина: ${pluginName}`)
 
-      // Удалить каталог плагина
+      // Удалить директорию плагина
       const pluginPath = path.join(this.pluginsDir, pluginName)
       await fs.remove(pluginPath)
 
-      // Удалить внедренные команды (из всех каталогов ИИ)
+      // Удалить внедренные команды (из всех директорий ИИ)
       const supportedAIs = await this.detectSupportedAIs()
 
       if (supportedAIs.claude && await fs.pathExists(this.commandsDirs.claude)) {
@@ -390,7 +389,7 @@ export class PluginManager {
         }
       }
 
-      // Выполнить ту же очистку для других каталогов ИИ
+      // Выполнить ту же очистку для других директорий ИИ
       for (const [aiType, dir] of Object.entries(this.commandsDirs)) {
         if (aiType !== 'claude' && await fs.pathExists(dir)) {
           const commandFiles = await fs.promises.readdir(dir)
@@ -402,13 +401,7 @@ export class PluginManager {
           }
         }
       }
-    } catch (error) {
-      logger.error(`Ошибка удаления плагина ${pluginName}:`, error)
-    }
-  }
-}
-```
-      // Удалить зарегистрированных экспертов
+      // Удаление зарегистрированных экспертов
       const pluginExpertsDir = path.join(this.expertsDir, 'plugins', pluginName)
       if (await fs.pathExists(pluginExpertsDir)) {
         await fs.remove(pluginExpertsDir)
@@ -422,11 +415,11 @@ export class PluginManager {
   }
 
   /**
-   * Преобразовать команду Markdown в формат TOML
+   * Преобразование команды Markdown в формат TOML
    */
   private convertMarkdownToToml(mdContent: string, cmd: any): string | null {
     try {
-      // Извлечь frontmatter
+      // Извлечение frontmatter
       const frontmatterMatch = mdContent.match(/^---\n([\s\S]*?)\n---/)
       let description = cmd.description || ''
 
@@ -438,10 +431,10 @@ export class PluginManager {
         }
       }
 
-      // Извлечь содержимое (удалить frontmatter)
+      // Извлечение содержимого (удаление frontmatter)
       const content = mdContent.replace(/^---\n[\s\S]*?\n---\n/, '')
 
-      // Сформировать содержимое TOML
+      // Формирование содержимого TOML
       const tomlContent = `description = "${description}"
 
 prompt = """
@@ -457,15 +450,15 @@ ${content}
   }
 
   /**
-   * Обновить плагин
+   * Обновление плагина
    */
   async updatePlugin(pluginName: string, source?: string): Promise<void> {
     logger.info(`Обновление плагина: ${pluginName}`)
 
-    // Сначала удалить старую версию
+    // Сначала удаляем старую версию
     await this.removePlugin(pluginName)
 
-    // Установить новую версию
+    // Устанавливаем новую версию
     await this.installPlugin(pluginName, source)
   }
 }

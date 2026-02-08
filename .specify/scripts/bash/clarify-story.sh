@@ -1,7 +1,6 @@
-```bash
 #!/bin/bash
 
-# Скрипт для уточнения синопсиса истории
+# Вспомогательный скрипт для уточнения структуры истории
 # Используется для команды /clarify, сканирует и возвращает текущий путь к истории
 
 set -e
@@ -10,7 +9,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
-# Парсинг аргументов
+# Разбор аргументов
 JSON_MODE=false
 PATHS_ONLY=false
 
@@ -40,7 +39,7 @@ if [ ! -d "$STORIES_DIR" ]; then
     if [ "$JSON_MODE" = true ]; then
         echo '{"error": "No stories directory found"}'
     else
-        echo "Ошибка: каталог stories не найден. Пожалуйста, сначала выполните /story для создания синопсиса истории."
+        echo "Ошибка: каталог stories не найден. Сначала запустите /story для создания структуры истории."
     fi
     exit 1
 fi
@@ -52,7 +51,7 @@ if [ -z "$STORY_DIR" ]; then
     if [ "$JSON_MODE" = true ]; then
         echo '{"error": "No story found"}'
     else
-        echo "Ошибка: история не найдена. Пожалуйста, сначала выполните /story для создания синопсиса истории."
+        echo "Ошибка: история не найдена. Сначала запустите /story для создания структуры истории."
     fi
     exit 1
 fi
@@ -71,7 +70,7 @@ if [ ! -f "$STORY_FILE" ]; then
     exit 1
 fi
 
-# Проверка, существует ли уже уточнение
+# Проверка наличия записей об уточнении
 CLARIFICATION_EXISTS=false
 if grep -q "## 澄清记录" "$STORY_FILE" 2>/dev/null; then
     CLARIFICATION_EXISTS=true
@@ -83,7 +82,7 @@ if [ "$CLARIFICATION_EXISTS" = true ]; then
     CLARIFICATION_COUNT=$(grep -c "### 澄清会话" "$STORY_FILE" 2>/dev/null || echo "0")
 fi
 
-# Вывод в формате JSON, если запрошено
+# Вывод в формате JSON при запросе
 if [ "$JSON_MODE" = true ]; then
     if [ "$PATHS_ONLY" = true ]; then
         # Минимальный вывод для шаблона команды
@@ -111,9 +110,8 @@ else
     echo "Найдена история: $STORY_NAME"
     echo "Путь к файлу: $STORY_FILE"
     if [ "$CLARIFICATION_EXISTS" = true ]; then
-        echo "Существующие сессии уточнения: $CLARIFICATION_COUNT"
+        echo "Уже проведено уточнений: $CLARIFICATION_COUNT раз"
     else
-        echo "Уточнение еще не проводилось."
+        echo "Уточнения еще не проводились"
     fi
 fi
-```

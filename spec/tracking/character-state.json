@@ -1,4 +1,3 @@
-```json
 {
   "novel": "[Название романа]",
   "lastUpdated": "",
@@ -7,12 +6,12 @@
     "name": "[Имя главного героя]",
     "currentStatus": {
       "alive": true,
-      "health": "хорошее",
-      "mentalState": "нормальное",
+      "health": "Хорошее",
+      "mentalState": "Нормальное",
       "location": "[Текущее местоположение]",
       "chapter": 1,
       "age": null,
-      "position": "[Статус/должность]",
+      "position": "[Должность/Статус]",
       "possessions": [],
       "skills": [],
       "knowledge": []
@@ -20,17 +19,17 @@
     "development": {
       "arc": "[Описание дуги развития]",
       "milestones": [],
-      "currentPhase": "начальная точка",
+      "currentPhase": "Начало",
       "nextGoal": ""
     },
     "relationships": {
-      "summary": "См. relationships.json для подробностей",
+      "summary": "См. relationships.json для подробной информации",
       "key": {}
     }
   },
 
   "supportingCharacters": {
-    "[Имя второстепенного героя]": {
+    "[Имя второстепенного персонажа]": {
       "role": "[Функция персонажа]",
       "importance": "high|medium|low",
       "status": {
@@ -63,7 +62,7 @@
       "appearances": [
         {
           "character": "[Имя персонажа]",
-          "role": "главный|второстепенный|фоновый",
+          "role": "Главный|Второстепенный|Фоновый",
           "significance": ""
         }
       ]
@@ -77,4 +76,3 @@
     "warnings": []
   }
 }
-```

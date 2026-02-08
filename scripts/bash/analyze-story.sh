@@ -1,4 +1,3 @@
-```sh
 #!/bin/bash
 
 # Скрипт анализа истории
@@ -30,9 +29,9 @@ check_story_files() {
     local missing_files=()
 
     # Проверка эталонных документов
-    [ ! -f "memory/constitution.md" ] && missing_files+=("Конституционный документ")
-    [ ! -f "$STORY_DIR/specification.md" ] && missing_files+=("Файл спецификации")
-    [ ! -f "$STORY_DIR/creative-plan.md" ] && missing_files+=("Файл творческого плана")
+    [ ! -f "memory/constitution.md" ] && missing_files+=("документ конституции")
+    [ ! -f "$STORY_DIR/specification.md" ] && missing_files+=("документ спецификации")
+    [ ! -f "$STORY_DIR/creative-plan.md" ] && missing_files+=("документ плана")
 
     if [ ${#missing_files[@]} -gt 0 ]; then
         echo "⚠️ Отсутствуют следующие эталонные документы:"
@@ -57,7 +56,7 @@ analyze_content() {
         for file in "$content_dir"/*.md; do
             if [ -f "$file" ]; then
                 ((chapter_count++))
-                # Точный подсчет китайских слов
+                # Используем точный подсчет китайских слов
                 local words=$(count_chinese_words "$file")
                 ((total_words += words))
                 local filename=$(basename "$file")
@@ -93,7 +92,7 @@ check_task_completion() {
     echo "  Всего задач: $total_tasks"
     echo "  Выполнено: $completed_tasks"
     echo "  В процессе: $in_progress"
-    echo "  Ожидается: $pending"
+    echo "  Ожидает: $pending"
 
     if [ $total_tasks -gt 0 ]; then
         local completion_rate=$((completed_tasks * 100 / total_tasks))
@@ -118,7 +117,7 @@ check_specification_compliance() {
     if [ $unclear -gt 0 ]; then
         echo "  ⚠️ Осталось $unclear пунктов, требующих уточнения"
     else
-        echo "  ✅ Все решения уточнены"
+        echo "  ✅ Все решения прояснены"
     fi
 }
 
@@ -137,7 +136,7 @@ main() {
         exit 1
     fi
 
-    echo "✅ Эталонные документы в полном объеме"
+    echo "✅ Эталонные документы в полном порядке"
     echo ""
 
     # Выполнение в зависимости от типа анализа
@@ -169,4 +168,3 @@ main() {
 }
 
 main
-```

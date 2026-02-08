@@ -1,8 +1,7 @@
-```json
 {
   "version": "0.4.0",
   "project": {
-    "name": "Novel Writer",
+    "name": "Писатель романов",
     "type": "novel",
     "language": "zh-CN"
   },
@@ -49,4 +48,3 @@
     "backupEnabled": true
   }
 }
-```

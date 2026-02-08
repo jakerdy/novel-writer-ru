@@ -1,4 +1,3 @@
-```powershell
 param(
     [switch]$Json,
     [switch]$PathsOnly
@@ -10,28 +9,28 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-# Получить каталог скрипта
+# Получить директорию скрипта
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 
-# Загрузить общие функции
+# Подключить общие функции
 . "$ScriptDir\common.ps1"
 
-# Получить корневой каталог проекта
+# Получить корневую директорию проекта
 $ProjectRoot = Get-ProjectRoot
 Set-Location $ProjectRoot
 
-# Найти текущий каталог истории
+# Найти директорию текущей истории
 $StoriesDir = "stories"
 if (-not (Test-Path $StoriesDir -PathType Container)) {
     if ($Json) {
         Write-Output '{"error": "No stories directory found"}'
     } else {
-        Write-Error "Ошибка: каталог stories не найден. Пожалуйста, сначала запустите /story для создания структуры истории."
+        Write-Error "Ошибка: директория stories не найдена. Пожалуйста, сначала запустите /story для создания структуры истории."
     }
     exit 1
 }
 
-# Получить последнюю историю
+# Получить последнюю созданную историю
 $StoryDirs = Get-ChildItem -Path $StoriesDir -Directory | Sort-Object Name -Descending
 if ($StoryDirs.Count -eq 0) {
     if ($Json) {
@@ -56,7 +55,7 @@ if (-not (Test-Path $StoryFile -PathType Leaf)) {
     exit 1
 }
 
-# Проверить, существует ли уже уточнение
+# Проверить, существует ли уже запись об уточнении
 $ClarificationExists = $false
 $StoryContent = Get-Content $StoryFile -Raw
 if ($StoryContent -match "## 澄清记录") {
@@ -70,12 +69,12 @@ if ($ClarificationExists) {
     $ClarificationCount = $matches.Count
 }
 
-# Преобразовать пути в прямые слеши для JSON
+# Преобразовать пути в формат с прямыми слешами для JSON
 $StoryFilePath = $StoryFile.Replace('\', '/')
 $StoryDirPath = $StoryDir.FullName.Replace('\', '/')
 $ProjectRootPath = $ProjectRoot.Replace('\', '/')
 
-# Вывод в формате JSON, если запрошено
+# Вывод в формате JSON при запросе
 if ($Json) {
     if ($PathsOnly) {
         # Минимальный вывод для шаблона команды
@@ -100,9 +99,8 @@ if ($Json) {
     Write-Output "Найдена история: $StoryName"
     Write-Output "Путь к файлу: $StoryFile"
     if ($ClarificationExists) {
-        Write-Output "Проведено уточнений: $ClarificationCount раз(а)"
+        Write-Output "Существующие сессии уточнения: $ClarificationCount"
     } else {
-        Write-Output "Уточнений еще не проводилось"
+        Write-Output "Уточнение еще не проводилось"
     }
 }
-```

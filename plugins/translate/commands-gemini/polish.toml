@@ -1,54 +1,52 @@
-```toml
-description = "Полировка английского перевода для придания ему более естественного звучания для носителей языка"
+description = "Polish English translations to make them more native-like"
 
 prompt = """
-Полировка английского перевода для улучшения качества языка.
+Polish the English translation to improve language quality.
 
-Ввод пользователя: {{args}}
+User input: {{args}}
 
-## Основные моменты полировки
+## Polishing Focus
 
-### 1. Естественность языка
-- Устранение следов «китайского английского»
-- Использование идиоматичных английских выражений
-- Корректировка структуры предложений
+### 1. Naturalness of Language
+- Eliminate traces of Chinglish
+- Use idiomatic English expressions
+- Adjust sentence structure
 
-### 2. Соответствие стилю
-- Единообразие повествовательного стиля
-- Соблюдение временной последовательности
-- Стандартизация использования знаков препинания
+### 2. Stylistic Consistency
+- Unify narrative style
+- Maintain tense consistency
+- Standardize punctuation usage
 
-### 3. Оптимизация читабельности
-- Упрощение сложных предложений
-- Улучшение связности абзацев
-- Повышение реалистичности диалогов
+### 3. Readability Optimization
+- Simplify complex sentences
+- Enhance paragraph coherence
+- Improve dialogue realism
 
-## Шаги выполнения
+## Execution Steps
 
-1. **Выявление проблем**
-   - Отметка неестественных выражений
-   - Поиск грамматических ошибок
-   - Обнаружение логических несоответствий
+1. **Identify Issues**
+   - Mark unnatural expressions
+   - Find grammatical errors
+   - Detect logical inconsistencies
 
-2. **Пошаговая оптимизация**
-   - Переписывание неуклюжих предложений
-   - Подбор подходящих слов
-   - Улучшение ритма предложений
+2. **Sentence-by-Sentence Optimization**
+   - Rewrite stiff sentences
+   - Adjust word choice
+   - Improve sentence rhythm
 
-3. **Общая корректировка**
-   - Проверка переходов между абзацами
-   - Обеспечение единообразия стиля
-   - Проверка полноты информации
+3. **Overall Adjustment**
+   - Check paragraph transitions
+   - Ensure stylistic unity
+   - Verify information completeness
 
-## Пример полировки
+## Polishing Example
 
-Оригинал: He cultivated his internal energy
-Полировка: He channeled his inner power
+Original: He cultivated his internal energy
+Polished: He channeled his inner power
 
-Оригинал: The sword light was very sharp
-Полировка: The blade gleamed with deadly precision
+Original: The sword light was very sharp
+Polished: The blade gleamed with deadly precision
 
-## Завершающее сообщение
-✅ Полировка завершена! Перевод оптимизирован до более идиоматичного английского выражения.
+## Completion Prompt
+✅ Polishing complete! The translation has been optimized for more idiomatic English expression.
 """
-```

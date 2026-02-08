@@ -1,7 +1,6 @@
-```typescript
 /**
  * Единый модуль управления версиями
- * Читает номер версии из package.json, обеспечивая единообразие версий во всем проекте
+ * Читает номер версии из package.json, обеспечивая единообразие версий всего проекта
  */
 
 import fs from 'fs';
@@ -12,12 +11,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /**
- * Получает текущий номер версии проекта
+ * Получить номер текущей версии проекта
  * @returns Строка с номером версии
  */
 export function getVersion(): string {
   try {
-    // Попытка чтения package.json из нескольких возможных путей
+    // Попытка прочитать package.json из нескольких возможных путей
     const possiblePaths = [
       path.join(__dirname, '../package.json'),      // Относительный путь от каталога src
       path.join(__dirname, '../../package.json'),   // Относительный путь от каталога dist
@@ -31,24 +30,24 @@ export function getVersion(): string {
       }
     }
 
-    // Если package.json не найден, возвращает версию по умолчанию
+    // Если package.json не найден, вернуть версию по умолчанию
     return '0.4.2';
   } catch (error) {
-    // В случае ошибки возвращает версию по умолчанию
+    // При возникновении ошибки вернуть версию по умолчанию
     return '0.4.2';
   }
 }
 
 /**
- * Получает строку с информацией о версии
- * @returns Форматированная информация о версии
+ * Получить строку с информацией о версии
+ * @returns Отформатированная информация о версии
  */
 export function getVersionInfo(): string {
-  return `Версия: ${getVersion()} | Архитектура на базе Spec Kit | Улучшенная система отслеживания`;
+  return `Версия: ${getVersion()} | На базе архитектуры Spec Kit | Улучшенная система отслеживания`;
 }
 
 /**
- * Получает краткую информацию о версии
+ * Получить краткую информацию о версии
  * @returns Краткая информация о версии
  */
 export function getShortVersionInfo(): string {
@@ -57,4 +56,3 @@ export function getShortVersionInfo(): string {
 
 // Экспорт константы версии (для обратной совместимости)
 export const VERSION = getVersion();
-```

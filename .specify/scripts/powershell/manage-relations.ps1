@@ -1,5 +1,3 @@
-```powershell
-#!/usr/bin/env pwsh
 # Управление отношениями персонажей (PowerShell)
 
 param(
@@ -47,7 +45,7 @@ function Show-Relations {
   $c = $j.characters.$main
   $r = if ($c.relationships) { $c.relationships } else { $c }
   $map = @{
-    romantic = '💕 Влюблённость'; allies='🤝 Союзники'; mentors='📚 Наставники'; enemies='⚔️ Враги'; family='👪 Семья'; neutral='・ Нейтрально'
+    romantic = '💕 Влюбленность'; allies='🤝 Союзники'; mentors='📚 Наставники'; enemies='⚔️ Враги'; family='👪 Семья'; neutral='・ Отношения'
   }
   foreach ($k in 'romantic','allies','mentors','enemies','family','neutral') {
     $lst = @($r.$k)
@@ -89,7 +87,7 @@ function Update-Relation([string]$a, [string]$rel, [string]$b) {
     $j | Add-Member -NotePropertyName history -NotePropertyValue @()
   }
   $j | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $relPath -Encoding UTF8
-  Write-Host "✅ Отношения обновлены: $a [$rel] $b"
+  Write-Host "✅ Отношение обновлено: $a [$rel] $b"
 }
 
 function Show-History {
@@ -132,4 +130,3 @@ switch ($Command) {
   'history'{ Show-History }
   'check'  { Check-Relations }
 }
-```

@@ -1,10 +1,9 @@
-```powershell
 #!/usr/bin/env pwsh
 # Генерация задач для написания
 
 $STORIES_DIR = "stories"
 
-# Поиск самой свежей директории с историей
+# Поиск самой последней директории с историей
 function Get-LatestStory {
     $latest = Get-ChildItem -Path $STORIES_DIR -Directory |
               Sort-Object Name -Descending |
@@ -19,7 +18,7 @@ function Get-LatestStory {
 $storyDir = Get-LatestStory
 
 if (!$storyDir) {
-    Write-Host "Ошибка: Директория с историей не найдена"
+    Write-Host "Ошибка: Проект истории не найден"
     Write-Host "Пожалуйста, сначала создайте историю с помощью команды /story"
     exit 1
 }
@@ -38,14 +37,14 @@ if (!(Test-Path $outlineFile)) {
 $currentDate = Get-Date -Format "yyyy-MM-dd"
 $currentDateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 
-# Создание файла задач с предварительным заполнением основной информации
+# Создание файла задач с предварительно заполненной базовой информацией
 $tasksContent = @"
 # Список задач для написания
 
 ## Обзор задач
-- **Дата создания**：$currentDate
-- **Последнее обновление**：$currentDate
-- **Статус задач**：Генерация
+- **Дата создания**: $currentDate
+- **Последнее обновление**: $currentDate
+- **Статус задач**: Ожидают генерации
 
 ---
 "@
@@ -72,6 +71,5 @@ Write-Host ""
 Write-Host "Генерация задач на основе плана глав:"
 Write-Host "- Задачи по написанию глав"
 Write-Host "- Задачи по доработке персонажей"
-Write-Host "- Задачи по дополнению мира"
+Write-Host "- Дополнение мира"
 Write-Host "- Задачи по редактированию"
-```

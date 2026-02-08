@@ -30,6 +30,6 @@ function Get-ActiveStory {
   if ($storyDir) {
     return Split-Path $storyDir -Leaf
   }
-  # Если нет активной истории, вернуть имя по умолчанию
+  # Если историй нет, возвращаем имя по умолчанию
   return "story-$(Get-Date -Format 'yyyyMMdd')"
 }

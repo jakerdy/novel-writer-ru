@@ -10,7 +10,7 @@ Write-Host "🚀 Инициализация системы отслеживан�
 
 $root = Get-ProjectRoot
 $storyDir = Get-CurrentStoryDir
-if (-not $storyDir) { throw "Пожалуйста, сначала выполните /story и /outline, каталог stories/*/ не найден" }
+if (-not $storyDir) { throw "Пожалуйста, сначала завершите этапы /story и /outline, каталог stories/*/ не найден" }
 
 $storyName = Split-Path $storyDir -Leaf
 $specTrack = Join-Path $root "spec/tracking"
@@ -32,7 +32,7 @@ if (-not (Test-Path $plotPath)) {
     foreshadowing = @()
     conflicts = @{ active=@(); resolved=@(); upcoming=@() }
     checkpoints = @{ volumeEnd=@(); majorEvents=@() }
-    notes = @{ plotHoles=@(); inconsistencies=@(); reminders=@('Пожалуйста, обновляйте данные отслеживания в соответствии с фактическим содержанием истории') }
+    notes = @{ plotHoles=@(); inconsistencies=@(); reminders=@('Обновите данные отслеживания в соответствии с фактическим сюжетом') }
   } | ConvertTo-Json -Depth 12
   Set-Content -LiteralPath $plotPath -Value $plot -Encoding UTF8
 }
@@ -60,7 +60,7 @@ if (-not (Test-Path $relationsPath)) {
   $relations = @{
     novel = $storyName
     lastUpdated = $utc
-    characters = @{ 'Главный герой' = @{ name='Не определено'; relationships=@{ allies=@(); enemies=@(); romantic=@(); neutral=@() } } }
+    characters = @{ 'Главный герой' = @{ name='Установить'; relationships=@{ allies=@(); enemies=@(); romantic=@(); neutral=@() } } }
     factions = @{}
     relationshipChanges = @()
     currentTensions = @()
@@ -75,7 +75,7 @@ if (-not (Test-Path $charStatePath)) {
   $cs = @{
     novel = $storyName
     lastUpdated = $utc
-    characters = @{ 'Главный герой' = @{ name='Не определено'; status='Здоров'; location='Не определено'; possessions=@(); skills=@(); lastSeen=@{ chapter=0; description='Еще не появился' }; development=@{ physical=0; mental=0; emotional=0; power=0 } } }
+    characters = @{ 'Главный герой' = @{ name='Установить'; status='Здоров'; location='Не определено'; possessions=@(); skills=@(); lastSeen=@{ chapter=0; description='Еще не появился' }; development=@{ physical=0; mental=0; emotional=0; power=0 } } }
     groupPositions = @{}
     importantItems = @{}
   } | ConvertTo-Json -Depth 12
@@ -83,7 +83,7 @@ if (-not (Test-Path $charStatePath)) {
 }
 
 Write-Host ""
-Write-Host "✅ Система отслеживания успешно инициализирована!"
+Write-Host "✅ Система отслеживания инициализирована!"
 Write-Host ""
 Write-Host "📊 Созданы следующие файлы отслеживания:"
 Write-Host "   • spec/tracking/plot-tracker.json - Отслеживание сюжета"
@@ -92,6 +92,6 @@ Write-Host "   • spec/tracking/relationships.json - Сеть взаимоот�
 Write-Host "   • spec/tracking/character-state.json - Состояние персонажей"
 Write-Host ""
 Write-Host "💡 Следующие шаги:"
-Write-Host "   1. Используйте /write для начала написания (данные отслеживания будут обновляться автоматически)"
+Write-Host "   1. Используйте /write для начала написания (данные отслеживания будут обновлены автоматически)"
 Write-Host "   2. Регулярно используйте /track для просмотра сводного отчета"
 Write-Host "   3. Используйте команды, такие как /plot-check, для проверки на согласованность"

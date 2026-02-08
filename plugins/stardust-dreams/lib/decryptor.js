@@ -1,8 +1,7 @@
-```javascript
 /**
  * Дешифратор
- * Отвечает за дешифровку зашифрованных Prompt, полученных с сервера, в памяти
- * Принцип безопасности: результат дешифровки находится только в памяти, никогда не сохраняется
+ * Отвечает за расшифровку зашифрованных Prompt, полученных от сервера, в памяти.
+ * Принцип безопасности: результат расшифровки находится только в памяти, никогда не сохраняется.
  */
 
 import crypto from 'crypto';
@@ -17,24 +16,24 @@ export class Decryptor {
   }
 
   /**
-   * Дешифрует зашифрованный Prompt
-   * @param {Object} encryptedData - Объект, содержащий зашифрованные данные
-   * @param {string} encryptedData.encrypted - Зашифрованные данные в hex-кодировке
-   * @param {string} encryptedData.iv - IV в hex-кодировке
-   * @param {string} encryptedData.authTag - Тег аутентификации в hex-кодировке
-   * @param {string} sessionKey - Ключ сессии в hex-формате
-   * @returns {string} Дешифрованный Prompt (только в памяти)
+   * Расшифровывает зашифрованный Prompt.
+   * @param {Object} encryptedData - Объект, содержащий зашифрованные данные.
+   * @param {string} encryptedData.encrypted - Зашифрованные данные в hex-кодировке.
+   * @param {string} encryptedData.iv - IV в hex-кодировке.
+   * @param {string} encryptedData.authTag - Тег аутентификации в hex-кодировке.
+   * @param {string} sessionKey - Ключ сессии в формате hex.
+   * @returns {string} Расшифрованный Prompt (только в памяти).
    */
   async decrypt(encryptedData, sessionKey) {
     let decrypted = null;
 
     try {
-      // Проверка ввода
+      // Проверка входных данных
       if (!encryptedData || !encryptedData.encrypted || !encryptedData.iv || !encryptedData.authTag) {
         throw new Error('Неполные зашифрованные данные');
       }
 
-      // Преобразование из hex-формата в Buffer
+      // Преобразование из hex в Buffer
       const iv = Buffer.from(encryptedData.iv, 'hex');
       const authTag = Buffer.from(encryptedData.authTag, 'hex');
       const encrypted = Buffer.from(encryptedData.encrypted, 'hex');
@@ -57,13 +56,13 @@ export class Decryptor {
       const decipher = crypto.createDecipheriv(this.algorithm, key, iv);
       decipher.setAuthTag(authTag);
 
-      // Выполнение дешифровки
+      // Выполнение расшифровки
       let decrypted = decipher.update(encrypted, null, 'utf8');
       decrypted += decipher.final('utf8');
 
-      // Проверка результата дешифровки
+      // Проверка результата расшифровки
       if (!this.isValidPrompt(decrypted)) {
-        throw new Error('Недопустимый результат дешифровки');
+        throw new Error('Недопустимый результат расшифровки');
       }
 
       // Немедленный возврат, без сохранения
@@ -77,38 +76,38 @@ export class Decryptor {
 
       // Предоставление полезной информации в зависимости от типа ошибки
       if (error.message.includes('bad decrypt')) {
-        throw new Error('Ошибка дешифровки: неверный ключ или поврежденные данные');
+        throw new Error('Ошибка расшифровки: неверный ключ или поврежденные данные');
       } else if (error.message.includes('auth tag')) {
-        throw new Error('Ошибка дешифровки: проверка целостности данных не удалась');
+        throw new Error('Ошибка расшифровки: ошибка проверки целостности данных');
       } else {
-        throw new Error(`Ошибка дешифровки: ${error.message}`);
+        throw new Error(`Ошибка расшифровки: ${error.message}`);
       }
     }
   }
 
 
   /**
-   * Проверяет, является ли дешифрованный Prompt действительным
-   * Базовая проверка, чтобы убедиться, что это не мусор
+   * Проверяет, является ли расшифрованный Prompt действительным.
+   * Базовая проверка, чтобы убедиться, что это не случайный набор символов.
    */
   isValidPrompt(prompt) {
     if (!prompt || typeof prompt !== 'string') {
       return false;
     }
 
-    // Проверка наличия основных признаков Prompt
-    // Эти признаки должны быть общей частью всех Prompt
+    // Проверка на наличие основных признаков Prompt
+    // Эти признаки должны быть общими для всех Prompt
     const hasValidStructure =
       prompt.length > 10 && // Минимум определенной длины
-      prompt.includes('{{') && // Содержит плейсхолдеры параметров
+      prompt.includes('{{') && // Содержит заполнители параметров
       /[\u4e00-\u9fa5]/.test(prompt); // Содержит китайские символы
 
     return hasValidStructure;
   }
 
   /**
-   * Безопасно очищает конфиденциальные данные
-   * Освобождает ссылки на память как можно быстрее
+   * Безопасная очистка конфиденциальных данных.
+   * Освобождает ссылки на память как можно быстрее.
    */
   secureClear(data) {
     if (!data) return;
@@ -122,7 +121,7 @@ export class Decryptor {
         data.fill(0);
         data = null;
       } else if (typeof data === 'object') {
-        // Для объектов выполняет рекурсивную очистку
+        // Для объектов выполняем рекурсивную очистку
         Object.keys(data).forEach(key => {
           this.secureClear(data[key]);
           delete data[key];
@@ -130,12 +129,12 @@ export class Decryptor {
         data = null;
       }
     } catch (e) {
-      // Игнорировать ошибки очистки
+      // Игнорируем ошибки очистки
     }
   }
 
   /**
-   * Проверяет формат ключа сессии
+   * Проверяет формат ключа сессии.
    */
   isValidSessionKey(sessionKey) {
     if (!sessionKey || typeof sessionKey !== 'string') {
@@ -148,8 +147,8 @@ export class Decryptor {
 
 
   /**
-   * Оценивает размер после дешифровки
-   * Используется для управления памятью
+   * Оценивает размер данных после расшифровки.
+   * Используется для управления памятью.
    */
   estimateDecryptedSize(encryptedData) {
     // Base64 кодирование увеличивает размер примерно на 33%
@@ -160,18 +159,17 @@ export class Decryptor {
   }
 
   /**
-   * Проверяет, можно ли безопасно дешифровать
-   * Убеждается, что достаточно памяти
+   * Проверяет, можно ли безопасно выполнить расшифровку.
+   * Убеждается, что достаточно памяти.
    */
   canSafelyDecrypt(encryptedData) {
     const estimatedSize = this.estimateDecryptedSize(encryptedData);
     const memoryUsage = process.memoryUsage();
-    const availableMemory = 500 * 1024 * 1024; // Предполагаемый верхний предел в 500 МБ
+    const availableMemory = 500 * 1024 * 1024; // Предполагаем лимит в 500 МБ
 
     return (memoryUsage.heapUsed + estimatedSize) < availableMemory;
   }
 }
 
-// Экспорт одиночного экземпляра
+// Экспорт синглтона
 export const decryptor = new Decryptor();
-```

@@ -1,18 +1,17 @@
-```yaml
 name: novel-translate
 version: 1.0.0
-description: Плагин для перевода китайских романов на английский — поддержка перевода контента романа и локализационной доработки
+description: Плагин для перевода китайских романов на английский — поддержка перевода и локализации контента романов
 type: feature
 commands:
   - id: translate
     file: commands/translate.md
-    description: Перевести выбранное китайское содержимое на английский
+    description: Перевести китайский роман на английский
   - id: translate-chapter
     file: commands/translate-chapter.md
-    description: Пакетно перевести всю главу
+    description: Пакетно перевести целую главу
   - id: polish
     file: commands/polish.md
-    description: Отредактировать английский перевод, чтобы он лучше соответствовал родному английскому выражению
+    description: Отредактировать английский перевод, чтобы он звучал более естественно для носителей английского языка
 experts:
   - id: translate
     file: experts/translate.md
@@ -21,7 +20,7 @@ experts:
   - id: localize
     file: experts/localize.md
     title: Эксперт по локализации
-    description: Эксперт по культурной адаптации и локализационной доработке
+    description: Эксперт по культурной адаптации и локализации
 dependencies:
   core: ">=0.5.0"
 installation:
@@ -29,11 +28,10 @@ installation:
     ✅ Плагин перевода успешно установлен!
 
     Доступные команды:
-    - /translate - перевести выбранное китайское содержимое
-    - /translate-chapter - пакетно перевести всю главу
+    - /translate - перевести выделенный китайский текст
+    - /translate-chapter - пакетно перевести целую главу
     - /polish - отредактировать английский перевод
 
     Режим эксперта:
-    - используйте /expert translate для активации эксперта по переводу
-    - используйте /expert localize для активации эксперта по локализации
-```
+    - Активируйте эксперта по переводу командой /expert translate
+    - Активируйте эксперта по локализации командой /expert localize

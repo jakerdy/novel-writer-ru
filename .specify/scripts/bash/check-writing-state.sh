@@ -1,4 +1,3 @@
-```xml
 #!/bin/bash
 
 # Скрипт проверки состояния написания
@@ -10,7 +9,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
-# Проверка, включен ли режим checklist
+# Проверка, используется ли режим чек-листа
 CHECKLIST_MODE=false
 if [ "$1" = "--checklist" ]; then
     CHECKLIST_MODE=true
@@ -48,7 +47,7 @@ check_methodology_docs() {
         return 1
     fi
 
-    echo "✅ Документы методологии в полном порядке"
+    echo "✅ Документы методологии полны"
     return 0
 }
 
@@ -57,7 +56,7 @@ check_pending_tasks() {
     local tasks_file="$STORY_DIR/tasks.md"
 
     if [ ! -f "$tasks_file" ]; then
-        echo "❌ Файл задач отсутствует"
+        echo "❌ Файл задач не существует"
         return 1
     fi
 
@@ -68,9 +67,9 @@ check_pending_tasks() {
 
     echo ""
     echo "Статус задач:"
-    echo "  К выполнению: $pending"
-    echo "  В процессе: $in_progress"
-    echo "  Завершено: $completed"
+    echo "  Ожидают: $pending"
+    echo "  В работе: $in_progress"
+    echo "  Завершены: $completed"
 
     if [ $pending -eq 0 ] && [ $in_progress -eq 0 ]; then
         echo ""
@@ -79,9 +78,9 @@ check_pending_tasks() {
         return 0
     fi
 
-    # Отображение следующей задачи к выполнению
+    # Отображение следующей задачи для написания
     echo ""
-    echo "Следующая задача к выполнению:"
+    echo "Следующая задача для написания:"
     grep "^- \[ \]" "$tasks_file" | head -n 1 || echo "（Нет ожидающих задач）"
 }
 
@@ -105,7 +104,7 @@ check_completed_content() {
         if [ $chapter_count -gt 0 ]; then
             echo ""
             echo "Завершенные главы: $chapter_count"
-            echo "Требования к объему: ${min_words}-${max_words} слов"
+            echo "Требования к количеству слов: ${min_words}-${max_words} слов"
             echo ""
             echo "Последние записи:"
             for file in $(ls -t "$content_dir"/*.md 2>/dev/null | head -n 3); do
@@ -116,7 +115,7 @@ check_completed_content() {
                 if [ "$words" -lt "$min_words" ]; then
                     status="⚠️ Недостаточно слов"
                 elif [ "$words" -gt "$max_words" ]; then
-                    status="⚠️ Превышен объем"
+                    status="⚠️ Превышено количество слов"
                 fi
 
                 echo "  - $filename: $words слов $status"
@@ -128,7 +127,7 @@ check_completed_content() {
     fi
 }
 
-# Генерация вывода в формате checklist
+# Генерация вывода в формате чек-листа
 output_checklist() {
     local has_constitution=false
     local has_specification=false
@@ -167,7 +166,7 @@ output_checklist() {
     if [ -d "$content_dir" ]; then
         chapter_count=$(ls "$content_dir"/*.md 2>/dev/null | wc -l | tr -d ' ')
 
-        # Подсчет глав, не соответствующих требованиям по объему
+        # Подсчет глав, не соответствующих требованиям по количеству слов
         for file in "$content_dir"/*.md; do
             [ -f "$file" ] || continue
             local words=$(count_chinese_words "$file")
@@ -184,55 +183,55 @@ output_checklist() {
         completion_rate=$((completed * 100 / total_tasks))
     fi
 
-    # Вывод checklist
+    # Вывод чек-листа
     cat <<EOF
 # Чек-лист проверки состояния написания
 
 **Время проверки**: $(date '+%Y-%m-%d %H:%M:%S')
 **Текущая история**: $STORY_NAME
-**Стандарт объема**: ${min_words}-${max_words} слов
+**Стандарт количества слов**: ${min_words}-${max_words} слов
 
 ---
 
-## Полнота документации
+## Полнота документов
 
-- [$([ "$has_constitution" = true ] && echo "x" || echo " ")] CHK001 novel-constitution.md присутствует
-- [$([ "$has_specification" = true ] && echo "x" || echo " ")] CHK002 specification.md присутствует
-- [$([ "$has_plan" = true ] && echo "x" || echo " ")] CHK003 creative-plan.md присутствует
-- [$([ "$has_tasks" = true ] && echo "x" || echo " ")] CHK004 tasks.md присутствует
+- [$([ "$has_constitution" = true ] && echo "x" || echo " ")] CHK001 novel-constitution.md существует
+- [$([ "$has_specification" = true ] && echo "x" || echo " ")] CHK002 specification.md существует
+- [$([ "$has_plan" = true ] && echo "x" || echo " ")] CHK003 creative-plan.md существует
+- [$([ "$has_tasks" = true ] && echo "x" || echo " ")] CHK004 tasks.md существует
 
-## Прогресс выполнения задач
+## Прогресс по задачам
 
 EOF
 
     if [ "$has_tasks" = true ]; then
-        echo "- [$([ $in_progress -gt 0 ] && echo "x" || echo " ")] CHK005 Есть задачи в процессе выполнения ($in_progress шт.)"
-        echo "- [x] CHK006 Количество задач к выполнению ($pending шт.)"
-        echo "- [$([ $completed -gt 0 ] && echo "x" || echo " ")] CHK007 Прогресс выполнения задач ($completed/$total_tasks = $completion_rate%)"
+        echo "- [$([ $in_progress -gt 0 ] && echo "x" || echo " ")] CHK005 Есть задачи в работе（$in_progress шт.）"
+        echo "- [x] CHK006 Количество ожидающих задач（$pending шт.）"
+        echo "- [$([ $completed -gt 0 ] && echo "x" || echo " ")] CHK007 Прогресс выполнения задач（$completed/$total_tasks = $completion_rate%）"
     else
-        echo "- [ ] CHK005 Есть задачи в процессе выполнения (tasks.md отсутствует)"
-        echo "- [ ] CHK006 Количество задач к выполнению (tasks.md отсутствует)"
-        echo "- [ ] CHK007 Прогресс выполнения задач (tasks.md отсутствует)"
+        echo "- [ ] CHK005 Есть задачи в работе（tasks.md не существует）"
+        echo "- [ ] CHK006 Количество ожидающих задач（tasks.md не существует）"
+        echo "- [ ] CHK007 Прогресс выполнения задач（tasks.md не существует）"
     fi
 
     cat <<EOF
 
 ## Качество контента
 
-- [$([ $chapter_count -gt 0 ] && echo "x" || echo " ")] CHK008 Количество завершенных глав ($chapter_count шт.)
+- [$([ $chapter_count -gt 0 ] && echo "x" || echo " ")] CHK008 Количество завершенных глав（$chapter_count глав）
 EOF
 
     if [ $chapter_count -gt 0 ]; then
-        echo "- [$([ $bad_chapters -eq 0 ] && echo "x" || echo "!")] CHK009 Объем соответствует стандарту ($([ $bad_chapters -eq 0 ] && echo "Все соответствует" || echo "$bad_chapters шт. не соответствуют")）"
+        echo "- [$([ $bad_chapters -eq 0 ] && echo "x" || echo "!")] CHK009 Количество слов соответствует стандарту（$([ $bad_chapters -eq 0 ] && echo "Все соответствуют" || echo "$bad_chapters глав не соответствуют")）"
     else
-        echo "- [ ] CHK009 Объем соответствует стандарту (Написание еще не начато)"
+        echo "- [ ] CHK009 Количество слов соответствует стандарту（Написание еще не начато）"
     fi
 
     cat <<EOF
 
 ---
 
-## Последующие действия
+## Дальнейшие действия
 
 EOF
 
@@ -247,16 +246,16 @@ EOF
     # Проверка задач
     if [ $pending -gt 0 ] || [ $in_progress -gt 0 ]; then
         if [ $in_progress -gt 0 ]; then
-            echo "- [ ] Продолжить выполнение задач в процессе ($in_progress шт.)"
+            echo "- [ ] Продолжить выполнение текущих задач（$in_progress шт.）"
         else
-            echo "- [ ] Начать выполнение следующей задачи к выполнению (всего $pending шт.)"
+            echo "- [ ] Начать следующую задачу для написания（Всего $pending шт.）"
         fi
         has_actions=true
     fi
 
     # Проверка качества глав
     if [ $bad_chapters -gt 0 ]; then
-        echo "- [ ] Исправить главы с несоответствующим объемом ($bad_chapters шт.)"
+        echo "- [ ] Исправить главы, не соответствующие требованиям по количеству слов（$bad_chapters шт.）"
         has_actions=true
     fi
 
@@ -275,13 +274,13 @@ EOF
 ---
 
 **Инструмент проверки**: check-writing-state.sh
-**Версия**: 1.1 (поддержка вывода checklist)
+**Версия**: 1.1 (поддержка вывода чек-листа)
 EOF
 }
 
 # Основной процесс
 main() {
-    # В режиме checklist вывод осуществляется напрямую и скрипт завершается
+    # Режим чек-листа: вывод и выход
     if [ "$CHECKLIST_MODE" = true ]; then
         output_checklist
         exit 0
@@ -301,8 +300,7 @@ main() {
     check_completed_content
 
     echo ""
-    echo "Готово к началу написания"
+    echo "Готово к написанию"
 }
 
 main
-```

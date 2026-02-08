@@ -1,5 +1,4 @@
-```powershell
-# Определение спецификации истории
+# Скрипт определения спецификаций истории
 # Используется для команды /specify
 
 param(
@@ -28,7 +27,7 @@ if ([string]::IsNullOrEmpty($StoryName)) {
         }
     }
 
-    # Если все еще нет, генерация имени по умолчанию
+    # Если всё ещё нет, генерация имени по умолчанию
     if ([string]::IsNullOrEmpty($StoryName)) {
         $StoryName = "story-$(Get-Date -Format 'yyyyMMdd')"
     }
@@ -63,7 +62,7 @@ if ($Json) {
     } | ConvertTo-Json
 }
 else {
-    Write-Host "Инициализация спецификации истории"
+    Write-Host "Инициализация спецификаций истории"
     Write-Host "================================"
     Write-Host "Имя истории: $StoryName"
     Write-Host "Путь к спецификации: $SpecFile"
@@ -81,4 +80,3 @@ else {
         Write-Host "✅ Обнаружена конституция для творчества, спецификация будет соответствовать принципам конституции" -ForegroundColor Green
     }
 }
-```

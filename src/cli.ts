@@ -1,4 +1,3 @@
-```json
 #!/usr/bin/env node
 
 import { Command } from '@commander-js/extra-typings';
@@ -17,7 +16,6 @@ import {
   selectWritingMethod,
   selectScriptType,
   confirmExpertMode,
-  displayStep,
   isInteractive
 } from './utils/interactive.js';
 
@@ -26,7 +24,7 @@ const __dirname = path.dirname(__filename);
 
 const program = new Command();
 
-// AI 平台配置 - 所有支持的平台
+// Конфигурация AI-платформы — все поддерживаемые платформы
 interface AIConfig {
   name: string;
   dir: string;
@@ -51,25 +49,25 @@ const AI_CONFIGS: AIConfig[] = [
   { name: 'q', dir: '.amazonq', commandsDir: 'prompts', displayName: 'Amazon Q Developer' }
 ];
 
-// 辅助函数：处理命令模板生成 Markdown 格式
+// Вспомогательная функция: генерация Markdown-команд из шаблона
 function generateMarkdownCommand(template: string, scriptPath: string): string {
-  // 直接替换 {SCRIPT} 并返回完整内容，保留所有 frontmatter 包括 scripts 部分
+  // Заменяем {SCRIPT} и возвращаем полное содержимое, сохраняя все frontmatter, включая раздел scripts
   return template.replace(/{SCRIPT}/g, scriptPath);
 }
 
-// 辅助函数：生成 TOML 格式命令
+// Вспомогательная функция: генерация TOML-команд из шаблона
 function generateTomlCommand(template: string, scriptPath: string): string {
-  // 提取 description
+  // Извлекаем description
   const descMatch = template.match(/description:\s*(.+)/);
-  const description = descMatch ? descMatch[1].trim() : '命令说明';
+  const description = descMatch ? descMatch[1].trim() : 'Описание команды';
 
-  // 移除 YAML frontmatter
+  // Удаляем YAML frontmatter
   const content = template.replace(/^---[\s\S]*?---\n/, '');
 
-  // 替换 {SCRIPT}
+  // Заменяем {SCRIPT}
   const processedContent = content.replace(/{SCRIPT}/g, scriptPath);
 
-  // 规范化换行符，避免 Windows CRLF 导致 TOML 解析失败
+  // Нормализуем символы новой строки, чтобы избежать ошибок парсинга TOML из-за CRLF в Windows
   const normalizedContent = processedContent.replace(/\r\n/g, '\n');
   const promptValue = JSON.stringify(normalizedContent);
   const escapedDescription = description
@@ -82,12 +80,12 @@ prompt = ${promptValue}
 `;
 }
 
-// 显示欢迎横幅
+// Отображение приветственного баннера
 function displayBanner(): void {
   const banner = `
 ╔═══════════════════════════════════════╗
 ║     📚  Novel Writer  📝              ║
-║     AI 驱动的中文小说创作工具        ║
+║     AI-驱动的中文小说创作工具        ║
 ╚═══════════════════════════════════════╝
 `;
   console.log(chalk.cyan(banner));
@@ -98,62 +96,62 @@ displayBanner();
 
 program
   .name('novel')
-  .description(chalk.cyan('Novel Writer - AI 驱动的中文小说创作工具初始化'))
-  .version(getVersion(), '-v, --version', '显示版本号')
-  .helpOption('-h, --help', '显示帮助信息');
+  .description(chalk.cyan('Novel Writer - AI-驱动的中文小说创作工具初始化'))
+  .version(getVersion(), '-v, --version', 'Показать номер версии')
+  .helpOption('-h, --help', 'Показать справку');
 
-// init 命令 - 初始化小说项目（类似 specify init）
+// Команда init — инициализация нового проекта романа (аналогично specify init)
 program
   .command('init')
-  .argument('[name]', '小说项目名称')
-  .option('--here', '在当前目录初始化')
-  .option('--ai <type>', '选择 AI 助手: claude | cursor | gemini | windsurf | roocode | copilot | qwen | opencode | codex | kilocode | auggie | codebuddy | q')
-  .option('--all', '为所有支持的 AI 助手生成配置')
-  .option('--method <type>', '选择写作方法: three-act | hero-journey | story-circle | seven-point | pixar | snowflake')
-  .option('--no-git', '跳过 Git 初始化')
-  .option('--with-experts', '包含专家模式')
-  .option('--plugins <names>', '预装插件，逗号分隔')
-  .description('初始化一个新的小说项目')
+  .argument('[name]', 'Название проекта романа')
+  .option('--here', 'Инициализировать в текущем каталоге')
+  .option('--ai <type>', 'Выбрать AI-ассистента: claude | cursor | gemini | windsurf | roocode | copilot | qwen | opencode | codex | kilocode | auggie | codebuddy | q')
+  .option('--all', 'Сгенерировать конфигурацию для всех поддерживаемых AI-ассистентов')
+  .option('--method <type>', 'Выбрать метод написания: three-act | hero-journey | story-circle | seven-point | pixar | snowflake')
+  .option('--no-git', 'Пропустить инициализацию Git')
+  .option('--with-experts', 'Включить режим эксперта')
+  .option('--plugins <names>', 'Предустановленные плагины, разделенные запятыми')
+  .description('Инициализировать новый проект романа')
   .action(async (name, options) => {
-    // 如果是交互式终端且没有明确指定参数，显示交互选择
+    // Если используется интерактивный терминал и параметры не указаны явно, показать интерактивный выбор
     const shouldShowInteractive = isInteractive() && !options.all;
     const needsAISelection = shouldShowInteractive && !options.ai;
     const needsMethodSelection = shouldShowInteractive && !options.method;
     const needsExpertConfirm = shouldShowInteractive && !options.withExperts;
 
     if (needsAISelection || needsMethodSelection || needsExpertConfirm) {
-      // 显示项目横幅
+      // Отобразить баннер проекта
       displayProjectBanner();
 
       let stepCount = 0;
       const totalSteps = 4;
 
-      // 交互式选择 AI 助手
+      // Интерактивный выбор AI-ассистента
       if (needsAISelection) {
         stepCount++;
-        displayStep(stepCount, totalSteps, '选择 AI 助手');
+        displayStep(stepCount, totalSteps, 'Выбор AI-ассистента');
         options.ai = await selectAIAssistant(AI_CONFIGS);
         console.log('');
       }
 
-      // 交互式选择写作方法
+      // Интерактивный выбор метода написания
       if (needsMethodSelection) {
         stepCount++;
-        displayStep(stepCount, totalSteps, '选择写作方法');
+        displayStep(stepCount, totalSteps, 'Выбор метода написания');
         options.method = await selectWritingMethod();
         console.log('');
       }
 
-      // 交互式选择脚本类型
+      // Интерактивный выбор типа скрипта
       stepCount++;
-      displayStep(stepCount, totalSteps, '选择脚本类型');
+      displayStep(stepCount, totalSteps, 'Выбор типа скрипта');
       const selectedScriptType = await selectScriptType();
       console.log('');
 
-      // 交互式确认专家模式
+      // Интерактивное подтверждение режима эксперта
       if (needsExpertConfirm) {
         stepCount++;
-        displayStep(stepCount, totalSteps, '专家模式');
+        displayStep(stepCount, totalSteps, 'Режим эксперта');
         const enableExperts = await confirmExpertMode();
         if (enableExperts) {
           options.withExperts = true;
@@ -162,32 +160,32 @@ program
       }
     }
 
-    // 设置默认值（如果没有通过交互或参数指定）
+    // Установка значений по умолчанию (если не указаны через интерактивный ввод или параметры)
     if (!options.ai) options.ai = 'claude';
     if (!options.method) options.method = 'three-act';
 
-    const spinner = ora('正在初始化小说项目...').start();
+    const spinner = ora('Инициализация проекта романа...').start();
 
     try {
-      // 确定项目路径
+      // Определение пути к проекту
       let projectPath: string;
       if (options.here) {
         projectPath = process.cwd();
         name = path.basename(projectPath);
       } else {
         if (!name) {
-          spinner.fail('请提供项目名称或使用 --here 参数');
+          spinner.fail('Пожалуйста, укажите название проекта или используйте параметр --here');
           process.exit(1);
         }
         projectPath = path.join(process.cwd(), name);
         if (await fs.pathExists(projectPath)) {
-          spinner.fail(`项目目录 "${name}" 已存在`);
+          spinner.fail(`Каталог проекта "${name}" уже существует`);
           process.exit(1);
         }
         await fs.ensureDir(projectPath);
       }
 
-      // 创建基础项目结构
+      // Создание базовой структуры проекта
       const baseDirs = [
         '.specify',
         '.specify/memory',
@@ -205,10 +203,10 @@ program
         await fs.ensureDir(path.join(projectPath, dir));
       }
 
-      // 根据 AI 类型创建特定目录
+      // Создание специфичных каталогов в зависимости от типа AI
       const aiDirs: string[] = [];
       if (options.all) {
-        // 创建所有 AI 目录
+        // Создание каталогов для всех AI
         aiDirs.push(
           '.claude/commands',
           '.cursor/commands',
@@ -226,7 +224,7 @@ program
           '.amazonq/prompts'
         );
       } else {
-        // 根据选择的 AI 创建目录
+        // Создание каталогов для выбранного AI
         switch(options.ai) {
           case 'claude':
             aiDirs.push('.claude/commands');
@@ -274,7 +272,7 @@ program
         await fs.ensureDir(path.join(projectPath, dir));
       }
 
-      // 创建基础配置文件
+      // Создание базового файла конфигурации
       const config = {
         name,
         type: 'novel',
@@ -286,7 +284,7 @@ program
 
       await fs.writeJson(path.join(projectPath, '.specify', 'config.json'), config, { spaces: 2 });
 
-      // 从构建产物复制 AI 配置和命令文件
+      // Копирование конфигурации AI и файлов команд из сборки
       const packageRoot = path.resolve(__dirname, '..');
       const scriptsDir = path.join(packageRoot, 'scripts');
       const sourceMap: Record<string, string> = {
@@ -305,7 +303,7 @@ program
         'q': 'dist/q'
       };
 
-      // 确定需要复制的 AI 平台
+      // Определение целевых AI для копирования
       const targetAI: string[] = [];
       if (options.all) {
         targetAI.push('claude', 'gemini', 'cursor', 'windsurf', 'roocode', 'copilot', 'qwen', 'opencode', 'codex', 'kilocode', 'auggie', 'codebuddy', 'q');
@@ -313,26 +311,25 @@ program
         targetAI.push(options.ai);
       }
 
-      // 复制 AI 配置目录（包含命令文件和 .specify 目录）
+      // Копирование каталогов конфигурации AI (включая файлы команд и каталог .specify)
       for (const ai of targetAI) {
         const sourceDir = path.join(packageRoot, sourceMap[ai]);
         if (await fs.pathExists(sourceDir)) {
-          // 复制整个构建产物目录到项目
+          // Копирование всего каталога сборки в проект
           await fs.copy(sourceDir, projectPath, { overwrite: false });
-          spinner.text = `已安装 ${ai} 配置...`;
+          spinner.text = `Установка конфигурации ${ai}...`;
         } else {
-          console.log(chalk.yellow(`\n警告: ${ai} 构建产物未找到，请运行 npm run build:commands`));
+          console.log(chalk.yellow(`\nПредупреждение: Сборка ${ai} не найдена. Пожалуйста, выполните npm run build:commands`));
         }
       }
 
-      // 复制脚本文件到用户项目的 .specify/scripts 目录（构建产物已包含）
-      // 注意：.specify 目录已由上面的 fs.copy 复制，此处仅作为备份逻辑
+      // Копирование файлов скриптов в каталог .specify/scripts пользовательского проекта (уже включено в сборку)
+      // Примечание: каталог .specify уже скопирован выше через fs.copy, здесь только резервная логика
       if (await fs.pathExists(scriptsDir) && !await fs.pathExists(path.join(projectPath, '.specify', 'scripts'))) {
         const userScriptsDir = path.join(projectPath, '.specify', 'scripts');
         await fs.copy(scriptsDir, userScriptsDir);
 
-        // 设置 bash 脚本执行权限
-```
+        // Установка прав на выполнение для bash-скриптов
         const bashDir = path.join(userScriptsDir, 'bash');
         if (await fs.pathExists(bashDir)) {
           const bashFiles = await fs.readdir(bashDir);
@@ -345,28 +342,28 @@ program
         }
       }
 
-      // Копирование файлов шаблонов в директорию .specify/templates
+      // Копирование файлов шаблонов в каталог .specify/templates
       const fullTemplatesDir = path.join(packageRoot, 'templates');
       if (await fs.pathExists(fullTemplatesDir)) {
         const userTemplatesDir = path.join(projectPath, '.specify', 'templates');
         await fs.copy(fullTemplatesDir, userTemplatesDir);
       }
 
-      // Копирование файлов memory в директорию .specify/memory
+      // Копирование файлов memory в каталог .specify/memory
       const memoryDir = path.join(packageRoot, 'memory');
       if (await fs.pathExists(memoryDir)) {
         const userMemoryDir = path.join(projectPath, '.specify', 'memory');
         await fs.copy(memoryDir, userMemoryDir);
       }
 
-      // Копирование шаблонов отслеживания в директорию spec/tracking
+      // Копирование шаблонов файлов отслеживания в каталог spec/tracking
       const trackingTemplatesDir = path.join(packageRoot, 'templates', 'tracking');
       if (await fs.pathExists(trackingTemplatesDir)) {
         const userTrackingDir = path.join(projectPath, 'spec', 'tracking');
         await fs.copy(trackingTemplatesDir, userTrackingDir);
       }
 
-      // Копирование шаблонов базы знаний в директорию spec/knowledge
+      // Копирование шаблонов базы знаний в каталог spec/knowledge
       const knowledgeTemplatesDir = path.join(packageRoot, 'templates', 'knowledge');
       if (await fs.pathExists(knowledgeTemplatesDir)) {
         const userKnowledgeDir = path.join(projectPath, 'spec', 'knowledge');
@@ -385,20 +382,20 @@ program
         }
       }
 
-      // Копирование структуры директории spec (включая пресеты и спецификации для обнаружения ИИ)
+      // Копирование структуры каталога spec (включая пресеты и спецификации для защиты от ИИ)
       // Примечание: сборка уже включает spec/presets и т. д., это резервный вариант для обеспечения полноты
       const specDir = path.join(packageRoot, 'spec');
       if (await fs.pathExists(specDir)) {
         const userSpecDir = path.join(projectPath, 'spec');
 
-        // Обход и копирование всех поддиректорий spec
+        // Перебор и копирование всех подкаталогов spec
         const specItems = await fs.readdir(specDir);
         for (const item of specItems) {
           const sourcePath = path.join(specDir, item);
           const targetPath = path.join(userSpecDir, item);
 
-          // presets, checklists, config.json и т. д. копируются напрямую (без перезаписи существующих)
-          // tracking и knowledge уже скопированы из templates ранее, пропускаем
+          // presets, checklists, config.json и т. д. копируются напрямую (не перезаписывая существующие)
+          // tracking и knowledge уже скопированы ранее из templates, пропускаем
           if (item !== 'tracking' && item !== 'knowledge') {
             await fs.copy(sourcePath, targetPath, { overwrite: false });
           }
@@ -436,16 +433,16 @@ program
 
       // Если указан --with-experts, копирование файлов экспертов и команды expert
       if (options.withExperts) {
-        spinner.text = 'Установка режима экспертов...';
+        spinner.text = 'Установка режима эксперта...';
 
-        // Копирование директории экспертов
+        // Копирование каталога экспертов
         const expertsSourceDir = path.join(packageRoot, 'experts');
         if (await fs.pathExists(expertsSourceDir)) {
           const userExpertsDir = path.join(projectPath, 'experts');
           await fs.copy(expertsSourceDir, userExpertsDir);
         }
 
-        // Копирование команды expert в каждую директорию AI
+        // Копирование команды expert в каждый каталог AI
         const expertCommandSource = path.join(packageRoot, 'templates', 'commands', 'expert.md');
         if (await fs.pathExists(expertCommandSource)) {
           const expertContent = await fs.readFile(expertCommandSource, 'utf-8');
@@ -455,17 +452,17 @@ program
               const expertPath = path.join(projectPath, aiDir, 'expert.md');
               await fs.writeFile(expertPath, expertContent);
             }
-            // Windsurf использует директорию workflows
+            // Windsurf использует каталог workflows
             if (aiDir.includes('windsurf')) {
               const expertPath = path.join(projectPath, aiDir, 'expert.md');
               await fs.writeFile(expertPath, expertContent);
             }
-            // Roo Code использует директорию Markdown команд
+            // Roo Code использует каталог Markdown команд
             if (aiDir.includes('.roo')) {
               const expertPath = path.join(projectPath, aiDir, 'expert.md');
               await fs.writeFile(expertPath, expertContent);
             }
-            // Обработка формата Gemini
+            // Обработка Gemini
             if (aiDir.includes('gemini')) {
               const expertPath = path.join(projectPath, aiDir, 'expert.toml');
               const expertToml = generateTomlCommand(expertContent, '');
@@ -511,7 +508,7 @@ program
 # Кэш ИИ
 .ai-cache/
 
-# Модули Node
+# Узлы модулей
 node_modules/
 `;
           await fs.writeFile(path.join(projectPath, '.gitignore'), gitignore);
@@ -519,7 +516,7 @@ node_modules/
           execSync('git add .', { cwd: projectPath, stdio: 'ignore' });
           execSync('git commit -m "Инициализация проекта романа"', { cwd: projectPath, stdio: 'ignore' });
         } catch {
-          console.log(chalk.yellow('\nПодсказка: Инициализация Git не удалась, но проект успешно создан'));
+          console.log(chalk.yellow('\nПодсказка: Инициализация Git не удалась, но проект создан успешно'));
         }
       }
 
@@ -530,7 +527,7 @@ node_modules/
       console.log(chalk.gray('─────────────────────────────'));
 
       if (!options.here) {
-        console.log(`  1. ${chalk.white(`cd ${name}`)} - перейти в директорию проекта`);
+        console.log(`  1. ${chalk.white(`cd ${name}`)} - Перейти в каталог проекта`);
       }
 
       const aiName = {
@@ -550,48 +547,48 @@ node_modules/
       }[options.ai] || 'AI-помощник';
 
       if (options.all) {
-        console.log(`  2. ${chalk.white('Открыть проект в любом AI-помощнике (Claude Code, Cursor, Gemini, Windsurf, Roo Code, GitHub Copilot, Qwen Code, OpenCode, Codex CLI, Kilo Code, Auggie CLI, CodeBuddy, Amazon Q Developer)')}`);
+        console.log(`  2. ${chalk.white('Открыть проект в любом из AI-помощников (Claude Code, Cursor, Gemini, Windsurf, Roo Code, GitHub Copilot, Qwen Code, OpenCode, Codex CLI, Kilo Code, Auggie CLI, CodeBuddy, Amazon Q Developer)')}`);
       } else {
         console.log(`  2. ${chalk.white(`Открыть проект в ${aiName}`)}`);
       }
       console.log(`  3. Используйте следующие команды с косой чертой для начала работы:`);
 
-      console.log('\n' + chalk.yellow('     📝 Семишаговый метод:'));
-      console.log(`     ${chalk.cyan('/constitution')} - создать конституцию для написания, определяющую основные принципы`);
-      console.log(`     ${chalk.cyan('/specify')}      - определить спецификации истории, уточнить, что нужно создать`);
-      console.log(`     ${chalk.cyan('/clarify')}      - прояснить ключевые точки принятия решений, устранить двусмысленность`);
-      console.log(`     ${chalk.cyan('/plan')}         - разработать технический план, решить, как писать`);
-      console.log(`     ${chalk.cyan('/tasks')}        - разбить на исполнимые задачи, создать список выполнимых задач`);
-      console.log(`     ${chalk.cyan('/write')}        - AI-ассистент для написания глав`);
-      console.log(`     ${chalk.cyan('/analyze')}      - комплексный анализ и проверка, обеспечение согласованности качества`);
+      console.log('\n' + chalk.yellow('     📝 Семишаговая методология:'));
+      console.log(`     ${chalk.cyan('/constitution')} - Создать конституцию проекта, определяющую основные принципы`);
+      console.log(`     ${chalk.cyan('/specify')}      - Определить спецификации истории, уточняя, что нужно создать`);
+      console.log(`     ${chalk.cyan('/clarify')}      - Прояснить ключевые точки принятия решений, устраняя неопределенности`);
+      console.log(`     ${chalk.cyan('/plan')}         - Разработать технический план, определив, как создавать`);
+      console.log(`     ${chalk.cyan('/tasks')}        - Разбить задачи на выполнимые списки`);
+      console.log(`     ${chalk.cyan('/write')}        - AI-ассистированное написание глав`);
+      console.log(`     ${chalk.cyan('/analyze')}      - Комплексный анализ и проверка для обеспечения качества`);
 
       console.log('\n' + chalk.yellow('     📊 Команды управления отслеживанием:'));
-      console.log(`     ${chalk.cyan('/plot-check')}  - проверить согласованность сюжета`);
-      console.log(`     ${chalk.cyan('/timeline')}    - управлять временной шкалой истории`);
-      console.log(`     ${chalk.cyan('/relations')}   - отслеживать отношения между персонажами`);
-      console.log(`     ${chalk.cyan('/world-check')} - проверить настройки мира`);
-      console.log(`     ${chalk.cyan('/track')}       - комплексное отслеживание и интеллектуальный анализ`);
+      console.log(`     ${chalk.cyan('/plot-check')}  - Проверить согласованность сюжета`);
+      console.log(`     ${chalk.cyan('/timeline')}    - Управлять временной шкалой истории`);
+      console.log(`     ${chalk.cyan('/relations')}   - Отслеживать отношения персонажей`);
+      console.log(`     ${chalk.cyan('/world-check')} - Проверить соответствие сеттинга`);
+      console.log(`     ${chalk.cyan('/track')}       - Комплексное отслеживание и интеллектуальный анализ`);
 
-      // Если установлен режим экспертов, отобразить подсказку
+      // Если установлен режим эксперта, отобразить подсказку
       if (options.withExperts) {
-        console.log('\n' + chalk.yellow('     🎓 Режим экспертов:'));
-        console.log(`     ${chalk.cyan('/expert')}       - показать доступных экспертов`);
-        console.log(`     ${chalk.cyan('/expert plot')} - эксперт по структуре сюжета`);
-        console.log(`     ${chalk.cyan('/expert character')} - эксперт по созданию персонажей`);
+        console.log('\n' + chalk.yellow('     🎓 Режим эксперта:'));
+        console.log(`     ${chalk.cyan('/expert')}       - Показать доступных экспертов`);
+        console.log(`     ${chalk.cyan('/expert plot')} - Эксперт по структуре сюжета`);
+        console.log(`     ${chalk.cyan('/expert character')} - Эксперт по созданию персонажей`);
       }
 
-      // Если установлены плагины, отобразить команды плагинов
+      // Если установлены плагины, отобразить команду плагина
       if (options.plugins) {
         const installedPlugins = options.plugins.split(',').map((p: string) => p.trim());
         if (installedPlugins.includes('translate')) {
           console.log('\n' + chalk.yellow('     🌍 Плагин перевода:'));
-          console.log(`     ${chalk.cyan('/translate')}   - перевод с китайского на английский`);
-          console.log(`     ${chalk.cyan('/polish')}      - полировка английского текста`);
+          console.log(`     ${chalk.cyan('/translate')}   - Перевод с китайского на английский`);
+          console.log(`     ${chalk.cyan('/polish')}      - Редактирование английского текста`);
         }
       }
 
       console.log('\n' + chalk.gray('Рекомендуемый порядок: constitution → specify → clarify → plan → tasks → write → analyze'));
-      console.log(chalk.dim('Примечание: команды с косой чертой используются внутри AI-помощника, а не в терминале'));
+      console.log(chalk.dim('Подсказка: команды с косой чертой используются внутри AI-помощника, а не в терминале'));
 
     } catch (error) {
       spinner.fail(chalk.red('Инициализация проекта не удалась'));
@@ -600,7 +597,7 @@ node_modules/
     }
   });
 
-// команда check - проверка окружения
+// Команда check - проверка окружения
 program
   .command('check')
   .description('Проверить системное окружение и инструменты ИИ')
@@ -627,7 +624,7 @@ program
 
     const hasAI = checks.slice(2).some(c => c.installed);
     if (!hasAI) {
-      console.log('\n' + chalk.yellow('Предупреждение: Не обнаружены инструменты ИИ-помощника'));
+      console.log('\n' + chalk.yellow('Предупреждение: Инструменты AI-помощников не обнаружены'));
       console.log('Пожалуйста, установите один из следующих инструментов:');
       console.log('  • Claude: https://claude.ai');
       console.log('  • Cursor: https://cursor.sh');
@@ -638,7 +635,7 @@ program
     }
   });
 
-// команда plugins - управление плагинами
+// Команда plugins — управление плагинами
 program
   .command('plugins')
   .description('Управление плагинами')
@@ -649,7 +646,7 @@ program
     console.log('  novel plugins add <name>        - Установить плагин');
     console.log('  novel plugins remove <name>     - Удалить плагин');
     console.log('\n' + chalk.gray('Доступные плагины:'));
-    console.log('  translate         - Плагин для перевода между китайским и английским');
+    console.log('  translate         - Плагин для перевода с китайского на английский');
     console.log('  authentic-voice   - Плагин для написания текстов с использованием реального голоса');
   });
 
@@ -672,11 +669,11 @@ program
 
       console.log(chalk.cyan('\n📦 Установленные плагины\n'));
       console.log(chalk.gray(`Проект: ${path.basename(projectPath)}`));
-      console.log(chalk.gray(`Конфигурация ИИ: ${projectInfo.installedAI.join(', ') || 'нет'}\n`));
+      console.log(chalk.gray(`Конфигурация AI: ${projectInfo.installedAI.join(', ') || 'Нет'}\n`));
 
       if (plugins.length === 0) {
-        console.log(chalk.yellow('Плагинов пока нет'));
-        console.log(chalk.gray('\nИспользуйте "novel plugins:add <name>" для установки плагинов'));
+        console.log(chalk.yellow('Плагины не найдены'));
+        console.log(chalk.gray('\nИспользуйте "novel plugins:add <name>" для установки плагина'));
         console.log(chalk.gray('Доступные плагины: translate, authentic-voice, book-analysis, genre-knowledge\n'));
         return;
       }
@@ -697,11 +694,11 @@ program
     } catch (error: any) {
       if (error.message === 'NOT_IN_PROJECT') {
         console.log(chalk.red('\n❌ Текущий каталог не является проектом novel-writer'));
-        console.log(chalk.gray('   Пожалуйста, выполните эту команду в корневом каталоге проекта\n'));
+        console.log(chalk.gray('   Запустите эту команду в корневом каталоге проекта\n'));
         process.exit(1);
       }
 
-      console.error(chalk.red('❌ Не удалось перечислить плагины:'), error);
+      console.error(chalk.red('❌ Ошибка при выводе списка плагинов:'), error);
       process.exit(1);
     }
   });
@@ -722,7 +719,7 @@ program
 
       console.log(chalk.cyan('\n📦 Установка плагина Novel Writer\n'));
       console.log(chalk.gray(`Версия проекта: ${projectInfo.version}`));
-      console.log(chalk.gray(`Конфигурация ИИ: ${projectInfo.installedAI.join(', ') || 'нет'}\n`));
+      console.log(chalk.gray(`Конфигурация AI: ${projectInfo.installedAI.join(', ') || 'Нет'}\n`));
 
       // 2. Найти плагин
       const packageRoot = path.resolve(__dirname, '..');
@@ -731,16 +728,16 @@ program
       if (!await fs.pathExists(builtinPluginPath)) {
         console.log(chalk.red(`❌ Плагин ${name} не найден\n`));
         console.log(chalk.gray('Доступные плагины:'));
-        console.log(chalk.gray('  - translate (плагин для перевода за рубеж)'));
-        console.log(chalk.gray('  - authentic-voice (плагин для реального голоса)'));
+        console.log(chalk.gray('  - translate (плагин для перевода с китайского на английский)'));
+        console.log(chalk.gray('  - authentic-voice (плагин для написания текстов с использованием реального голоса)'));
         console.log(chalk.gray('  - book-analysis (плагин для анализа книг)'));
-        console.log(chalk.gray('  - genre-knowledge (плагин для знаний по жанрам)'));
+        console.log(chalk.gray('  - genre-knowledge (плагин для знаний о жанрах)'));
         process.exit(1);
       }
 
       // 3. Прочитать конфигурацию плагина
       const pluginConfigPath = path.join(builtinPluginPath, 'config.yaml');
-      const yaml = (await import('js-yaml')).default;
+      const yaml = await import('js-yaml');
       const pluginConfigContent = await fs.readFile(pluginConfigPath, 'utf-8');
       const pluginConfig = yaml.load(pluginConfigContent) as any;
 
@@ -757,10 +754,10 @@ program
       }
 
       if (projectInfo.installedAI.length > 0) {
-        console.log(chalk.gray(`Целевой ИИ: ${projectInfo.installedAI.join(', ')}\n`));
+        console.log(chalk.gray(`Целевой AI: ${projectInfo.installedAI.join(', ')}\n`));
       } else {
-        console.log(chalk.yellow('\n⚠️  Каталог конфигурации ИИ не обнаружен'));
-        console.log(chalk.gray('   Плагин будет скопирован, но команды не будут внедрены ни на одну ИИ-платформу\n'));
+        console.log(chalk.yellow('\n⚠️  Каталог конфигурации AI не обнаружен'));
+        console.log(chalk.gray('   Плагин будет скопирован, но команды не будут внедрены ни на одну AI-платформу\n'));
       }
 
       // 5. Установить плагин
@@ -789,11 +786,11 @@ program
     } catch (error: any) {
       if (error.message === 'NOT_IN_PROJECT') {
         console.log(chalk.red('\n❌ Текущий каталог не является проектом novel-writer'));
-        console.log(chalk.gray('   Пожалуйста, выполните эту команду в корневом каталоге проекта или используйте novel init для создания нового проекта\n'));
+        console.log(chalk.gray('   Запустите эту команду в корневом каталоге проекта или используйте novel init для создания нового проекта\n'));
         process.exit(1);
       }
 
-      console.log(chalk.red('\n❌ Не удалось установить плагин'));
+      console.log(chalk.red('\n❌ Ошибка при установке плагина'));
       console.error(chalk.gray(error.message || error));
       console.log('');
       process.exit(1);
@@ -818,7 +815,7 @@ program
 
       console.log(chalk.cyan('\n📦 Удаление плагина Novel Writer\n'));
       console.log(chalk.gray(`Подготовка к удалению плагина: ${name}`));
-      console.log(chalk.gray(`Конфигурация ИИ: ${projectInfo.installedAI.join(', ') || 'нет'}\n`));
+      console.log(chalk.gray(`Конфигурация AI: ${projectInfo.installedAI.join(', ') || 'Нет'}\n`));
 
       const spinner = ora('Удаление плагина...').start();
       await pluginManager.removePlugin(name);
@@ -826,11 +823,11 @@ program
     } catch (error: any) {
       if (error.message === 'NOT_IN_PROJECT') {
         console.log(chalk.red('\n❌ Текущий каталог не является проектом novel-writer'));
-        console.log(chalk.gray('   Пожалуйста, выполните эту команду в корневом каталоге проекта\n'));
+        console.log(chalk.gray('   Запустите эту команду в корневом каталоге проекта\n'));
         process.exit(1);
       }
 
-      console.log(chalk.red('\n❌ Не удалось удалить плагин'));
+      console.log(chalk.red('\n❌ Ошибка при удалении плагина'));
       console.error(chalk.gray(error.message || error));
       console.log('');
       process.exit(1);
@@ -928,7 +925,7 @@ async function updateCommands(
     if (await fs.pathExists(sourceDir)) {
       const targetDir = path.join(projectPath, aiConfig.dir);
 
-      // Копирование каталога команд
+      // Копировать каталог с файлами команд
       const sourceCommandsDir = path.join(sourceDir, aiConfig.dir, aiConfig.commandsDir);
       const targetCommandsDir = path.join(targetDir, aiConfig.commandsDir);
 
@@ -937,7 +934,7 @@ async function updateCommands(
           await fs.copy(sourceCommandsDir, targetCommandsDir, { overwrite: true });
         }
 
-        // Подсчет файлов команд
+        // Подсчитать количество файлов команд
         const commandFiles = await fs.readdir(sourceCommandsDir);
         const cmdCount = commandFiles.filter(f =>
           f.endsWith('.md') || f.endsWith('.toml')
@@ -961,7 +958,7 @@ async function updateCommands(
         }
       }
     } else {
-      console.log(chalk.yellow(`  ⚠ Сборка артефактов не найдена для ${aiConfig?.displayName || ai}`));
+      console.log(chalk.yellow(`  ⚠ Сборка не найдена для ${aiConfig?.displayName || ai}`));
     }
   }
 
@@ -1070,7 +1067,7 @@ async function updateMemory(
 }
 
 /**
- * Обновление каталога spec (включая пресеты, спецификации анти-AI детектирования и т. д.)
+ * Обновление каталога spec (включая presets, правила анти-AI детекции и т. д.)
  */
 async function updateSpec(
   projectPath: string,
@@ -1088,8 +1085,8 @@ async function updateSpec(
   let count = 0;
 
   if (!dryRun) {
-    // Перебор каталога spec, обновление только presets, checklists, config.json и т. д.
-    // Не перезаписывать tracking и knowledge (данные пользователя)
+    // Обход каталога spec, обновление только presets, checklists, config.json и т. д.
+    // Не перезаписывать tracking и knowledge (пользовательские данные)
     const specItems = await fs.readdir(specSource);
     for (const item of specItems) {
       if (item !== 'tracking' && item !== 'knowledge') {
@@ -1287,20 +1284,20 @@ function displayUpgradeReport(
 
   if (backupPath) {
     console.log(chalk.gray(`\n📦 Местоположение резервной копии: ${backupPath}`));
-    console.log('   Для отката удалите текущие файлы и восстановите из резервной копии');
+    console.log(chalk.gray('   Для отката удалите текущие файлы и восстановите из резервной копии'));
   }
 
   console.log(chalk.cyan('\n✨ Обновление включает:'));
-  console.log('  • Правила анти-AI детектирования: Руководство по написанию с 0% AI-концентрацией, основанное на реальных тестах Zhuque');
-  console.log('  • Улучшения экспертного режима: Основные экспертные системы (персонажи, сюжет, стиль, мировоззрение)');
+  console.log('  • Правила анти-AI детекции: Руководство по написанию с 0% ИИ-концентрацией, протестированное на реальных данных Zhuque');
+  console.log('  • Улучшения экспертного режима: Основная экспертная система (персонажи, сюжет, стиль, мировоззрение)');
   console.log('  • Контроль температуры ИИ: Добавлены инструкции по усилению творчества в команду write');
   console.log('  • Поддержка нескольких платформ: Обновлены команды для всех 13 платформ ИИ');
 
-  console.log(chalk.gray('\n📚 Просмотр подробного руководства по обновлению: docs/upgrade-guide.md'));
+  console.log(chalk.gray('\n📚 Просмотрите подробное руководство по обновлению: docs/upgrade-guide.md'));
   console.log(chalk.gray('   Или посетите: https://github.com/wordflowlab/novel-writer/blob/main/docs/upgrade-guide.md'));
 }
 
-// команда upgrade - обновление существующего проекта
+// Команда upgrade - обновление существующего проекта
 program
   .command('upgrade')
   .option('--ai <type>', 'Указать конфигурацию ИИ для обновления: claude | cursor | gemini | windsurf | roocode | copilot | qwen | opencode | codex | kilocode | auggie | codebuddy | q')
@@ -1314,8 +1311,8 @@ program
   .option('--memory', 'Обновить только файлы памяти')
   .option('-y, --yes', 'Пропустить подтверждение')
   .option('--no-backup', 'Пропустить резервное копирование')
-  .option('--dry-run', 'Предварительный просмотр обновляемого контента, без фактических изменений')
-  .description('Обновление существующего проекта до последней версии')
+  .option('--dry-run', 'Предварительный просмотр обновлений без фактического изменения')
+  .description('Обновить существующий проект до последней версии')
   .action(async (options) => {
     const projectPath = process.cwd();
     const packageRoot = path.resolve(__dirname, '..');
@@ -1324,9 +1321,8 @@ program
       // 1. Проверка проекта
       const configPath = path.join(projectPath, '.specify', 'config.json');
       if (!await fs.pathExists(configPath)) {
-```typescript
         console.log(chalk.red('❌ Текущий каталог не является проектом novel-writer'));
-        console.log(chalk.gray('   Пожалуйста, выполните эту команду в корневом каталоге проекта или используйте novel init для создания нового проекта'));
+        console.log(chalk.gray('   Запустите эту команду в корневом каталоге проекта или используйте novel init для создания нового проекта'));
         process.exit(1);
       }
 
@@ -1338,7 +1334,7 @@ program
       console.log(chalk.gray(`Текущая версия: ${projectVersion}`));
       console.log(chalk.gray(`Целевая версия: ${getVersion()}\n`));
 
-      // 2. Обнаружение установленных конфигураций ИИ
+      // 2. Определение установленных конфигураций ИИ
       const installedAI: string[] = [];
       for (const aiConfig of AI_CONFIGS) {
         if (await fs.pathExists(path.join(projectPath, aiConfig.dir))) {
@@ -1358,7 +1354,7 @@ program
 
       console.log(chalk.green('✓') + ' Обнаружены конфигурации ИИ: ' + displayNames.join(', '));
 
-      // 3. Определение конфигураций ИИ для обновления
+      // 3. Определение целевых конфигураций ИИ для обновления
       let targetAI = installedAI;
       if (options.ai) {
         if (!installedAI.includes(options.ai)) {
@@ -1376,16 +1372,16 @@ program
         return config?.displayName || name;
       });
 
-      console.log(chalk.cyan(`\nЦели обновления: ${targetDisplayNames.join(', ')}\n`));
+      console.log(chalk.cyan(`\nЦель обновления: ${targetDisplayNames.join(', ')}\n`));
 
-      // 4. Определение обновляемого содержимого
+      // 4. Определение обновляемого контента
       let updateContent: UpdateContent;
 
       if (options.interactive) {
         // Интерактивный выбор
         updateContent = await selectUpdateContentInteractive();
       } else {
-        // Определение содержимого для обновления на основе опций
+        // Определение контента для обновления на основе опций
         const hasSpecificOption = options.commands || options.scripts || options.spec || options.experts || options.templates || options.memory;
 
         updateContent = {
@@ -1398,7 +1394,7 @@ program
         };
       }
 
-      // Отображение обновляемого содержимого
+      // Отображение обновляемого контента
       const updateList: string[] = [];
       if (updateContent.commands) updateList.push('файлы команд');
       if (updateContent.scripts) updateList.push('файлы скриптов');
@@ -1407,7 +1403,7 @@ program
       if (updateContent.templates) updateList.push('файлы шаблонов');
       if (updateContent.memory) updateList.push('файлы памяти');
 
-      console.log(chalk.cyan(`Обновляемое содержимое: ${updateList.join(', ')}\n`));
+      console.log(chalk.cyan(`Обновляемый контент: ${updateList.join(', ')}\n`));
 
       if (options.dryRun) {
         console.log(chalk.yellow('🔍 Режим предварительного просмотра (файлы не будут изменены)\n'));
@@ -1420,7 +1416,7 @@ program
           {
             type: 'confirm',
             name: 'proceed',
-            message: 'Подтвердить выполнение обновления?',
+            message: 'Подтвердите выполнение обновления?',
             default: true
           }
         ]);
@@ -1495,24 +1491,24 @@ program
     }
   });
 
-// Команда info — просмотр информации о методах (простая версия)
+// Команда info - просмотр информации о методах (простая версия)
 program
   .command('info')
   .description('Просмотр доступных методов письма')
   .action(() => {
     console.log(chalk.cyan('\n📚 Доступные методы письма:\n'));
-    console.log(chalk.yellow('  Трехактная структура') + ' — классическая структура истории, подходит для большинства жанров');
-    console.log(chalk.yellow('  Путешествие героя') + ' — 12-этапное путешествие роста, подходит для фэнтези и приключений');
-    console.log(chalk.yellow('  Круг историй') + ' — 8-этапная циклическая структура, подходит для историй, ориентированных на персонажей');
-    console.log(chalk.yellow('  Семиточечная структура') + ' — компактная структура сюжета, подходит для триллеров и детективов');
-    console.log(chalk.yellow('  Формула Пиксар') + ' — простой и мощный шаблон истории, подходит для коротких рассказов');
-    console.log(chalk.yellow('  Десять шагов снежинки') + ' — систематическое пошаговое планирование, подходит для детального построения');
-    console.log('\n' + chalk.gray('Подсказка: Используйте команду /method в помощнике ИИ для интеллектуального выбора'));
-    console.log(chalk.gray('ИИ поймет ваши потребности в ходе диалога и порекомендует наиболее подходящий метод'));
-    console.log(chalk.gray('Система отслеживания будет автоматически обновляться во время письма для синхронизации данных'));
+    console.log(chalk.yellow('  Структура из трех актов') + ' - Классическая структура истории, подходит для большинства жанров');
+    console.log(chalk.yellow('  Путешествие героя') + ' - 12-этапное путешествие роста, подходит для фэнтези и приключений');
+    console.log(chalk.yellow('  Круг историй') + ' - 8-этапная циклическая структура, подходит для историй, ориентированных на персонажей');
+    console.log(chalk.yellow('  Семиточечная структура') + ' - Компактная структура сюжета, подходит для триллеров и детективов');
+    console.log(chalk.yellow('  Формула Пиксар') + ' - Простой и мощный шаблон истории, подходит для коротких рассказов');
+    console.log(chalk.yellow('  Снежинка в десять шагов') + ' - Систематическое пошаговое планирование, подходит для детального построения');
+    console.log('\n' + chalk.gray('Подсказка: Используйте команду /method в ИИ-помощнике для интеллектуального выбора'));
+    console.log(chalk.gray('ИИ-помощник поймет ваши потребности через диалог и порекомендует наиболее подходящий метод'));
+    console.log(chalk.gray('Система отслеживания будет автоматически обновляться во время написания для синхронизации данных'));
   });
 
-// Пользовательская справка
+// Пользовательская помощь
 program.on('--help', () => {
   console.log('');
   console.log(chalk.yellow('Примеры использования:'));
@@ -1522,9 +1518,9 @@ program.on('--help', () => {
   console.log('  $ novel check                    # Проверить окружение');
   console.log('  $ novel info                     # Просмотреть методы письма');
   console.log('');
-  console.log(chalk.cyan('Основные команды для творчества:'));
+  console.log(chalk.cyan('Основные команды для создания контента:'));
   console.log('  /method      - Интеллектуальный выбор метода письма (рекомендуется выполнить первым)');
-  console.log('  /style       - Установка стиля и руководящих принципов письма');
+  console.log('  /style       - Установка стиля и правил письма');
   console.log('  /story       - Создание синопсиса истории (с использованием выбранного метода)');
   console.log('  /outline     - Планирование структуры глав (на основе шаблона метода)');
   console.log('  /track-init  - Инициализация системы отслеживания');
@@ -1539,11 +1535,10 @@ program.on('--help', () => {
   console.log(chalk.gray('Дополнительная информация: https://github.com/wordflowlab/novel-writer'));
 });
 
-// Разбор аргументов командной строки
+// Парсинг аргументов командной строки
 program.parse(process.argv);
 
-// Если не указана ни одна команда, показать справку
+// Если не указана ни одна команда, отобразить справку
 if (!process.argv.slice(2).length) {
   program.outputHelp();
 }
-```

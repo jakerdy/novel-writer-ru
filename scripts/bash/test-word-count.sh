@@ -1,49 +1,48 @@
-```bash
 #!/bin/bash
 
-# 测试中文字数统计功能
-# 用于验证 count_chinese_words 函数的准确性
+# Тестирование функции подсчета китайских слов
+# Используется для проверки точности функции count_chinese_words
 
 set -e
 
-# Source common functions
+# Источник общих функций
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
-# 颜色输出
+# Цветовой вывод
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+NC='\033[0m' # Нет цвета
 
 echo "========================================"
-echo "中文字数统计功能测试"
+echo "Тестирование функции подсчета китайских слов"
 echo "========================================"
 echo ""
 
-# 创建临时测试文件
+# Создание временного тестового каталога
 TEST_DIR=$(mktemp -d)
 trap "rm -rf $TEST_DIR" EXIT
 
-# 测试用例1: 纯中文文本
-echo "## 测试1: 纯中文文本"
+# Тестовый случай 1: Только китайский текст
+echo "## Тест 1: Только китайский текст"
 cat > "$TEST_DIR/test1.md" << 'EOF'
 今天天气很好，我去公园散步。
 看到很多人在锻炼身体。
 EOF
 expected1=16
 actual1=$(count_chinese_words "$TEST_DIR/test1.md")
-echo "  预期字数: $expected1"
-echo "  实际字数: $actual1"
+echo "  Ожидаемое количество слов: $expected1"
+echo "  Фактическое количество слов: $actual1"
 if [ "$actual1" -eq "$expected1" ]; then
-    echo -e "  ${GREEN}✅ 测试通过${NC}"
+    echo -e "  ${GREEN}✅ Тест пройден${NC}"
 else
-    echo -e "  ${RED}❌ 测试失败${NC}"
+    echo -e "  ${RED}❌ Тест не пройден${NC}"
 fi
 echo ""
 
-# 测试用例2: 包含Markdown标记
-echo "## 测试2: 包含Markdown标记的文本"
+# Тестовый случай 2: Текст с разметкой Markdown
+echo "## Тест 2: Текст с разметкой Markdown"
 cat > "$TEST_DIR/test2.md" << 'EOF'
 # 第一章
 
@@ -54,38 +53,38 @@ cat > "$TEST_DIR/test2.md" << 'EOF'
 
 > 这是引用
 EOF
-# 实际内容: 第一章这是重要的内容列表项1列表项2这是引用
+# Фактический контент (без пробелов и пунктуации): 第一章这是重要的内容列表项1列表项2这是引用
 expected2=21
 actual2=$(count_chinese_words "$TEST_DIR/test2.md")
-echo "  预期字数: $expected2"
-echo "  实际字数: $actual2"
+echo "  Ожидаемое количество слов: $expected2"
+echo "  Фактическое количество слов: $actual2"
 if [ "$actual2" -eq "$expected2" ]; then
-    echo -e "  ${GREEN}✅ 测试通过${NC}"
+    echo -e "  ${GREEN}✅ Тест пройден${NC}"
 else
-    echo -e "  ${YELLOW}⚠️ 字数差异: $((actual2 - expected2))${NC}"
+    echo -e "  ${YELLOW}⚠️ Разница в количестве слов: $((actual2 - expected2))${NC}"
 fi
 echo ""
 
-# 测试用例3: 中英混合
-echo "## 测试3: 中英文混合文本"
+# Тестовый случай 3: Смешанный китайско-английский текст
+echo "## Тест 3: Смешанный китайско-английский текст"
 cat > "$TEST_DIR/test3.md" << 'EOF'
 这是一个测试test文件。
 包含123数字和English单词。
 EOF
-# 实际内容（移除空格和标点后）: 这是一个测试test文件包含123数字和English单词
+# Фактический контент (без пробелов и пунктуации): 这是一个测试test文件包含123数字和English单词
 expected3=27
 actual3=$(count_chinese_words "$TEST_DIR/test3.md")
-echo "  预期字数: 约$expected3"
-echo "  实际字数: $actual3"
+echo "  Ожидаемое количество слов: около $expected3"
+echo "  Фактическое количество слов: $actual3"
 if [ "$actual3" -ge 20 ] && [ "$actual3" -le 35 ]; then
-    echo -e "  ${GREEN}✅ 测试通过（在合理范围内）${NC}"
+    echo -e "  ${GREEN}✅ Тест пройден (в разумных пределах)${NC}"
 else
-    echo -e "  ${YELLOW}⚠️ 字数差异较大${NC}"
+    echo -e "  ${YELLOW}⚠️ Значительная разница в количестве слов${NC}"
 fi
 echo ""
 
-# 测试用例4: 包含代码块
-echo "## 测试4: 包含代码块的文本"
+# Тестовый случай 4: Текст с блоками кода
+echo "## Тест 4: Текст с блоками кода"
 cat > "$TEST_DIR/test4.md" << 'EOF'
 这是正常文本。
 
@@ -97,17 +96,17 @@ console.log("这是代码不应该被计数");
 EOF
 expected4=12
 actual4=$(count_chinese_words "$TEST_DIR/test4.md")
-echo "  预期字数: $expected4"
-echo "  实际字数: $actual4"
+echo "  Ожидаемое количество слов: $expected4"
+echo "  Фактическое количество слов: $actual4"
 if [ "$actual4" -eq "$expected4" ]; then
-    echo -e "  ${GREEN}✅ 测试通过${NC}"
+    echo -e "  ${GREEN}✅ Тест пройден${NC}"
 else
-    echo -e "  ${YELLOW}⚠️ 字数差异: $((actual4 - expected4))${NC}"
+    echo -e "  ${YELLOW}⚠️ Разница в количестве слов: $((actual4 - expected4))${NC}"
 fi
 echo ""
 
-# 对比测试: wc -w vs 新方法
-echo "## 对比测试: wc -w vs count_chinese_words"
+# Сравнительный тест: wc -w vs новый метод
+echo "## Сравнительный тест: wc -w vs count_chinese_words"
 cat > "$TEST_DIR/compare.md" << 'EOF'
 这是一个包含大约五十个字的测试文本。
 我们需要验证字数统计的准确性。
@@ -117,13 +116,13 @@ cat > "$TEST_DIR/compare.md" << 'EOF'
 EOF
 wc_result=$(wc -w < "$TEST_DIR/compare.md" | tr -d ' ')
 new_result=$(count_chinese_words "$TEST_DIR/compare.md")
-echo "  wc -w 结果: $wc_result （不准确）"
-echo "  新方法结果: $new_result （准确）"
-echo -e "  ${YELLOW}注意：wc -w 对中文统计极不准确！${NC}"
+echo "  Результат wc -w: $wc_result (неточно)"
+echo "  Результат нового метода: $new_result (точно)"
+echo -e "  ${YELLOW}Примечание: wc -w крайне неточно подсчитывает китайские слова!${NC}"
 echo ""
 
-# 性能测试
-echo "## 性能测试: 大文件处理"
+# Тест производительности
+echo "## Тест производительности: Обработка большого файла"
 cat > "$TEST_DIR/large.md" << 'EOF'
 # 第一章：开始
 
@@ -154,31 +153,30 @@ EOF
 start_time=$(date +%s%N)
 large_count=$(count_chinese_words "$TEST_DIR/large.md")
 end_time=$(date +%s%N)
-elapsed=$((($end_time - $start_time) / 1000000)) # 转换为毫秒
+elapsed=$(($((end_time - start_time)) / 1000000)) # Преобразование в миллисекунды
 
-echo "  文件字数: $large_count"
-echo "  处理时间: ${elapsed}ms"
+echo "  Количество слов в файле: $large_count"
+echo "  Время обработки: ${elapsed}ms"
 if [ "$elapsed" -lt 1000 ]; then
-    echo -e "  ${GREEN}✅ 性能良好${NC}"
+    echo -e "  ${GREEN}✅ Производительность хорошая${NC}"
 else
-    echo -e "  ${YELLOW}⚠️ 处理时间较长${NC}"
+    echo -e "  ${YELLOW}⚠️ Время обработки довольно долгое${NC}"
 fi
 echo ""
 
-# 总结
+# Заключение
 echo "========================================"
-echo "测试完成！"
+echo "Тестирование завершено!"
 echo "========================================"
 echo ""
-echo -e "${GREEN}核心功能：${NC}"
-echo "  ✓ 准确统计中文字符"
-echo "  ✓ 排除Markdown标记"
-echo "  ✓ 排除代码块"
-echo "  ✓ 处理混合文本"
+echo -e "${GREEN}Основные функции:${NC}"
+echo "  ✓ Точный подсчет китайских символов"
+echo "  ✓ Исключение разметки Markdown"
+echo "  ✓ Исключение блоков кода"
+echo "  ✓ Обработка смешанного текста"
 echo ""
-echo -e "${YELLOW}使用建议：${NC}"
-echo "  • 不要使用 'wc -w' 统计中文字数"
-echo "  • 使用 'count_chinese_words' 函数获得准确结果"
-echo "  • 在写作完成后验证字数是否达标"
+echo -e "${YELLOW}Рекомендации по использованию:${NC}"
+echo "  • Не используйте 'wc -w' для подсчета китайских слов"
+echo "  • Используйте функцию 'count_chinese_words' для получения точного результата"
+echo "  • Проверяйте количество слов после завершения написания"
 echo ""
-```

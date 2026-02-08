@@ -1,4 +1,3 @@
-```bash
 #!/usr/bin/env bash
 # Общая библиотека функций
 
@@ -53,7 +52,7 @@ create_numbered_dir() {
 
     mkdir -p "$base_dir"
 
-    # Найти максимальный номер
+    # Найти наивысший номер
     highest=0
     for dir in "$base_dir"/*; do
         [ -d "$dir" ] || continue
@@ -88,4 +87,3 @@ ensure_file() {
         fi
     fi
 }
-```

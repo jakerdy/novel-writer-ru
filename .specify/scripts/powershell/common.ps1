@@ -1,4 +1,3 @@
-```powershell
 #!/usr/bin/env pwsh
 # Общие функции (PowerShell)
 
@@ -14,7 +13,7 @@ function Get-ProjectRoot {
     if (-not $parent -or $parent -eq $current) { break }
     $current = $parent
   }
-  throw "Корневой каталог проекта не найден (отсутствует .specify/config.json)"
+  throw "Не удалось найти корневой каталог проекта (отсутствует .specify/config.json)"
 }
 
 function Get-CurrentStoryDir {
@@ -25,4 +24,3 @@ function Get-CurrentStoryDir {
   if ($dirs.Count -gt 0) { return $dirs[0].FullName }
   return $null
 }
-```

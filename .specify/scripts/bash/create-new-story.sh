@@ -1,4 +1,3 @@
-```bash
 #!/usr/bin/env bash
 # Создание нового проекта истории
 
@@ -32,7 +31,7 @@ STORIES_DIR="$PROJECT_ROOT/stories"
 # Создание каталога истории с нумерацией
 STORY_NUM=$(create_numbered_dir "$STORIES_DIR" "story")
 
-# Генерация имени каталога истории (по аналогии с spec-kit)
+# Генерация имени каталога истории (по аналогии со spec-kit)
 STORY_NAME=$(echo "$STORY_DESCRIPTION" | tr '[:upper:]' '[:lower:]' | \
     sed 's/[^a-z0-9]/-/g' | sed 's/-\+/-/g' | \
     sed 's/^-//' | sed 's/-$//')
@@ -43,7 +42,7 @@ if [ -n "$STORY_NAME" ]; then
     STORY_NAME="$WORDS"
 fi
 
-# Если после обработки имя пустое (например, описание только на китайском), использовать имя по умолчанию
+# Если после обработки имя пустое (например, чисто китайское описание), использовать имя по умолчанию
 if [ -z "$STORY_NAME" ]; then
     STORY_NAME="story"
 fi
@@ -73,4 +72,3 @@ else
     echo "STORY_NUM: $STORY_NUM"
     echo "STORY_DIR: $STORY_DIR"
 fi
-```

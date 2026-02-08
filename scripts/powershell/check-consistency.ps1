@@ -8,7 +8,7 @@ $ErrorActionPreference = 'Stop'
 
 $root = Get-ProjectRoot
 $storyDir = Get-CurrentStoryDir
-if (-not $storyDir) { throw "Проект истории (stories/*) не найден" }
+if (-not $storyDir) { throw "Не найден проект истории (stories/*)" }
 
 $progress = Join-Path $storyDir "progress.json"
 $plot = Join-Path $storyDir "spec/tracking/plot-tracker.json"
@@ -50,10 +50,10 @@ function Check-ChapterConsistency {
     Check "Синхронизация номеров глав" ($pCh -eq $plCh) "progress($pCh) != plot-tracker($plCh)"
     if (Test-Path $charState) {
       $cs = Get-Content -LiteralPath $charState -Raw -Encoding UTF8 | ConvertFrom-Json
-      # Поле protagonist в примере структуры нестабильно, откатываемся к characters->主角
+      # В примере структуры поле protagonist нестабильно, откатываемся к characters->主角
       $csCh = [int]($cs.protagonist.currentStatus.chapter)
       if (-not $csCh) { $csCh = [int]($cs.characters.'主角'.lastSeen.chapter) }
-      if ($csCh) { Check "Синхронизация глав в состоянии персонажа" ($pCh -eq $csCh) "Несоответствие с character-state($csCh)" }
+      if ($csCh) { Check "Синхронизация глав состояния персонажа" ($pCh -eq $csCh) "Несоответствие с character-state($csCh)" }
     }
   } else { Warn "Некоторые файлы отслеживания отсутствуют, невозможно завершить проверку глав" }
   Write-Host ""
@@ -75,7 +75,7 @@ function Check-TimelineConsistency {
 }
 
 function Check-CharacterConsistency {
-  Write-Host "👥 Проверка разумности состояния персонажей"
+  Write-Host "👥 Проверка достоверности состояния персонажей"
   Write-Host "─────────────────────"
   if ((Test-Path $charState) -and (Test-Path $rels)) {
     $cs = Get-Content -LiteralPath $charState -Raw -Encoding UTF8 | ConvertFrom-Json

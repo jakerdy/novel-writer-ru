@@ -12,7 +12,7 @@ $ARGUMENTS
 
 ## Goal
 
-Define the story like a Product Requirements Document (PRD), clarifying "what to create" rather than "how to create." Output specifications with the tag `[Needs Clarification]` to leave room for subsequent clarification steps.
+Define the story like a Product Requirements Document (PRD), clarifying "what to create" rather than "how to create." Output specifications marked with `[Needs Clarification]` to allow space for subsequent clarification steps.
 
 ## Execution Steps
 
@@ -27,15 +27,15 @@ Run `{SCRIPT}` to get path information:
 
 If `memory/novel-constitution.md` exists:
 - Load constitutional principles
-- Ensure the specifications align with constitutional values
-- Reference relevant principles in the specifications
+- Ensure the specification aligns with constitutional values
+- Reference relevant principles in the specification
 
 ### 3. Create Story Specification Document
 
 Create the specification using the following structure:
 
 ```markdown
-# Story Specification
+# Story Specification Document
 
 ## Metadata
 - Story Name: [Name]
@@ -47,27 +47,27 @@ Create the specification using the following structure:
 ## I. Story Synopsis
 
 ### One-Sentence Story (Elevator Pitch)
-[Core story description within 30 characters]
+[Describe the core of the story in under 30 words]
 
-### Story Introduction (100-200 characters)
-[Expanded description, including main conflict and hints of the ending]
+### Story Introduction (100-200 words)
+[Expand on the description, including the main conflict and hints of the ending]
 
 ### Core Themes
 - Theme: [e.g., "Growth," "Redemption," "Revenge"]
 - Deeper Meaning: [What do you want to convey?]
 - Emotional Core: [What do you want the reader to feel?]
 
-## II. Target Audience
+## II. Target Audience & Positioning
 
 ### Target Reader Persona
 - Age Group: [Needs Clarification: Specific age range]
 - Gender Tendency: [Needs Clarification: Male-oriented/Female-oriented/General]
 - Reading Level: [Needs Clarification: Beginner/Intermediate/Advanced]
 - Genre Preference: [Fantasy/Urban/Historical, etc.]
-- Reading Scenario: [Fragmented time/In-depth reading]
+- Reading Scenario: [Fragmented time/Deep reading]
 
 ### Market Positioning
-- Genre Tags: [Main Tag] + [Sub Tag]
+- Genre Tags: [Primary Tag] + [Secondary Tag]
 - Competitor Analysis: Similar to [Work 1]'s [Feature] + [Work 2]'s [Feature]
 - Differentiation: [Needs Clarification: What is the core selling point?]
 
@@ -80,15 +80,15 @@ Create the specification using the following structure:
 - Business Goals: [If applicable]
 
 ### Quality Standards
-- Logical Consistency: Must/Should have no obvious loopholes
+- Logical Consistency: [Must/Should] be free of obvious plot holes
 - Character Depth: Protagonist has [X] layers, supporting characters have [Y] layers
-- Plot Pacing: [Needs Clarification: Conflict in every chapter/Allow transitional chapters]
+- Plot Pacing: [Needs Clarification: Conflict in every chapter/Allow for transition chapters]
 - Writing Quality: [Needs Clarification: Easy to understand/Literary/Professional]
 
 ### Reader Feedback Metrics
 - Target Rating: [If applicable]
-- Engagement Rate: [Comment/Favorite Ratio]
-- Completion Rate: [Desired reader completion rate]
+- Engagement Rate: [Ratio of comments/favorites]
+- Completion Rate: [Desired reader completion percentage]
 
 ## IV. Core Requirements
 
@@ -96,50 +96,50 @@ Create the specification using the following structure:
 1. [Core Plot Element 1]
 2. [Core Character Relationship]
 3. [Core Conflict Setup]
-4. [Essential World-building Element]
+4. [Essential World-Building Element]
 
 ### Should-Haves (P1)
-1. [Elements to Enhance Experience]
-2. [Content to Deepen Themes]
-3. [Subplots to Enrich Characters]
+1. [Elements that enhance the experience]
+2. [Content that deepens the theme]
+3. [Subplots that enrich characters]
 
 ### Could-Haves (P2)
-1. [Nice-to-have Elements]
-2. [Optional Subplots]
-3. [Bonus Easter Eggs]
+1. [Nice-to-have elements]
+2. [Optional subplots]
+3. [Bonus Easter eggs]
 
 ## V. Constraints
 
 ### Content Red Lines
 - Absolutely Prohibited: [e.g., Illegal content]
 - Avoid: [e.g., Sensitive topics]
-- Handle with Care: [Needs Clarification: How to handle relationships?]
+- Handle with Care: [Needs Clarification: How to handle romantic relationships]
 
 ### Creative Constraints
 - Knowledge Limitations: [Needs Clarification: Is specialized knowledge required?]
-- Time Limitations: [Completion Deadline]
+- Time Limitations: [Deadline for completion]
 - Resource Limitations: [e.g., Required reference materials]
 
 ### Technical Constraints
 - Publishing Platform: [Needs Clarification: Web novel platform/Publication/Self-media]
-- Format Requirements: [Chapter length, etc.]
+- Formatting Requirements: [Chapter length, etc.]
 - Update Requirements: [Fixed times, etc.]
 
 ## VI. Risk Assessment
 
 ### Creative Risks
 - Writing Difficulty: [Needs Clarification: Where are the challenges?]
-- Inspiration Burnout: [How to cope?]
-- Logical Loopholes: [Complexity assessment]
+- Inspiration Burnout: [How to cope]
+- Plot Holes: [Complexity assessment]
 
 ### Market Risks
-- Homogenization: [How to differentiate?]
+- Homogenization: [How to differentiate]
 - Reader Acceptance: [Needs Clarification: Is the innovation excessive?]
 - Timeliness: [Will the theme become outdated?]
 
-## VII. Key Decision Points [Needs Clarification]
+## VII. Core Decision Points [Needs Clarification]
 
-The following key decisions need to be clarified in the `/clarify` phase:
+The following key decisions need to be clarified during the `/clarify` phase:
 1. [Decision 1: e.g., Is the protagonist hot-blooded or calm?]
 2. [Decision 2: e.g., Is the ending open or complete?]
 3. [Decision 3: e.g., Is the narrative single-threaded or multi-threaded?]
@@ -149,7 +149,7 @@ The following key decisions need to be clarified in the `/clarify` phase:
 ## VIII. Verification Checklist
 
 - [ ] Story synopsis is clear and concise
-- [ ] Target reader is accurately defined
+- [ ] Target audience is accurately defined
 - [ ] Success criteria are measurable
 - [ ] Core requirements are listed
 - [ ] Constraints are identified
@@ -158,31 +158,31 @@ The following key decisions need to be clarified in the `/clarify` phase:
 
 ## Appendix: References
 
-### Sources of Inspiration
+### Inspiration Sources
 - [Source 1]
 - [Source 2]
 
 ### Reference Works
-- [Work 1]: Referencing its [Feature]
-- [Work 2]: Referencing its [Feature]
+- [Work 1]: Refer to its [Feature]
+- [Work 2]: Refer to its [Feature]
 
 ### Additional Notes
-[Anything else that needs to be stated]
+[Any other necessary explanations]
 ```
 
 ### 4. Mark Points Needing Clarification
 
-Mark all decision points in the specification that require further clarification:
-- Use the format `[Needs Clarification: Specific Question]`
+Mark all decision points that require further clarification in the specification:
+- Use the format `[Needs Clarification: Specific question]`
 - Ensure 5-10 key decision points are marked
-- These will be handled in the `/clarify` step
+- These will be addressed in the `/clarify` step
 
 ### 5. Version Management
 
 - Initial Version: 1.0.0 (Draft)
 - After Clarification: 1.1.0 (Clarified)
 - After Planning: 1.2.0 (Confirmed)
-- In Progress: 2.0.0 (In Progress)
+- In Progress: 2.0.0 (Execution)
 
 ### 6. Output and Save
 
@@ -194,7 +194,7 @@ Mark all decision points in the specification that require further clarification
 
 ### Focus on WHAT, Not HOW
 - ✅ Correct: "Need a villain that readers will hate"
-- ❌ Incorrect: "The villain appears in Chapter 3 and uses a flashback technique"
+- ❌ Incorrect: "The villain appears in Chapter 3 and uses a flashback"
 
 ### Maintain Specification Flexibility
 - Leave room for clarification
@@ -202,8 +202,8 @@ Mark all decision points in the specification that require further clarification
 - Mark all uncertain points
 
 ### Relationship with Subsequent Steps
-- `/clarify` will handle all `[Needs Clarification]` tags
-- `/plan` will create a technical solution based on the clarified specifications
-- `/analyze` will verify if the implementation meets the specifications
+- `/clarify` will handle all `[Needs Clarification]` marks
+- `/plan` will create a technical solution based on the clarified specification
+- `/analyze` will verify if the implementation meets the specification
 
-Remember: **Specifications define the destination, not the route.**
+Remember: **Specifications define the destination, not the path.**
