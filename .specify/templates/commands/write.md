@@ -1,8 +1,11 @@
 ---
-description: Выполнение конкретной задачи по написанию главы, создание контента с помощью ИИ
+description: Написание глав на основе списка задач, автоматическая загрузка контекста и правил валидации
+argument-hint: [номер главы или ID задачи]
+allowed-tools: Read(//**), Write(//stories/**/content/**), Bash(ls:*), Bash(find:*), Bash(wc:*), Bash(grep:*), Bash(*)
+model: claude-sonnet-4-5-20250929
 scripts:
-  sh: .specify/scripts/bash/write-chapter.sh
-  ps: .specify/scripts/powershell/write-chapter.ps1
+  sh: .specify/scripts/bash/check-writing-state.sh
+  ps: .specify/scripts/powershell/check-writing-state.ps1
 ---
 
 Выполнение задачи по написанию главы:

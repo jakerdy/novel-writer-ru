@@ -3,7 +3,8 @@
  * Преобразование существующего контента между различными методами письма
  */
 
-interface StoryContent {
+interface StoryContent
+{
   chapters: Chapter[];
   characters: Character[];
   worldSetting: WorldSetting;
@@ -11,7 +12,8 @@ interface StoryContent {
   currentMethod: string;
 }
 
-interface Chapter {
+interface Chapter
+{
   number: number;
   title: string;
   content: string;
@@ -19,42 +21,49 @@ interface Chapter {
   wordCount: number;
 }
 
-interface Character {
+interface Character
+{
   name: string;
   role: string;
   arc: string;
 }
 
-interface WorldSetting {
+interface WorldSetting
+{
   time: string;
   place: string;
   rules: string[];
 }
 
-interface ConversionMap {
+interface ConversionMap
+{
   chapters: ChapterMapping[];
   structuralNotes: string[];
   recommendations: string[];
   warnings: string[];
 }
 
-interface ChapterMapping {
+interface ChapterMapping
+{
   original: number[];
   target: string;
   description: string;
 }
 
-export class MethodConverter {
+export class MethodConverter
+{
   /**
    * Преобразование метода
    */
-  convert(content: StoryContent, targetMethod: string): ConversionMap {
+  convert(content: StoryContent, targetMethod: string): ConversionMap
+  {
     const sourceMethod = content.currentMethod;
 
     // Выбор стратегии преобразования в зависимости от исходного и целевого метода
     const converterKey = `${sourceMethod}_to_${targetMethod}`;
 
-    switch (converterKey) {
+    switch (converterKey)
+    {
       case 'three-act_to_hero-journey':
         return this.threeActToHeroJourney(content);
       case 'three-act_to_seven-point':
@@ -75,7 +84,8 @@ export class MethodConverter {
   /**
    * Структура из трех актов в Путешествие героя
    */
-  private threeActToHeroJourney(content: StoryContent): ConversionMap {
+  private threeActToHeroJourney(content: StoryContent): ConversionMap
+  {
     const totalChapters = content.chapters.length;
     const act1End = Math.floor(totalChapters * 0.25);
     const act2End = Math.floor(totalChapters * 0.75);
@@ -166,7 +176,8 @@ export class MethodConverter {
   /**
    * Структура из трех актов в семиточечную структуру
    */
-  private threeActToSevenPoint(content: StoryContent): ConversionMap {
+  private threeActToSevenPoint(content: StoryContent): ConversionMap
+  {
     const totalChapters = content.chapters.length;
 
     const mapping: ChapterMapping[] = [
@@ -230,7 +241,8 @@ export class MethodConverter {
   /**
    * Путешествие героя в структуру из трех актов
    */
-  private heroJourneyToThreeAct(content: StoryContent): ConversionMap {
+  private heroJourneyToThreeAct(content: StoryContent): ConversionMap
+  {
     const mapping: ChapterMapping[] = [
       {
         original: [1, 5], // Этапы 1-5
@@ -272,7 +284,8 @@ export class MethodConverter {
   /**
    * Путешествие героя в круг историй
    */
-  private heroJourneyToStoryCircle(content: StoryContent): ConversionMap {
+  private heroJourneyToStoryCircle(content: StoryContent): ConversionMap
+  {
     const mapping: ChapterMapping[] = [
       {
         original: [1], // Обычный мир
@@ -339,7 +352,8 @@ export class MethodConverter {
   /**
    * Круг историй в структуру из трех актов
    */
-  private storyCircleToThreeAct(content: StoryContent): ConversionMap {
+  private storyCircleToThreeAct(content: StoryContent): ConversionMap
+  {
     const mapping: ChapterMapping[] = [
       {
         original: [1, 2], // Ты + Потребность
@@ -381,7 +395,8 @@ export class MethodConverter {
   /**
    * Семиточечная структура в структуру из трех актов
    */
-  private sevenPointToThreeAct(content: StoryContent): ConversionMap {
+  private sevenPointToThreeAct(content: StoryContent): ConversionMap
+  {
     const mapping: ChapterMapping[] = [
       {
         original: [1, 2], // Крючок + PP1
@@ -421,37 +436,10 @@ export class MethodConverter {
   }
 
   /**
-   * Общее преобразование для неизвестных пар методов
-   */
-  private genericConversion(content: StoryContent, sourceMethod: string, targetMethod: string): ConversionMap {
-    // Здесь может быть реализована более общая логика преобразования,
-    // или просто возвращено сообщение об ошибке, если преобразование невозможно.
-    // Для примера вернем пустую карту с предупреждением.
-    console.warn(`Преобразование из ${sourceMethod} в ${targetMethod} не поддерживается напрямую.`);
-
-    return {
-      chapters: [],
-      structuralNotes: [
-        `Прямое преобразование из ${sourceMethod} в ${targetMethod} не реализовано. Требуется ручная адаптация.`
-      ],
-      recommendations: [
-        'Проанализируйте структуру исходного метода и целевого метода.',
-        'Вручную сопоставьте ключевые точки и этапы.',
-        'Убедитесь, что основные сюжетные линии и темы сохранены.'
-      ],
-      warnings: [
-        `Автоматическое преобразование из ${sourceMethod} в ${targetMethod} невозможно.`
-      ]
-    };
-  }
-}
-    return { chapters: mapping, structuralNotes: notes, recommendations, warnings };
-  }
-
-  /**
    * Общее преобразование (когда нет конкретных правил преобразования)
    */
-  private genericConversion(content: StoryContent, source: string, target: string): ConversionMap {
+  private genericConversion(content: StoryContent, source: string, target: string): ConversionMap
+  {
     const totalChapters = content.chapters.length;
 
     // Общее сопоставление на основе процентов
@@ -497,7 +485,8 @@ export class MethodConverter {
   /**
    * Генерация отчета о преобразовании
    */
-  generateConversionReport(content: StoryContent, targetMethod: string): string {
+  generateConversionReport(content: StoryContent, targetMethod: string): string
+  {
     const conversionMap = this.convert(content, targetMethod);
 
     let report = `# 📝 Отчет о преобразовании метода\n\n`;
@@ -510,7 +499,8 @@ export class MethodConverter {
     report += `## 📊 Сопоставление глав\n\n`;
     report += `| Исходные главы | Целевая структура | Описание |\n`;
     report += `|----------------|-------------------|----------|\n`;
-    conversionMap.chapters.forEach(mapping => {
+    conversionMap.chapters.forEach(mapping =>
+    {
       const range = mapping.original.length === 2
         ? `${mapping.original[0]}-${mapping.original[1]}`
         : `${mapping.original[0]}`;
@@ -518,18 +508,22 @@ export class MethodConverter {
     });
 
     report += `\n## 📌 Структурные примечания\n`;
-    conversionMap.structuralNotes.forEach(note => {
+    conversionMap.structuralNotes.forEach(note =>
+    {
       report += `- ${note}\n`;
     });
 
     report += `\n## ✅ Рекомендации\n`;
-    conversionMap.recommendations.forEach(rec => {
+    conversionMap.recommendations.forEach(rec =>
+    {
       report += `- ${rec}\n`;
     });
 
-    if (conversionMap.warnings.length > 0) {
+    if (conversionMap.warnings.length > 0)
+    {
       report += `\n## ⚠️ Предупреждения\n`;
-      conversionMap.warnings.forEach(warning => {
+      conversionMap.warnings.forEach(warning =>
+      {
         report += `- ${warning}\n`;
       });
     }
@@ -547,7 +541,8 @@ export class MethodConverter {
   /**
    * Получить китайское название метода
    */
-  private getMethodName(method: string): string {
+  private getMethodName(method: string): string
+  {
     const names: Record<string, string> = {
       'three-act': 'Трёхактная структура',
       'hero-journey': 'Путешествие героя',

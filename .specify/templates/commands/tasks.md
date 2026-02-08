@@ -1,5 +1,7 @@
 ---
-description: Разбить план творчества на список выполнимых задач
+description: Разбить творческий план на список выполнимых задач
+allowed-tools: Read(//stories/**/creative-plan.md), Read(stories/**/creative-plan.md), Read(//stories/**/specification.md), Read(stories/**/specification.md), Write(//stories/**/tasks.md), Write(stories/**/tasks.md), Bash(find:*), Bash(*)
+model: claude-sonnet-4-5-20250929
 scripts:
   sh: .specify/scripts/bash/tasks-story.sh
   ps: .specify/scripts/powershell/generate-tasks.ps1

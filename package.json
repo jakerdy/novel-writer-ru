@@ -9,24 +9,24 @@
     "chinese",
     "ai",
     "creative-writing",
-    "小说",
-    "创作",
-    "写作"
+    "translation"
   ],
-  "author": "Novel Writer Team",
+  "authors": [
+    "Novel Writer Team",
+    "JakErdy"
+  ],
   "license": "MIT",
   "main": "dist/cli.js",
   "bin": {
     "novel": "dist/cli.js"
   },
   "scripts": {
+    "postbuild": "node scripts/build/ensure-cli-exec.cjs",
     "build": "tsc",
-    "postbuild": "chmod +x dist/cli.js",
-    "build:commands": "bash scripts/build/generate-commands.sh --agents=claude,gemini,cursor,windsurf,roocode,copilot,qwen,opencode,codex,kilocode,auggie,codebuddy,q --scripts=sh",
+    "build:commands": "bash scripts/build/generate-commands.sh --agents=claude,gemini,cursor,windsurf,roocode,copilot,qwen,opencode,codex,kilocode,auggie,codebuddy,q --scripts=sh,ps",
     "dev": "tsx src/cli.ts",
     "start": "node dist/cli.js",
     "clean": "rm -rf dist",
-    "prepare": "npm run build:commands && npm run build",
     "prepublishOnly": "npm run clean && npm run build:commands && npm run build"
   },
   "dependencies": {
@@ -37,7 +37,8 @@
     "glob": "^10.3.10",
     "inquirer": "^9.2.12",
     "js-yaml": "^4.1.0",
-    "ora": "^8.0.1"
+    "ora": "^8.0.1",
+    "readable-stream": "^4.5.2"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",

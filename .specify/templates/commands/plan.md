@@ -1,5 +1,8 @@
 ---
-description: Разработка технического решения на основе уточненных спецификаций истории
+description: Разработка технического плана реализации на основе спецификации истории
+argument-hint: [технические предпочтения и выбор]
+allowed-tools: Read(//stories/**/specification.md), Read(stories/**/specification.md), Read(//stories/**/creative-plan.md), Read(stories/**/creative-plan.md), Read(//plugins/**), Read(plugins/**), Write(//stories/**/creative-plan.md), Write(stories/**/creative-plan.md), Read(//memory/constitution.md), Read(memory/constitution.md), Bash(find:*), Bash(grep:*), Bash(*)
+model: claude-sonnet-4-5-20250929
 scripts:
   sh: .specify/scripts/bash/plan-story.sh
   ps: .specify/scripts/powershell/plan-story.ps1

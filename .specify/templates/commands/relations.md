@@ -1,6 +1,9 @@
 ---
 name: relations
 description: Управление и отслеживание изменений в отношениях персонажей
+argument-hint: [update | show | history | check] [персонаж] [отношение] [целевой персонаж]
+allowed-tools: Read(//spec/tracking/relationships.json), Read(spec/tracking/relationships.json), Write(//spec/tracking/relationships.json), Write(spec/tracking/relationships.json), Bash(find:*), Bash(*)
+model: claude-sonnet-4-5-20250929
 scripts:
   sh: .specify/scripts/bash/manage-relations.sh
   ps: .specify/scripts/powershell/manage-relations.ps1

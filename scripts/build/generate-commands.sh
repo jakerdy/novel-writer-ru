@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Игнорировать SIGPIPE для предотвращения случайных ошибок 141
+trap '' PIPE
+
 # generate-commands.sh
 # На основе архитектуры spec-kit для генерации многоплатформенных команд для novel-writer
 # Поддерживает пространства имен для избежания конфликтов с spec-kit
@@ -53,12 +56,12 @@ generate_commands() {
     # Нормализация конца строки
     file_content=$(tr -d '\r' < "$template")
 
-    # Извлечение полей frontmatter
-    description=$(printf '%s\n' "$file_content" | awk '/^description:/ {sub(/^description:[[:space:]]*/, ""); print; exit}')
-    argument_hint=$(printf '%s\n' "$file_content" | awk '/^argument-hint:/ {sub(/^argument-hint:[[:space:]]*/, ""); print; exit}')
+    # Извлечение полей frontmatter (|| true предотвращает broken pipe)
+    description=$(echo "$file_content" | awk '/^description:/ {sub(/^description:[[:space:]]*/, ""); print; exit}' || true)
+    argument_hint=$(echo "$file_content" | awk '/^argument-hint:/ {sub(/^argument-hint:[[:space:]]*/, ""); print; exit}' || true)
 
     # Извлечение команды для соответствующего варианта скрипта
-    script_command=$(printf '%s\n' "$file_content" | awk -v sv="$script_variant" '/^[[:space:]]*'"$script_variant"':[[:space:]]*/ {sub(/^[[:space:]]*'"$script_variant"':[[:space:]]*/, ""); print; exit}')
+    script_command=$(echo "$file_content" | awk -v sv="$script_variant" '/^[[:space:]]*'"$script_variant"':[[:space:]]*/ {sub(/^[[:space:]]*'"$script_variant"':[[:space:]]*/, ""); print; exit}' || true)
 
     if [[ -z $script_command ]]; then
       echo "    ⚠️  Предупреждение: команда скрипта $script_variant не найдена в $template" >&2
@@ -66,25 +69,25 @@ generate_commands() {
     fi
 
     # Замена плейсхолдера {SCRIPT}
-    body=$(printf '%s\n' "$file_content" | sed "s|{SCRIPT}|${script_command}|g")
+    body=$(echo "$file_content" | sed "s|{SCRIPT}|${script_command}|g" || true)
 
     # Удаление секции scripts: (так как она уже заменена)
-    body=$(printf '%s\n' "$body" | awk '
+    body=$(echo "$body" | awk '
       /^---$/ { print; if (++dash_count == 1) in_frontmatter=1; else in_frontmatter=0; next }
       in_frontmatter && /^scripts:$/ { skip_scripts=1; next }
       in_frontmatter && /^[a-zA-Z].*:/ && skip_scripts { skip_scripts=0 }
       in_frontmatter && skip_scripts && /^[[:space:]]/ { next }
       { print }
-    ')
+    ' || true)
 
     # Применение других замен
-    body=$(printf '%s\n' "$body" | sed "s/{ARGS}/$arg_format/g" | sed "s/\$ARGUMENTS/$arg_format/g" | sed "s/__AGENT__/$agent/g" | rewrite_paths)
+    body=$(echo "$body" | sed "s/{ARGS}/$arg_format/g" | sed "s/\$ARGUMENTS/$arg_format/g" | sed "s/__AGENT__/$agent/g" | rewrite_paths || true)
 
     # Извлечение чистого содержимого prompt для Gemini (удаление YAML frontmatter)
-    prompt_body=$(printf '%s\n' "$body" | awk '
+    prompt_body=$(echo "$body" | awk '
       /^---$/ { if (++dash_count == 2) { in_content=1; next } next }
       in_content { print }
-    ')
+    ' || true)
 
     # Генерация вывода в зависимости от формата файла
     case $ext in
@@ -138,7 +141,8 @@ generate_commands() {
     esac
   done
 
-  echo "    ✅ Готово ($(ls "$output_dir" | wc -l | tr -d ' ') файлов)"
+  local file_count=$(find "$output_dir" -type f 2>/dev/null | wc -l | tr -d ' ')
+  echo "    ✅ Готово ($file_count файлов)"
 }
 
 # Копирование вспомогательных файлов в каталог сборки
@@ -225,6 +229,7 @@ build_variant() {
   echo
   echo "🏗️  Сборка для $agent ($script скрипт)..."
   echo "--------------------------------"
+  echo "    📋 Агент: $agent, Вариант скрипта: $script"
 
   local base_dir="$PROJECT_ROOT/dist/$agent"
   mkdir -p "$base_dir"
@@ -340,6 +345,12 @@ if [ ${#SCRIPTS[@]} -eq 0 ]; then
   SCRIPTS=("${ALL_SCRIPTS[@]}")
 fi
 
+echo
+echo "📋 Конфигурация сборки:"
+echo "  Платформы: ${AGENTS[*]}"
+echo "  Скрипты: ${SCRIPTS[*]}"
+echo
+
 # Запуск сборки для выбранных агентов и скриптов
 for script in "${SCRIPTS[@]}"; do
   for agent in "${AGENTS[@]}"; do
@@ -349,40 +360,9 @@ done
 
 echo
 echo "================================"
-echo "🔨 Сборка завершена."
-echo "   Результаты находятся в каталоге: $PROJECT_ROOT/dist"
-echo "================================"
-```
-      echo "Используйте --help для справки"
-      exit 1
-      ;;
-  esac
-done
-
-# Если не указано, использовать все
-[[ ${#AGENTS[@]} -eq 0 ]] && AGENTS=("${ALL_AGENTS[@]}")
-[[ ${#SCRIPTS[@]} -eq 0 ]] && SCRIPTS=("${ALL_SCRIPTS[@]}")
-
-echo "📋 Конфигурация сборки:"
-echo "  Платформы: ${AGENTS[*]}"
-echo "  Скрипты: ${SCRIPTS[*]}"
-
-# Выполнение сборки
-for agent in "${AGENTS[@]}"; do
-  for script in "${SCRIPTS[@]}"; do
-    build_variant "$agent" "$script"
-  done
-done
-
-echo
-echo "================================"
 echo "✅ Сборка завершена!"
 echo
 echo "📦 Результаты сборки находятся в: $PROJECT_ROOT/dist/"
-echo
-echo "Структура каталогов:"
-tree -L 3 "$PROJECT_ROOT/dist/" 2>/dev/null || find "$PROJECT_ROOT/dist/" -type d | head -20
-
 echo
 echo "💡 Подсказки:"
 echo "  - Пользователям Claude: используйте команды /novel.constitution, /novel.specify и т. д."

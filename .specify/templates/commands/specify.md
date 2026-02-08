@@ -1,5 +1,8 @@
 ---
-description: Define the story specifications and clarify what kind of work to create.
+description: Определение спецификации истории, уточнение какое произведение создавать
+argument-hint: [описание истории]
+allowed-tools: Read(//stories/**/specification.md), Read(stories/**/specification.md), Write(//stories/**/specification.md), Write(stories/**/specification.md), Read(//memory/constitution.md), Read(memory/constitution.md), Bash(find:*), Bash(*)
+model: claude-sonnet-4-5-20250929
 scripts:
   sh: .specify/scripts/bash/specify-story.sh --json
   ps: .specify/scripts/powershell/specify-story.ps1 -Json

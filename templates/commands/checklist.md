@@ -1,6 +1,6 @@
 ---
 name: checklist
-description: 生成或执行质量检查清单（规格验证 + 内容扫描）
+description: Создание или выполнение контрольного списка качества (проверка спецификаций + сканирование контента)
 allowed-tools: Read, Bash, Write, Edit, Glob, Grep
 model: claude-sonnet-4-5-20250929
 scripts:

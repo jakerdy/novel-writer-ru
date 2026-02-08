@@ -1,6 +1,8 @@
 ---
 name: track-init
 description: Инициализация системы отслеживания на основе данных трекера, установленных по плану истории
+allowed-tools: Read(//stories/**/specification.md), Read(stories/**/specification.md), Read(//stories/**/outline.md), Read(stories/**/outline.md), Read(//stories/**/creative-plan.md), Read(stories/**/creative-plan.md), Write(//spec/tracking/**), Write(spec/tracking/**), Bash(find:*), Bash(grep:*), Bash(wc:*), Bash(*)
+model: claude-sonnet-4-5-20250929
 scripts:
   sh: .specify/scripts/bash/init-tracking.sh
   ps: .specify/scripts/powershell/init-tracking.ps1

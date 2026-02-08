@@ -1,3 +1,14 @@
+---
+name: track
+description: Комплексное отслеживание прогресса и содержания написания романа
+argument-hint: [--brief | --plot | --stats | --check | --fix]
+allowed-tools: Read(//spec/tracking/**), Read(spec/tracking/**), Read(//stories/**), Read(stories/**), Bash(find:*), Bash(wc:*), Bash(grep:*), Bash(*)
+model: claude-sonnet-4-5-20250929
+scripts:
+  sh: .specify/scripts/bash/track-progress.sh
+  ps: .specify/scripts/powershell/track-progress.ps1
+---
+
 # Комплексное отслеживание прогресса
 
 Полное отображение всех аспектов прогресса и состояния создания романа.

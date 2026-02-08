@@ -1,3 +1,13 @@
+---
+description: Создание или обновление конституции написания романа, определяющей бескомпромиссные принципы творчества
+argument-hint: [описание творческих принципов]
+allowed-tools: Write(//memory/constitution.md), Write(memory/constitution.md), Read(//memory/**), Read(memory/**), Bash(find:*), Bash(*)
+model: claude-sonnet-4-5-20250929
+scripts:
+  sh: .specify/scripts/bash/constitution.sh
+  ps: .specify/scripts/powershell/constitution.ps1
+---
+
 Пользовательский ввод может быть предоставлен напрямую или в качестве аргументов командной строки — вы **обязаны** рассмотреть его перед продолжением (если он не пуст).
 
 Пользовательский ввод:

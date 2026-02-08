@@ -1,5 +1,5 @@
 ---
-description: 将创作计划分解为可执行的任务清单
+description: Разбейте свой творческий план на исполняемый список дел.
 allowed-tools: Read(//stories/**/creative-plan.md), Read(stories/**/creative-plan.md), Read(//stories/**/specification.md), Read(stories/**/specification.md), Write(//stories/**/tasks.md), Write(stories/**/tasks.md), Bash(find:*), Bash(*)
 model: claude-sonnet-4-5-20250929
 scripts:

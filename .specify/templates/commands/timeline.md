@@ -1,3 +1,14 @@
+---
+name: timeline
+description: Управление и проверка временной шкалы истории
+argument-hint: [add | check | show | sync]
+allowed-tools: Read(//spec/tracking/timeline.json), Read(spec/tracking/timeline.json), Write(//spec/tracking/timeline.json), Write(spec/tracking/timeline.json), Read(//stories/**/content/**), Read(stories/**/content/**), Bash(find:*), Bash(*)
+model: claude-sonnet-4-5-20250929
+scripts:
+  sh: .specify/scripts/bash/check-timeline.sh
+  ps: .specify/scripts/powershell/check-timeline.ps1
+---
+
 # Управление временной шкалой
 
 Ведение временной шкалы истории для обеспечения логической последовательности событий.
