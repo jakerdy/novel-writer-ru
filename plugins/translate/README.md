@@ -14,10 +14,10 @@ Novel Translation Plugin — это плагин для перевода, спе
 
 ## Способ установки
 
-Убедитесь, что novel-writer-cn установлен:
+Убедитесь, что novel-writer-ru установлен:
 
 ```bash
-npm install -g novel-writer-cn
+npm install -g novel-writer-ru
 ```
 
 Плагин будет установлен автоматически вместе с основной программой.

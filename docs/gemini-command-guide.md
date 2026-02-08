@@ -339,8 +339,8 @@ ls dist/claude/.claude/commands/
 npm pack --dry-run | grep dist/
 
 # Проверка файлов после установки
-npm list -g novel-writer-cn
-ls ~/.npm-global/lib/node_modules/novel-writer-cn/dist/
+npm list -g novel-writer-ru
+ls ~/.npm-global/lib/node_modules/novel-writer-ru/dist/
 ```
 
 ### Проблемы с пространством имён

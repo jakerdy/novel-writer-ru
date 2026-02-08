@@ -28,19 +28,19 @@ npm --version   # Должен отобразиться номер версии 
 Установите глобально с помощью npm:
 
 ```bash
-npm install -g novel-writer-cn
+npm install -g novel-writer-ru
 ```
 
 Или с помощью yarn:
 
 ```bash
-yarn global add novel-writer-cn
+yarn global add novel-writer-ru
 ```
 
 Или с помощью pnpm:
 
 ```bash
-pnpm add -g novel-writer-cn
+pnpm add -g novel-writer-ru
 ```
 
 ### 3. Проверка установки
@@ -151,7 +151,7 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 **macOS/Linux**:
 ```bash
 # Установите с помощью sudo
-sudo npm install -g novel-writer-cn
+sudo npm install -g novel-writer-ru
 ```
 
 ### В: Отображается сообщение "command not found"
@@ -198,17 +198,17 @@ novel init wo-de-xiao-shuo
 novel --version
 
 # Обновление до последней версии
-npm update -g novel-writer-cn
+npm update -g novel-writer-ru
 
 # Или переустановите
-npm uninstall -g novel-writer-cn
-npm install -g novel-writer-cn
+npm uninstall -g novel-writer-ru
+npm install -g novel-writer-ru
 ```
 
 ## Удаление
 
 ```bash
-npm uninstall -g novel-writer-cn
+npm uninstall -g novel-writer-ru
 ```
 
 ## Получение помощи

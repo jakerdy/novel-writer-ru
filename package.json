@@ -1,5 +1,5 @@
 {
-  "name": "novel-writer-cn",
+  "name": "novel-writer-ru",
   "version": "0.20.0",
   "type": "module",
   "description": "Инструмент для создания китайских романов на базе ИИ — умный помощник по написанию, основанный на структурированном рабочем процессе",
@@ -27,8 +27,7 @@
     "start": "node dist/cli.js",
     "clean": "rm -rf dist",
     "prepare": "npm run build:commands && npm run build",
-    "prepublishOnly": "npm run clean && npm run build:commands && npm run build",
-    "rename-chinese": "node scripts/rename-chinese-files.js"
+    "prepublishOnly": "npm run clean && npm run build:commands && npm run build"
   },
   "dependencies": {
     "@commander-js/extra-typings": "^12.0.0",
@@ -55,10 +54,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/wordflowlab/novel-writer"
+    "url": "https://github.com/jakerdy/novel-writer-ru"
   },
-  "homepage": "https://github.com/wordflowlab/novel-writer#readme",
+  "homepage": "https://github.com/jakerdy/novel-writer-ru#readme",
   "bugs": {
-    "url": "https://github.com/wordflowlab/novel-writer/issues"
+    "url": "https://github.com/jakerdy/novel-writer-ru/issues"
   }
 }

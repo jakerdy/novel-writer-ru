@@ -328,7 +328,7 @@
 ### Установка Novel Writer
 
 ```bash
-npm install -g novel-writer-cn
+npm install -g novel-writer-ru
 ```
 
 ### Инициализация проекта
